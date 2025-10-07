@@ -84,7 +84,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: Colors.grey,
                           ),
                         ),
-                        
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Đăng nhập',
+                          style: TextStyle(
+                            fontSize: 24,
+                            color: Colors.deepPurple,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 32),
                         TextFormField(
                           controller: _emailController,
