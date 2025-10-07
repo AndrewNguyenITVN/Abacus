@@ -201,7 +201,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             const Text('Đã có tài khoản?'),
                             TextButton(
                               onPressed: () {
-                                
+                                Navigator.pop(context); 
                               },
                               child: const Text('Đăng nhập'),
                             ),
