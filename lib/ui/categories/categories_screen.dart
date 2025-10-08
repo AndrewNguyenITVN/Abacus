@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '/models/category.dart';
 import '/ui/shared/app_drawer.dart';
+import '/models/category.dart';
+import '/ui/categories/categories_manager.dart';
 
 // Helper functions to mock dialogs and helpers from the original project
 Color _parseColor(String hexCode) {
@@ -26,20 +27,6 @@ IconData _getIconData(String iconName) {
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({super.key});
 
-  // Dummy data
-  static final List<Category> _expenseCategories = [
-    Category(id: '1', name: 'Ăn uống', icon: 'restaurant', color: '#FF5722', type: 'expense', isDefault: true),
-    Category(id: '2', name: 'Mua sắm', icon: 'shopping_bag', color: '#4CAF50', type: 'expense', isDefault: true),
-    Category(id: '3', name: 'Di chuyển', icon: 'local_gas_station', color: '#2196F3', type: 'expense', isDefault: false),
-    Category(id: '4', name: 'Nhà cửa', icon: 'house', color: '#9C27B0', type: 'expense', isDefault: true),
-  ];
-
-  static final List<Category> _incomeCategories = [
-    Category(id: '5', name: 'Lương', icon: 'work', color: '#8BC34A', type: 'income', isDefault: true),
-    Category(id: '6', name: 'Thưởng', icon: 'attach_money', color: '#FFC107', type: 'income', isDefault: false),
-  ];
-
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -57,8 +44,8 @@ class CategoriesScreen extends StatelessWidget {
         drawer: const AppDrawer(),
         body: TabBarView(
           children: [
-            _buildCategoryList(context, _expenseCategories),
-            _buildCategoryList(context, _incomeCategories),
+            _buildCategoryList(context, CategoriesManager().expenseCategories),
+            _buildCategoryList(context, CategoriesManager().incomeCategories),
           ],
         ),
         floatingActionButton: FloatingActionButton(

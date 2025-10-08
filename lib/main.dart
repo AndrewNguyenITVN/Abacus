@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'ui/auth/login_screen.dart';
+import 'ui/categories/categories_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,7 +33,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      //home: const LoginScreen(),
+      home: const CategoriesScreen(),
     );
   }
 }
