@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'ui/auth/login_screen.dart';
 import 'ui/categories/categories_screen.dart';
+
 import 'ui/bottom_nav_bar_screen.dart';
 
 void main() {
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       //home: const LoginScreen(),
+
       //home: const CategoriesScreen(),
       home: const BottomNavBarScreen(),
     );
