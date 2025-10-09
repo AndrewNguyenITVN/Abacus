@@ -34,6 +34,17 @@ class CategoriesScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Danh mục'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                // Mock FAB action
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Chức năng thêm danh mục chưa được cài đặt.')),
+                );
+              },
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Chi tiêu'),
@@ -47,15 +58,6 @@ class CategoriesScreen extends StatelessWidget {
             _buildCategoryList(context, CategoriesManager().expenseCategories),
             _buildCategoryList(context, CategoriesManager().incomeCategories),
           ],
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Mock FAB action
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Chức năng thêm danh mục chưa được cài đặt.')),
-            );
-          },
-          child: const Icon(Icons.add),
         ),
       ),
     );
