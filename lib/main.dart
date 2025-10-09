@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'ui/auth/login_screen.dart';
 import 'ui/categories/categories_screen.dart';
-
 import 'ui/bottom_nav_bar_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('vi_VN', null);
   runApp(const MyApp());
 }
 
