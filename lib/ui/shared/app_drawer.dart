@@ -24,22 +24,19 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Trang chủ'),
+            leading: const Icon(Icons.notifications),
+            title: const Text('Thông báo'),
             onTap: () {
               // Later will navigate to home
               Navigator.pop(context);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.category),
-            title: const Text('Danh mục'),
+            leading: const Icon(Icons.receipt_long),
+            title: const Text('Giao dịch'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CategoriesScreen()),
-              );
+              
             },
           ),
           const Divider(),
