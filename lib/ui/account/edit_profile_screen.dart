@@ -48,7 +48,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       initialDate: _selectedDate ?? DateTime(2000),
       firstDate: DateTime(1950),
       lastDate: DateTime.now(),
-      locale: const Locale('vi', 'VN'),
     );
     
     if (picked != null && picked != _selectedDate) {
