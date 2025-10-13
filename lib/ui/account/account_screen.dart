@@ -16,6 +16,14 @@ class AccountScreen extends StatelessWidget {
               // Header Section
               _buildHeader(context),
               const SizedBox(height: 12),
+
+              // Action Buttons
+              _buildActionButtons(),
+              const SizedBox(height: 16),
+              
+              // Utilities Section
+              // _buildUtilitiesSection(),
+              // const SizedBox(height: 16),
               
               // Settings Section
               _buildSettingsSection(context),
@@ -150,6 +158,59 @@ class AccountScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildActionButtons() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildActionButton(Icons.account_balance_wallet, 'Quản lý\n chi tiêu'),
+            _buildActionButton(Icons.settings, 'Cài đặt\nthanh toán'),
+            _buildActionButton(Icons.security, 'Đăng nhập\nvà bảo mật'),
+            _buildActionButton(Icons.notifications, 'Cài đặt\nthông báo'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(IconData icon, String label) {
+  return Column(
+    children: [
+      Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.purple.shade50,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(icon, color: Colors.deepPurple, size: 28),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        label,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 11,
+          color: Colors.black87,
+        ),
+      ),
+    ],
+  );
+}
 
   Widget _buildSettingsSection(BuildContext context) {
     return Padding(
