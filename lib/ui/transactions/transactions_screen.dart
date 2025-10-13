@@ -5,6 +5,7 @@ import '/models/transaction.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/shared/app_drawer.dart';
 import '/ui/transactions/transactions_manager.dart';
+import '/ui/transactions/edit_transaction_screen.dart';
 
 // Helper functions to mock dialogs and helpers from the original project
 Color _parseColor(String hexCode) {
@@ -180,24 +181,35 @@ class TransactionsScreen extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: _parseColor(category.color),
-          child: Icon(
-            _getIconData(category.icon),
-            color: Colors.white,
-          ),
-        ),
-        title: Text(transaction.description),
-        subtitle: Text(category.name),
-        trailing: Text(
-          '${isIncome ? '+' : '-'}${currencyFormat.format(transaction.amount)}',
-          style: TextStyle(
-            color: isIncome ? Colors.green : Colors.red,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
+      child: Builder(
+        builder: (context) {
+          return ListTile(
+            leading: CircleAvatar(
+              backgroundColor: _parseColor(category.color),
+              child: Icon(
+                _getIconData(category.icon),
+                color: Colors.white,
+              ),
+            ),
+            title: Text(transaction.description),
+            subtitle: Text(category.name),
+            trailing: Text(
+              '${isIncome ? '+' : '-'}${currencyFormat.format(transaction.amount)}',
+              style: TextStyle(
+                color: isIncome ? Colors.green : Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EditTransactionScreen(transaction: transaction),
+                ),
+              );
+            },
+          );
+        }
       ),
     );
   }
