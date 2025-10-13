@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '/ui/auth/login_screen.dart';
+import '/ui/account/edit_profile_screen.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -117,18 +118,21 @@ class AccountScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              // Theme Button
+              // Edit Profile Button
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.palette_outlined),
+                  icon: const Icon(Icons.edit_outlined),
                   color: Colors.deepPurple,
+                  tooltip: 'Chỉnh sửa thông tin',
                   onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đổi hình nền')),
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const EditProfileScreen(),
+                      ),
                     );
                   },
                 ),
@@ -271,10 +275,10 @@ class AccountScreen extends StatelessWidget {
             _buildDivider(),
             _buildSettingItem(
               Icons.palette_outlined,
-              'Đổi hình nền',
+              'Đổi màu nền',
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đổi hình nền')),
+                  const SnackBar(content: Text('Đổi màu nền')),
                 );
               },
             ),
