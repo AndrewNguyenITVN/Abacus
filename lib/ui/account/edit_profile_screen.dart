@@ -85,6 +85,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         const SnackBar(
           content: Text('Cập nhật thông tin thành công'),
           backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
         ),
       );
       
