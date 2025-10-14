@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../models/account.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  final Account account;
+
+  const EditProfileScreen({super.key, required this.account});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -24,12 +27,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     // Load existing user data
-    _fullNameController.text = 'Nguyễn Minh Nhựt';
-    _emailController.text = 'nminhut@example.com';
-    _phoneController.text = '0389xxxx44';
-    _addressController.text = 'TP. Hồ Chí Minh';
-    _dobController.text = '01/01/2000';
-    _selectedDate = DateTime(2000, 1, 1);
+    _fullNameController.text = widget.account.fullName;
+    _emailController.text = widget.account.email;
+    _phoneController.text = widget.account.phone;
+    _addressController.text = widget.account.address;
+    _selectedDate = widget.account.dateOfBirth;
+    _dobController.text =
+        '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}';
+    _selectedGender = widget.account.gender;
   }
   
   @override
@@ -60,13 +65,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   
   void _saveProfile() {
     if (_formKey.currentState!.validate()) {
+      final updatedAccount = widget.account.copyWith(
+        fullName: _fullNameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        address: _addressController.text,
+        dateOfBirth: _selectedDate,
+        gender: _selectedGender,
+      );
       // Log for now (in a real app, you would update user profile in database)
-      print('Full Name: ${_fullNameController.text}');
-      print('Email: ${_emailController.text}');
-      print('Phone: ${_phoneController.text}');
-      print('Address: ${_addressController.text}');
-      print('Date of Birth: ${_dobController.text}');
-      print('Gender: $_selectedGender');
+      print('Full Name: ${updatedAccount.fullName}');
+      print('Email: ${updatedAccount.email}');
+      print('Phone: ${updatedAccount.phone}');
+      print('Address: ${updatedAccount.address}');
+      print('Date of Birth: ${updatedAccount.dateOfBirth}');
+      print('Gender: ${updatedAccount.gender}');
       
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -76,7 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       
       // Return to previous screen
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(updatedAccount);
     }
   }
   
@@ -164,7 +177,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     child: Center(
                       child: Text(
-                        'NM',
+                        widget.account.initials ?? 'NA',
                         style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,

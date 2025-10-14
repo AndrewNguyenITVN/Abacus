@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/account.dart';
 import '/ui/auth/login_screen.dart';
 import '/ui/account/edit_profile_screen.dart';
+import '/ui/account/account_manager.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final accountManager = Provider.of<AccountManager>(context);
+    final account = accountManager.account;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
@@ -15,7 +22,7 @@ class AccountScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Section
-              _buildHeader(context),
+              _buildHeader(context, account),
               const SizedBox(height: 12),
 
               // Action Buttons
@@ -44,7 +51,7 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, Account account) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -83,7 +90,7 @@ class AccountScreen extends StatelessWidget {
                     ),
                     child: Center(
                       child: Text(
-                        'NM',
+                        account.initials ?? 'NA',
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -94,28 +101,31 @@ class AccountScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   // Verified Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.check_circle, color: Colors.white, size: 14),
-                        SizedBox(width: 4),
-                        Text(
-                          'Đã xác thực',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
+                  if (account.isVerified)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.check_circle,
+                              color: Colors.white, size: 14),
+                          SizedBox(width: 4),
+                          Text(
+                            'Đã xác thực',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
               // Edit Profile Button
@@ -128,12 +138,15 @@ class AccountScreen extends StatelessWidget {
                   icon: const Icon(Icons.edit_outlined),
                   color: Colors.deepPurple,
                   tooltip: 'Chỉnh sửa thông tin',
-                  onPressed: () {
-                    Navigator.of(context).push(
+                  onPressed: () async {
+                    final result = await Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => const EditProfileScreen(),
+                        builder: (context) => EditProfileScreen(account: account),
                       ),
                     );
+                    if (result != null && result is Account) {
+                      context.read<AccountManager>().updateAccount(result);
+                    }
                   },
                 ),
               ),
@@ -141,9 +154,9 @@ class AccountScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           // Name
-          const Text(
-            'Nguyễn Minh Nhựt',
-            style: TextStyle(
+          Text(
+            account.fullName,
+            style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -151,9 +164,9 @@ class AccountScreen extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           // Phone
-          const Text(
-            '0389xxxx44',
-            style: TextStyle(
+          Text(
+            account.phone,
+            style: const TextStyle(
               fontSize: 16,
               color: Colors.black54,
             ),
