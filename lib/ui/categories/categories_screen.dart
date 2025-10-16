@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '/ui/shared/app_drawer.dart';
 import '/models/category.dart';
 import '/ui/categories/categories_manager.dart';
+import '/ui/categories/edit_category_screen.dart';
 
 // Helper functions to mock dialogs and helpers from the original project
 Color _parseColor(String hexCode) {
@@ -19,51 +20,142 @@ IconData _getIconData(String iconName) {
     'school': Icons.school,
     'work': Icons.work,
     'attach_money': Icons.attach_money,
+    'local_hospital': Icons.local_hospital,
+    'fitness_center': Icons.fitness_center,
+    'flight': Icons.flight,
+    'phone': Icons.phone,
+    'computer': Icons.computer,
+    'directions_car': Icons.directions_car,
+    'pets': Icons.pets,
+    'games': Icons.games,
   };
   return iconMap[iconName] ?? Icons.help_outline;
 }
 
 
-class CategoriesScreen extends StatelessWidget {
+class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Danh mục'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                // Mock FAB action
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Chức năng thêm danh mục chưa được cài đặt.')),
-                );
-              },
-            ),
-          ],
-          bottom: const TabBar(
-            tabs: [
-              Tab(text: 'Chi tiêu'),
-              Tab(text: 'Thu nhập'),
-            ],
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final CategoriesManager _categoriesManager = CategoriesManager();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _categoriesManager.addListener(_onCategoriesChanged);
+  }
+
+  @override
+  void dispose() {
+    _categoriesManager.removeListener(_onCategoriesChanged);
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _onCategoriesChanged() {
+    setState(() {});
+  }
+
+  Future<void> _addCategory() async {
+    final type = _tabController.index == 0 ? 'expense' : 'income';
+    final result = await Navigator.push<Category>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCategoryScreen(type: type),
+      ),
+    );
+
+    if (result != null && mounted) {
+      _categoriesManager.addCategory(result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã thêm danh mục mới')),
+      );
+    }
+  }
+
+  Future<void> _editCategory(Category category) async {
+    final result = await Navigator.push<Category>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditCategoryScreen(
+          category: category,
+          type: category.type,
+        ),
+      ),
+    );
+
+    if (result != null && mounted) {
+      _categoriesManager.updateCategory(result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã cập nhật danh mục')),
+      );
+    }
+  }
+
+  Future<void> _deleteCategory(Category category) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xác nhận xóa'),
+        content: Text('Bạn có chắc chắn muốn xóa danh mục "${category.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Hủy'),
           ),
-        ),
-        drawer: const AppDrawer(),
-        body: TabBarView(
-          children: [
-            _buildCategoryList(context, CategoriesManager().expenseCategories),
-            _buildCategoryList(context, CategoriesManager().incomeCategories),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      _categoriesManager.deleteCategory(category.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Đã xóa danh mục')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Danh mục'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: _addCategory,
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Chi tiêu'),
+            Tab(text: 'Thu nhập'),
           ],
         ),
+      ),
+      drawer: const AppDrawer(),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildCategoryList(_categoriesManager.expenseCategories),
+          _buildCategoryList(_categoriesManager.incomeCategories),
+        ],
       ),
     );
   }
 
-  Widget _buildCategoryList(BuildContext context, List<Category> categories) {
+  Widget _buildCategoryList(List<Category> categories) {
     if (categories.isEmpty) {
       return const Center(child: Text('Chưa có danh mục nào'));
     }
@@ -91,19 +183,11 @@ class CategoriesScreen extends StatelessWidget {
                 ? null
                 : IconButton(
                     icon: const Icon(Icons.delete),
-                    onPressed: () {
-                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Chức năng xóa chưa được cài đặt.')),
-                      );
-                    },
+                    onPressed: () => _deleteCategory(category),
                   ),
             onTap: category.isDefault
                 ? null
-                : () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Chức năng sửa chưa được cài đặt.')),
-                    );
-                  }
+                : () => _editCategory(category),
           ),
         );
       },
