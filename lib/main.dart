@@ -1,8 +1,8 @@
 import 'ui/account/account_manager.dart';
+import 'ui/categories/categories_manager.dart';
+import 'ui/transactions/transactions_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'ui/auth/login_screen.dart';
-import 'ui/categories/categories_screen.dart';
 import 'ui/bottom_nav_bar_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -13,6 +13,14 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => AccountManager()),
+        ChangeNotifierProvider(create: (context) => CategoriesManager()),
+        ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
+          create: (context) => TransactionsManager(
+            Provider.of<CategoriesManager>(context, listen: false),
+          ),
+          update: (context, categoriesManager, previousTransactionsManager) =>
+              previousTransactionsManager ?? TransactionsManager(categoriesManager),
+        ),
       ],
       child: const MyApp(),
     ),
