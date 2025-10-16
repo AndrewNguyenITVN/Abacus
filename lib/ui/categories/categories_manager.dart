@@ -1,36 +1,36 @@
-import 'package:flutter/material.dart';
-import '/models/category.dart';
+import 'package:flutter/foundation.dart';
+import '../../models/my_category.dart';
 
 class CategoriesManager extends ChangeNotifier {
-  final List<Category> _expenseCategories = [
-    Category(id: '1', name: 'Ăn uống', icon: 'restaurant', color: '#FF5722', type: 'expense', isDefault: true),
-    Category(id: '2', name: 'Mua sắm', icon: 'shopping_bag', color: '#4CAF50', type: 'expense', isDefault: true),
-    Category(id: '3', name: 'Di chuyển', icon: 'local_gas_station', color: '#2196F3', type: 'expense', isDefault: false),
-    Category(id: '4', name: 'Nhà cửa', icon: 'house', color: '#9C27B0', type: 'expense', isDefault: true),
+  final List<MyCategory> _expenseCategories = [
+    MyCategory(id: '1', name: 'Ăn uống', icon: 'restaurant', color: '#FF5722', type: 'expense', isDefault: true),
+    MyCategory(id: '2', name: 'Mua sắm', icon: 'shopping_bag', color: '#4CAF50', type: 'expense', isDefault: true),
+    MyCategory(id: '3', name: 'Di chuyển', icon: 'local_gas_station', color: '#2196F3', type: 'expense', isDefault: false),
+    MyCategory(id: '4', name: 'Nhà cửa', icon: 'house', color: '#9C27B0', type: 'expense', isDefault: true),
   ];
 
-  final List<Category> _incomeCategories = [
-    Category(id: '5', name: 'Lương', icon: 'work', color: '#8BC34A', type: 'income', isDefault: true),
-    Category(id: '6', name: 'Thưởng', icon: 'attach_money', color: '#FFC107', type: 'income', isDefault: false),
+  final List<MyCategory> _incomeCategories = [
+    MyCategory(id: '5', name: 'Lương', icon: 'work', color: '#8BC34A', type: 'income', isDefault: true),
+    MyCategory(id: '6', name: 'Thưởng', icon: 'attach_money', color: '#FFC107', type: 'income', isDefault: false),
   ];
 
-  List<Category> get expenseCategories => List.unmodifiable(_expenseCategories);
-  List<Category> get incomeCategories => List.unmodifiable(_incomeCategories);
+  List<MyCategory> get expenseCategories => List.unmodifiable(_expenseCategories);
+  List<MyCategory> get incomeCategories => List.unmodifiable(_incomeCategories);
 
   int get itemCount {
     return _expenseCategories.length + _incomeCategories.length;
   }
 
-  List<Category> get items {
+  List<MyCategory> get items {
     return [..._expenseCategories, ..._incomeCategories];
   }
 
-  List<Category> get favoriteItems {
+  List<MyCategory> get favoriteItems {
     return items.where((item) => item.isDefault).toList();
   }
 
   // Thêm danh mục mới
-  void addCategory(Category category) {
+  void addCategory(MyCategory category) {
     if (category.type == 'expense') {
       _expenseCategories.add(category);
     } else {
@@ -40,7 +40,7 @@ class CategoriesManager extends ChangeNotifier {
   }
 
   // Sửa danh mục
-  void updateCategory(Category category) {
+  void updateCategory(MyCategory category) {
     if (category.type == 'expense') {
       final index = _expenseCategories.indexWhere((c) => c.id == category.id);
       if (index != -1) {

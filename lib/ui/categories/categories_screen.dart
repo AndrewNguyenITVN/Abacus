@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/ui/shared/app_drawer.dart';
-import '/models/category.dart';
+import '../../models/my_category.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/categories/edit_category_screen.dart';
 
@@ -42,29 +43,23 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final CategoriesManager _categoriesManager = CategoriesManager();
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _categoriesManager.addListener(_onCategoriesChanged);
   }
 
   @override
   void dispose() {
-    _categoriesManager.removeListener(_onCategoriesChanged);
     _tabController.dispose();
     super.dispose();
   }
 
-  void _onCategoriesChanged() {
-    setState(() {});
-  }
-
   Future<void> _addCategory() async {
+    final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
     final type = _tabController.index == 0 ? 'expense' : 'income';
-    final result = await Navigator.push<Category>(
+    final result = await Navigator.push<MyCategory>(
       context,
       MaterialPageRoute(
         builder: (context) => EditCategoryScreen(type: type),
@@ -72,15 +67,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (result != null && mounted) {
-      _categoriesManager.addCategory(result);
+      categoriesManager.addCategory(result);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đã thêm danh mục mới')),
       );
     }
   }
 
-  Future<void> _editCategory(Category category) async {
-    final result = await Navigator.push<Category>(
+  Future<void> _editCategory(MyCategory category) async {
+    final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
+    final result = await Navigator.push<MyCategory>(
       context,
       MaterialPageRoute(
         builder: (context) => EditCategoryScreen(
@@ -91,14 +87,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (result != null && mounted) {
-      _categoriesManager.updateCategory(result);
+      categoriesManager.updateCategory(result);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đã cập nhật danh mục')),
       );
     }
   }
 
-  Future<void> _deleteCategory(Category category) async {
+  Future<void> _deleteCategory(MyCategory category) async {
+    final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -118,7 +115,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (confirmed == true && mounted) {
-      _categoriesManager.deleteCategory(category.id);
+      categoriesManager.deleteCategory(category.id);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đã xóa danh mục')),
       );
@@ -127,6 +124,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
+    final categoriesManager = context.watch<CategoriesManager>();
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Danh mục'),
@@ -148,14 +147,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildCategoryList(_categoriesManager.expenseCategories),
-          _buildCategoryList(_categoriesManager.incomeCategories),
+          _buildCategoryList(categoriesManager.expenseCategories),
+          _buildCategoryList(categoriesManager.incomeCategories),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryList(List<Category> categories) {
+  Widget _buildCategoryList(List<MyCategory> categories) {
     if (categories.isEmpty) {
       return const Center(child: Text('Chưa có danh mục nào'));
     }

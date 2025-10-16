@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '/models/category.dart';
+import '../../models/my_category.dart';
 
 class EditCategoryScreen extends StatefulWidget {
-  final Category? category; // null khi thêm mới
+  final MyCategory? category; // null khi thêm mới
   final String type; // 'expense' hoặc 'income'
 
   const EditCategoryScreen({
@@ -77,7 +77,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
 
   void _saveCategory() {
     if (_formKey.currentState!.validate()) {
-      final category = Category(
+      final category = MyCategory(
         id: widget.category?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text.trim(),
         icon: _selectedIcon,
