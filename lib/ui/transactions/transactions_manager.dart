@@ -1,15 +1,16 @@
+import 'package:flutter/foundation.dart';
 import '/models/transaction.dart';
 import '/ui/categories/categories_manager.dart';
 
-class TransactionsManager {
-  final CategoriesManager _categoriesManager = CategoriesManager();
+class TransactionsManager extends ChangeNotifier {
+  final CategoriesManager categoriesManager;
 
   final List<Transaction> _transactions = [];
 
-  TransactionsManager() {
+  TransactionsManager(this.categoriesManager) {
     final now = DateTime.now();
-    final expenseCategories = _categoriesManager.expenseCategories;
-    final incomeCategories = _categoriesManager.incomeCategories;
+    final expenseCategories = categoriesManager.expenseCategories;
+    final incomeCategories = categoriesManager.incomeCategories;
     _transactions.addAll([
       Transaction(
         id: 't1',
@@ -73,4 +74,25 @@ class TransactionsManager {
   }
 
   double get balance => totalIncome - totalExpense;
+
+  // Thêm transaction mới
+  void addTransaction(Transaction transaction) {
+    _transactions.add(transaction);
+    notifyListeners();
+  }
+
+  // Cập nhật transaction
+  void updateTransaction(Transaction transaction) {
+    final index = _transactions.indexWhere((t) => t.id == transaction.id);
+    if (index != -1) {
+      _transactions[index] = transaction;
+      notifyListeners();
+    }
+  }
+
+  // Xóa transaction
+  void deleteTransaction(String id) {
+    _transactions.removeWhere((t) => t.id == id);
+    notifyListeners();
+  }
 }

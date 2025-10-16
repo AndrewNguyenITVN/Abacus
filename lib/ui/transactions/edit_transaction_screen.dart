@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../models/category.dart';
+import 'package:provider/provider.dart';
+import '../../models/my_category.dart';
 import '../../models/transaction.dart';
 import '../categories/categories_manager.dart';
+import '../transactions/transactions_manager.dart';
 
 enum TransactionType { expense, income }
 
@@ -17,8 +19,7 @@ class EditTransactionScreen extends StatefulWidget {
 
 class _EditTransactionScreenState extends State<EditTransactionScreen> {
   late TransactionType _selectedType;
-  final _categoriesManager = CategoriesManager();
-  late List<Category> _categories;
+  late List<MyCategory> _categories;
   late String? _selectedCategoryId;
 
   final _formKey = GlobalKey<FormState>();
@@ -51,10 +52,11 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   }
 
   void _updateCategories() {
+    final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
     setState(() {
       _categories = _selectedType == TransactionType.expense
-          ? _categoriesManager.expenseCategories
-          : _categoriesManager.incomeCategories;
+          ? categoriesManager.expenseCategories
+          : categoriesManager.incomeCategories;
       
       // Check if current category exists in new category list
       final categoryExists = _categories.any((c) => c.id == _selectedCategoryId);
@@ -90,25 +92,29 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
   void _saveTransaction() {
     if (_formKey.currentState!.validate()) {
+      final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
       final amount = double.parse(_amountController.text.replaceAll('.', ''));
       final description = _descriptionController.text;
       final note = _noteController.text;
-      final categoryId = _selectedCategoryId;
+      final categoryId = _selectedCategoryId!;
       final type = _selectedType.toString().split('.').last;
 
-      // Log for now (in a real app, you would update the transaction in a database)
-      print('Updated Transaction ID: ${widget.transaction.id}');
-      print('Amount: $amount');
-      print('Description: $description');
-      print('Note: $note');
-      print('Category ID: $categoryId');
-      print('Type: $type');
+      final updatedTransaction = Transaction(
+        id: widget.transaction.id,
+        amount: amount,
+        description: description,
+        date: widget.transaction.date,
+        categoryId: categoryId,
+        type: type,
+        note: note.isEmpty ? null : note,
+      );
+
+      transactionsManager.updateTransaction(updatedTransaction);
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Đã cập nhật giao dịch')),
       );
 
-      // Return to previous screen
       Navigator.of(context).pop();
     }
   }
@@ -127,8 +133,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
             ),
             TextButton(
               onPressed: () {
-                // Log for now (in a real app, you would delete from database)
-                print('Deleted Transaction ID: ${widget.transaction.id}');
+                final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
+                transactionsManager.deleteTransaction(widget.transaction.id);
                 
                 Navigator.of(context).pop(); // Close dialog
                 Navigator.of(context).pop(); // Return to transactions screen
@@ -222,7 +228,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                     _selectedCategoryId = newValue!;
                   });
                 },
-                items: _categories.map<DropdownMenuItem<String>>((Category category) {
+                items: _categories.map<DropdownMenuItem<String>>((MyCategory category) {
                   return DropdownMenuItem<String>(
                     value: category.id,
                     child: Text(category.name),

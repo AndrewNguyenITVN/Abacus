@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../models/category.dart';
+import 'package:provider/provider.dart';
+import '../../models/my_category.dart';
+import '../../models/transaction.dart';
 import '../categories/categories_manager.dart';
+import '../transactions/transactions_manager.dart';
 
 enum TransactionType { expense, income }
 
@@ -14,8 +17,7 @@ class AddTransactionScreen extends StatefulWidget {
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
   TransactionType _selectedType = TransactionType.expense;
-  final _categoriesManager = CategoriesManager();
-  late List<Category> _categories;
+  late List<MyCategory> _categories;
   String? _selectedCategoryId;
 
   final _formKey = GlobalKey<FormState>();
@@ -30,10 +32,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 
   void _updateCategories() {
+    final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
     setState(() {
       _categories = _selectedType == TransactionType.expense
-          ? _categoriesManager.expenseCategories
-          : _categoriesManager.incomeCategories;
+          ? categoriesManager.expenseCategories
+          : categoriesManager.incomeCategories;
       _selectedCategoryId = null;
     });
   }
@@ -128,7 +131,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     _selectedCategoryId = newValue!;
                   });
                 },
-                items: _categories.map<DropdownMenuItem<String>>((Category category) {
+                items: _categories.map<DropdownMenuItem<String>>((MyCategory category) {
                   return DropdownMenuItem<String>(
                     value: category.id,
                     child: Text(category.name),
@@ -150,20 +153,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
+                    final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
                     final amount = double.parse(_amountController.text.replaceAll('.', ''));
                     final description = _descriptionController.text;
-                    final categoryId = _selectedCategoryId;
+                    final categoryId = _selectedCategoryId!;
                     final type = _selectedType.toString().split('.').last;
 
-                    // Log for now
-                    print('Amount: $amount');
-                    print('Description: $description');
-                    print('Category ID: $categoryId');
-                    print('Type: $type');
+                    final newTransaction = Transaction(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      amount: amount,
+                      description: description,
+                      date: DateTime.now(),
+                      categoryId: categoryId,
+                      type: type,
+                    );
+
+                    transactionsManager.addTransaction(newTransaction);
 
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đang lưu giao dịch...')),
+                      const SnackBar(content: Text('Đã thêm giao dịch mới')),
                     );
+
+                    Navigator.pop(context);
                   }
                 },
                 child: const Text('Lưu giao dịch'),

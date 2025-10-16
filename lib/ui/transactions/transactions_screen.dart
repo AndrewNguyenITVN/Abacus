@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '/models/transaction.dart';
 import '/ui/categories/categories_manager.dart';
@@ -23,6 +24,14 @@ IconData _getIconData(String iconName) {
     'school': Icons.school,
     'work': Icons.work,
     'attach_money': Icons.attach_money,
+    'local_hospital': Icons.local_hospital,
+    'fitness_center': Icons.fitness_center,
+    'flight': Icons.flight,
+    'phone': Icons.phone,
+    'computer': Icons.computer,
+    'directions_car': Icons.directions_car,
+    'pets': Icons.pets,
+    'games': Icons.games,
   };
   return iconMap[iconName] ?? Icons.help_outline;
 }
@@ -32,8 +41,8 @@ class TransactionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final transactionsManager = TransactionsManager();
-    final categoriesManager = CategoriesManager();
+    final transactionsManager = context.watch<TransactionsManager>();
+    final categoriesManager = context.watch<CategoriesManager>();
     final transactions = transactionsManager.transactions;
 
     return Scaffold(
