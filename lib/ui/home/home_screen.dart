@@ -5,34 +5,49 @@ import '/ui/shared/app_drawer.dart';
 import '/ui/transactions/transactions_manager.dart';
 import '/ui/categories/categories_manager.dart';
 
-class HomeScreen extends StatelessWidget {
+// Helper functions
+String _formatCurrency(double amount) {
+  final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  return formatter.format(amount);
+}
+
+String _formatDate(DateTime date) {
+  final formatter = DateFormat('dd/MM/yyyy', 'vi_VN');
+  return formatter.format(date);
+}
+
+IconData _getIconData(String iconName) {
+  const iconMap = {
+    'restaurant': Icons.restaurant,
+    'shopping_bag': Icons.shopping_bag,
+    'local_gas_station': Icons.local_gas_station,
+    'house': Icons.house,
+    'work': Icons.work,
+    'attach_money': Icons.attach_money,
+  };
+  return iconMap[iconName] ?? Icons.category;
+}
+
+Color _parseColor(String hexColor) {
+  final hexCode = hexColor.replaceAll('#', '');
+  return Color(int.parse('FF$hexCode', radix: 16));
+}
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  String formatCurrency(double amount) {
-    final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
-    return formatter.format(amount);
-  }
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-  String formatDate(DateTime date) {
-    final formatter = DateFormat('dd/MM/yyyy', 'vi_VN');
-    return formatter.format(date);
-  }
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentReportPage = 0;
+  final PageController _reportPageController = PageController();
 
-  IconData getIconData(String iconName) {
-    final iconMap = {
-      'restaurant': Icons.restaurant,
-      'shopping_bag': Icons.shopping_bag,
-      'local_gas_station': Icons.local_gas_station,
-      'house': Icons.house,
-      'work': Icons.work,
-      'attach_money': Icons.attach_money,
-    };
-    return iconMap[iconName] ?? Icons.category;
-  }
-
-  Color getColorFromHex(String hexColor) {
-    final hexCode = hexColor.replaceAll('#', '');
-    return Color(int.parse('FF$hexCode', radix: 16));
+  @override
+  void dispose() {
+    _reportPageController.dispose();
+    super.dispose();
   }
 
   @override
@@ -138,7 +153,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    formatCurrency(balance),
+                    _formatCurrency(balance),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 32,
@@ -193,7 +208,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            formatCurrency(totalIncome),
+                            _formatCurrency(totalIncome),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -244,7 +259,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           Text(
-                            formatCurrency(totalExpense),
+                            _formatCurrency(totalExpense),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -319,7 +334,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         Text(
                           totalIncome > totalExpense
-                              ? 'Còn lại: ${formatCurrency(totalIncome - totalExpense)}'
+                              ? 'Còn lại: ${_formatCurrency(totalIncome - totalExpense)}'
                               : 'Vượt chi!',
                           style: TextStyle(
                             fontSize: 12,
@@ -332,6 +347,93 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Reports Carousel
+            SizedBox(
+              height: 320,
+              child: Stack(
+                children: [
+                  PageView(
+                    controller: _reportPageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentReportPage = index;
+                      });
+                    },
+                    children: [
+                      // Report 1: Báo cáo tháng này
+                      _buildMonthlyReportCard(totalExpense),
+                      // Report 2: Báo cáo xu hướng
+                      _buildTrendReportCard(totalExpense, totalIncome),
+                    ],
+                  ),
+                  // Navigation buttons
+                  Positioned(
+                    left: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          if (_currentReportPage > 0) {
+                            _reportPageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.chevron_right,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          if (_currentReportPage < 1) {
+                            _reportPageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Dots indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                2,
+                (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentReportPage == index ? 12 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentReportPage == index
+                        ? Colors.green
+                        : Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
               ),
             ),
@@ -422,14 +524,14 @@ class HomeScreen extends StatelessWidget {
                           leading: Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: getColorFromHex(
+                              color: _parseColor(
                                 category.color,
                               ).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              getIconData(category.icon),
-                              color: getColorFromHex(category.color),
+                              _getIconData(category.icon),
+                              color: _parseColor(category.color),
                               size: 24,
                             ),
                           ),
@@ -441,14 +543,14 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           subtitle: Text(
-                            '${category.name} • ${formatDate(transaction.date)}',
+                            '${category.name} • ${_formatDate(transaction.date)}',
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 13,
                             ),
                           ),
                           trailing: Text(
-                            '${isIncome ? '+' : '-'} ${formatCurrency(transaction.amount)}',
+                            '${isIncome ? '+' : '-'} ${_formatCurrency(transaction.amount)}',
                             style: TextStyle(
                               color: isIncome ? Colors.green : Colors.red,
                               fontWeight: FontWeight.bold,
@@ -466,4 +568,359 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+
+  // Báo cáo tháng này
+  Widget _buildMonthlyReportCard(double totalExpense) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey.shade900, Colors.grey.shade800],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Báo cáo tháng này',
+                style: TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 30),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  'Xem báo cáo',
+                  style: TextStyle(color: Colors.green, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+          Text(
+            _formatCurrency(totalExpense),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Tổng chi tháng này - 0%',
+            style: TextStyle(color: Colors.orange.shade300, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+          // Bar Chart
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 70,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade400.withOpacity(0.5),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tháng trước',
+                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 24),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    '1 M',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Container(
+                    width: 70,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade400,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tháng này',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Báo cáo xu hướng
+  Widget _buildTrendReportCard(double totalExpense, double totalIncome) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.grey.shade900, Colors.grey.shade800],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Báo cáo xu hướng',
+                style: TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 30),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  'Xem báo cáo',
+                  style: TextStyle(color: Colors.green, fontSize: 12),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Tổng đã chi',
+                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _formatCurrency(totalExpense),
+                    style: const TextStyle(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Tổng thu',
+                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    _formatCurrency(totalIncome),
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Line Chart Area
+          SizedBox(
+            height: 120,
+            child: Stack(
+              children: [
+                // Grid lines
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _buildGridLine('900 K'),
+                    _buildGridLine('600 K'),
+                    _buildGridLine('300 K'),
+                    _buildGridLine('0'),
+                  ],
+                ),
+                // Chart
+                Positioned(
+                  bottom: 10,
+                  left: 10,
+                  right: 40,
+                  top: 10,
+                  child: CustomPaint(painter: _TrendChartPainter(totalExpense)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          // Date labels
+          const Padding(
+            padding: EdgeInsets.only(left: 10, right: 40),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '01/10',
+                  style: TextStyle(color: Colors.white70, fontSize: 10),
+                ),
+                Text(
+                  '31/10',
+                  style: TextStyle(color: Colors.white70, fontSize: 10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGridLine(String label) {
+    return Row(
+      children: [
+        Expanded(
+          child: Container(
+            height: 1,
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+        ),
+      ],
+    );
+  }
+}
+
+// Custom painter for trend chart
+class _TrendChartPainter extends CustomPainter {
+  final double totalExpense;
+
+  _TrendChartPainter(this.totalExpense);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.red.shade400
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5;
+
+    final fillPaint = Paint()
+      ..color = Colors.red.shade400.withOpacity(0.2)
+      ..style = PaintingStyle.fill;
+
+    // Create chart path
+    final path = Path();
+    final fillPath = Path();
+
+    // Simulated data points
+    final points = [
+      Offset(0, size.height * 0.8),
+      Offset(size.width * 0.3, size.height * 0.6),
+      Offset(size.width * 0.6, size.height * 0.3),
+      Offset(size.width, size.height * 0.1),
+    ];
+
+    // Line path
+    path.moveTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      path.lineTo(points[i].dx, points[i].dy);
+    }
+
+    // Fill path
+    fillPath.moveTo(points[0].dx, size.height);
+    fillPath.lineTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      fillPath.lineTo(points[i].dx, points[i].dy);
+    }
+    fillPath.lineTo(size.width, size.height);
+    fillPath.close();
+
+    // Draw fill and line
+    canvas.drawPath(fillPath, fillPaint);
+    canvas.drawPath(path, paint);
+
+    // Draw points
+    final pointPaint = Paint()
+      ..color = Colors.red.shade300
+      ..style = PaintingStyle.fill;
+
+    for (final point in points) {
+      canvas.drawCircle(point, 4, pointPaint);
+    }
+
+    // Draw selected point (last one)
+    final selectedPointPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(points.last, 5, selectedPointPaint);
+    canvas.drawCircle(points.last, 3, pointPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
