@@ -55,6 +55,35 @@ class HomeScreen extends StatelessWidget {
         ),
         elevation: 0,
         backgroundColor: Theme.of(context).colorScheme.surface,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Chức năng tìm kiếm
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Chức năng tìm kiếm sẽ được triển khai'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            tooltip: 'Tìm kiếm',
+          ),
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              // Chức năng thông báo
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Chức năng thông báo sẽ được triển khai'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            tooltip: 'Thông báo',
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       drawer: const AppDrawer(),
       body: SingleChildScrollView(
