@@ -5,6 +5,23 @@ import '/ui/transactions/add_transaction_screen.dart';
 import '/ui/categories/categories_screen.dart';
 import '/ui/account/account_screen.dart';
 
+// Custom FloatingActionButtonLocation để giữ vị trí cố định
+class _CustomCenterDockedFabLocation extends FloatingActionButtonLocation {
+  const _CustomCenterDockedFabLocation();
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    final double fabX =
+        (scaffoldGeometry.scaffoldSize.width -
+            scaffoldGeometry.floatingActionButtonSize.width) /
+        2.0;
+    final double contentBottom = scaffoldGeometry.contentBottom;
+    final double fabHeight = scaffoldGeometry.floatingActionButtonSize.height;
+    final double fabY = contentBottom - fabHeight / 2.0;
+    return Offset(fabX, fabY);
+  }
+}
+
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
 
@@ -50,22 +67,29 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 6,
+        notchMargin: 8,
+        elevation: 8,
         child: SizedBox(
-          height: 60,
+          height: 65,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               // Trang chủ
-              _buildNavItem(0, Icons.home, 'Trang chủ'),
+              Expanded(child: _buildNavItem(0, Icons.home, 'Trang chủ')),
               // Sổ giao dịch
-              _buildNavItem(1, Icons.account_balance_wallet, 'Giao dịch'),
+              Expanded(
+                child: _buildNavItem(
+                  1,
+                  Icons.account_balance_wallet,
+                  'Giao dịch',
+                ),
+              ),
               // Khoảng trống cho nút thêm
-              const SizedBox(width: 40),
+              const SizedBox(width: 56),
               // Danh mục
-              _buildNavItem(3, Icons.category, 'Danh mục'),
+              Expanded(child: _buildNavItem(3, Icons.category, 'Danh mục')),
               // Tài khoản
-              _buildNavItem(4, Icons.person, 'Tài khoản'),
+              Expanded(child: _buildNavItem(4, Icons.person, 'Tài khoản')),
             ],
           ),
         ),
@@ -74,9 +98,11 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
         onPressed: _showAddTransactionScreen,
-        child: const Icon(Icons.add, color: Colors.white),
+        elevation: 4,
+        child: const Icon(Icons.add, color: Colors.white, size: 32),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: const _CustomCenterDockedFabLocation(),
+      resizeToAvoidBottomInset: false,
     );
   }
 
@@ -87,20 +113,23 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
       onTap: () => _onItemTapped(index),
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               icon,
+              size: 24,
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
                   : Colors.grey,
             ),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
                     : Colors.grey,
