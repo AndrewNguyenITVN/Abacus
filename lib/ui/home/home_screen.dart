@@ -576,16 +576,17 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.grey.shade900, Colors.grey.shade800],
+          colors: [Colors.orange.shade50, Colors.red.shade50],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.orange.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -598,7 +599,11 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const Text(
                 'Báo cáo tháng này',
-                style: TextStyle(color: Colors.white70, fontSize: 13),
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               TextButton(
                 onPressed: () {},
@@ -607,17 +612,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   minimumSize: const Size(0, 30),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text(
+                child: Text(
                   'Xem báo cáo',
-                  style: TextStyle(color: Colors.green, fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.orange.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
           ),
           Text(
             _formatCurrency(totalExpense),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Colors.red.shade700,
               fontSize: 26,
               fontWeight: FontWeight.bold,
             ),
@@ -625,7 +634,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 2),
           Text(
             'Tổng chi tháng này - 0%',
-            style: TextStyle(color: Colors.orange.shade300, fontSize: 12),
+            style: TextStyle(color: Colors.black54, fontSize: 12),
           ),
           const SizedBox(height: 16),
           // Bar Chart
@@ -640,16 +649,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 70,
                     height: 70,
                     decoration: BoxDecoration(
-                      color: Colors.red.shade400.withOpacity(0.5),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.red.shade300.withOpacity(0.6),
+                          Colors.red.shade400.withOpacity(0.4),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(8),
                       ),
+                      border: Border.all(color: Colors.red.shade300, width: 1),
                     ),
                   ),
                   const SizedBox(height: 6),
                   const Text(
                     'Tháng trước',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                    style: TextStyle(color: Colors.black54, fontSize: 11),
                   ),
                 ],
               ),
@@ -657,10 +674,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     '1 M',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.red.shade700,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
@@ -670,9 +687,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 70,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Colors.red.shade400,
+                      gradient: LinearGradient(
+                        colors: [Colors.red.shade400, Colors.red.shade600],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
                       borderRadius: const BorderRadius.vertical(
                         top: Radius.circular(8),
+                      ),
+                      border: Border.all(
+                        color: Colors.red.shade700,
+                        width: 1.5,
                       ),
                     ),
                   ),
@@ -680,7 +705,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Text(
                     'Tháng này',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Colors.black87,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
@@ -701,16 +726,17 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.grey.shade900, Colors.grey.shade800],
+          colors: [Colors.blue.shade50, Colors.purple.shade50],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.blue.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -723,7 +749,11 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const Text(
                 'Báo cáo xu hướng',
-                style: TextStyle(color: Colors.white70, fontSize: 13),
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               TextButton(
                 onPressed: () {},
@@ -732,9 +762,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   minimumSize: const Size(0, 30),
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: const Text(
+                child: Text(
                   'Xem báo cáo',
-                  style: TextStyle(color: Colors.green, fontSize: 12),
+                  style: TextStyle(
+                    color: Colors.blue.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
@@ -749,13 +783,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Text(
                     'Tổng đã chi',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                    style: TextStyle(color: Colors.black54, fontSize: 11),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     _formatCurrency(totalExpense),
-                    style: const TextStyle(
-                      color: Colors.red,
+                    style: TextStyle(
+                      color: Colors.red.shade700,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -768,13 +802,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   const Text(
                     'Tổng thu',
-                    style: TextStyle(color: Colors.white70, fontSize: 11),
+                    style: TextStyle(color: Colors.black54, fontSize: 11),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     _formatCurrency(totalIncome),
-                    style: const TextStyle(
-                      color: Colors.green,
+                    style: TextStyle(
+                      color: Colors.green.shade700,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -819,11 +853,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Text(
                   '01/10',
-                  style: TextStyle(color: Colors.white70, fontSize: 10),
+                  style: TextStyle(color: Colors.black54, fontSize: 10),
                 ),
                 Text(
                   '31/10',
-                  style: TextStyle(color: Colors.white70, fontSize: 10),
+                  style: TextStyle(color: Colors.black54, fontSize: 10),
                 ),
               ],
             ),
@@ -841,7 +875,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 1,
             decoration: BoxDecoration(
               border: Border(
-                top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1),
+                top: BorderSide(color: Colors.black.withOpacity(0.1), width: 1),
               ),
             ),
           ),
@@ -849,7 +883,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(width: 8),
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 10),
+          style: TextStyle(color: Colors.black.withOpacity(0.4), fontSize: 10),
         ),
       ],
     );
@@ -865,12 +899,19 @@ class _TrendChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.red.shade400
+      ..color = Colors.red.shade600
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5;
+      ..strokeWidth = 3;
 
     final fillPaint = Paint()
-      ..color = Colors.red.shade400.withOpacity(0.2)
+      ..shader = LinearGradient(
+        colors: [
+          Colors.red.shade300.withOpacity(0.3),
+          Colors.red.shade100.withOpacity(0.1),
+        ],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
     // Create chart path
@@ -906,19 +947,22 @@ class _TrendChartPainter extends CustomPainter {
 
     // Draw points
     final pointPaint = Paint()
-      ..color = Colors.red.shade300
+      ..color = Colors.red.shade600
       ..style = PaintingStyle.fill;
+
+    final pointBorderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
 
     for (final point in points) {
-      canvas.drawCircle(point, 4, pointPaint);
+      canvas.drawCircle(point, 5, pointBorderPaint);
+      canvas.drawCircle(point, 3, pointPaint);
     }
 
-    // Draw selected point (last one)
-    final selectedPointPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(points.last, 5, selectedPointPaint);
-    canvas.drawCircle(points.last, 3, pointPaint);
+    // Draw selected point (last one) - larger
+    canvas.drawCircle(points.last, 6, pointBorderPaint);
+    canvas.drawCircle(points.last, 4, pointPaint);
   }
 
   @override
