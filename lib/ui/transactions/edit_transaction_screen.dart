@@ -3,10 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../models/my_category.dart';
 import '../../models/transaction.dart';
+import '../../models/transaction_type.dart';
 import '../categories/categories_manager.dart';
 import '../transactions/transactions_manager.dart';
-
-enum TransactionType { expense, income }
 
 class EditTransactionScreen extends StatefulWidget {
   final Transaction transaction;
