@@ -64,7 +64,7 @@ class AuthService {
         'name': name,
       });
 
-      return Account(
+      final account = Account(
         id: record.id,
         fullName: record.data['name'] ?? '',
         email: record.data['email'] ?? '',
@@ -74,6 +74,8 @@ class AuthService {
         gender: '',
         isVerified: false,
       );
+      onAuthChange?.call(account);
+      return account;
     } catch (error) {
       throw _handleError(error);
     }
@@ -89,7 +91,7 @@ class AuthService {
       );
 
       final record = authData.record;
-      return Account(
+      final account = Account(
         id: record.id,
         fullName: record.data['name'] ?? '',
         email: record.data['email'] ?? '',
@@ -101,6 +103,8 @@ class AuthService {
         gender: record.data['gender'] ?? '',
         isVerified: record.data['verified'] ?? false,
       );
+      onAuthChange?.call(account);
+      return account;
     } catch (error) {
       throw _handleError(error);
     }

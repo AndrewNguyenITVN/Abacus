@@ -5,6 +5,7 @@ import '../../services/auth_service.dart';
 
 class AuthManager with ChangeNotifier {
   late final AuthService _authService;
+  bool _didTryAutoLogin = false;
   Account? _loggedInUser;
 
   AuthManager() {
@@ -31,6 +32,8 @@ class AuthManager with ChangeNotifier {
   }
 
   Future<void> tryAutoLogin() async {
+    if (_didTryAutoLogin) return;
+    _didTryAutoLogin = true;
     final account = await _authService.getUserFromStore();
     if (account != null) {
       _loggedInUser = account;
