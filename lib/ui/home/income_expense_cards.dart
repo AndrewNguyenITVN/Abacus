@@ -34,47 +34,64 @@ class IncomeExpenseCards extends StatelessWidget {
 
   Widget _buildIncomeCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.green.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.green.shade200),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFF11998e), // Teal
+            const Color(0xFF38ef7d), // Light green
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF11998e).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+            spreadRadius: -4,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.green,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_downward,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Thu nhập',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
+          // Icon with gradient background
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.trending_up_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          
+          // Label
+          Text(
+            'Thu nhập',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withOpacity(0.9),
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          
+          // Amount
           Text(
             formatCurrency(totalIncome),
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.green,
+              color: Colors.white,
+              letterSpacing: -0.5,
             ),
           ),
         ],
@@ -84,47 +101,64 @@ class IncomeExpenseCards extends StatelessWidget {
 
   Widget _buildExpenseCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.shade200),
+        gradient: LinearGradient(
+          colors: [
+            const Color(0xFFee0979), // Pink
+            const Color(0xFFff6a00), // Orange
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFee0979).withOpacity(0.3),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+            spreadRadius: -4,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.arrow_upward,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Chi tiêu',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
+          // Icon with gradient background
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Icons.trending_down_rounded,
+              color: Colors.white,
+              size: 24,
+            ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
+          
+          // Label
+          Text(
+            'Chi tiêu',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: Colors.white.withOpacity(0.9),
+              letterSpacing: 0.5,
+            ),
+          ),
+          const SizedBox(height: 6),
+          
+          // Amount
           Text(
             formatCurrency(totalExpense),
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.red,
+              color: Colors.white,
+              letterSpacing: -0.5,
             ),
           ),
         ],

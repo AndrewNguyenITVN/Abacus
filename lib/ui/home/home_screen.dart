@@ -40,10 +40,15 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text(
           'Trang chủ',
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
         ),
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: const Color(0xFFF8F9FD),
+        surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -73,88 +78,95 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       drawer: const AppDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Balance Card
-            BalanceCard(balance: balance),
+      body: Container(
+        color: const Color(0xFFF8F9FD), // Subtle background color
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Balance Card
+              BalanceCard(balance: balance),
 
-            // Income & Expense Cards
-            IncomeExpenseCards(
-              totalIncome: totalIncome,
-              totalExpense: totalExpense,
-            ),
+              const SizedBox(height: 8),
 
-            const SizedBox(height: 24),
-
-            // Spending Analysis
-            SpendingAnalysisCard(
-              totalIncome: totalIncome,
-              totalExpense: totalExpense,
-            ),
-
-            const SizedBox(height: 24),
-
-            // Reports Carousel
-            SizedBox(
-              height: 320,
-              child: Stack(
-                children: [
-                  PageView(
-                    controller: _reportPageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentReportPage = index;
-                      });
-                    },
-                    children: [
-                      // Monthly Report
-                      MonthlyReportCard(totalExpense: totalExpense),
-                      // Trend Report
-                      TrendReportCard(
-                        totalExpense: totalExpense,
-                        totalIncome: totalIncome,
-                      ),
-                    ],
-                  ),
-                  // Navigation buttons
-                  _buildNavigationButton(
-                    alignment: Alignment.centerLeft,
-                    icon: Icons.chevron_left,
-                    onPressed: () {
-                      if (_currentReportPage > 0) {
-                        _reportPageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    },
-                  ),
-                  _buildNavigationButton(
-                    alignment: Alignment.centerRight,
-                    icon: Icons.chevron_right,
-                    onPressed: () {
-                      if (_currentReportPage < 1) {
-                        _reportPageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    },
-                  ),
-                ],
+              // Income & Expense Cards
+              IncomeExpenseCards(
+                totalIncome: totalIncome,
+                totalExpense: totalExpense,
               ),
-            ),
 
-            // Dots indicator
-            _buildPageIndicator(),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 24),
+              // Spending Analysis
+              SpendingAnalysisCard(
+                totalIncome: totalIncome,
+                totalExpense: totalExpense,
+              ),
 
-            // Recent Transactions
-            const RecentTransactionsList(),
-          ],
+              const SizedBox(height: 20),
+
+              // Reports Carousel
+              SizedBox(
+                height: 320,
+                child: Stack(
+                  children: [
+                    PageView(
+                      controller: _reportPageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentReportPage = index;
+                        });
+                      },
+                      children: [
+                        // Monthly Report
+                        MonthlyReportCard(totalExpense: totalExpense),
+                        // Trend Report
+                        TrendReportCard(
+                          totalExpense: totalExpense,
+                          totalIncome: totalIncome,
+                        ),
+                      ],
+                    ),
+                    // Navigation buttons
+                    _buildNavigationButton(
+                      alignment: Alignment.centerLeft,
+                      icon: Icons.chevron_left,
+                      onPressed: () {
+                        if (_currentReportPage > 0) {
+                          _reportPageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                    ),
+                    _buildNavigationButton(
+                      alignment: Alignment.centerRight,
+                      icon: Icons.chevron_right,
+                      onPressed: () {
+                        if (_currentReportPage < 1) {
+                          _reportPageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Dots indicator
+              _buildPageIndicator(),
+
+              const SizedBox(height: 20),
+
+              // Recent Transactions
+              const RecentTransactionsList(),
+
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
