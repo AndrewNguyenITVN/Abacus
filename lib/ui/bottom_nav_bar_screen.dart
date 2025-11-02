@@ -165,15 +165,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                 size: 28,
               ),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Thêm',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF11998e),
-              ),
-            ),
+            const SizedBox(height: 4)
           ],
         ),
       ),
