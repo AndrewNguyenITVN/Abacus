@@ -16,7 +16,7 @@ class AuthService {
     if (!_initialized) {
       _pb = await getPocketbaseInstance();
       _initialized = true;
-      
+
       // Listen to auth changes
       _pb.authStore.onChange.listen((event) {
         if (event.token.isEmpty) {
@@ -43,8 +43,8 @@ class AuthService {
         email: record.data['email'] ?? '',
         phone: record.data['phone'] ?? '',
         address: record.data['address'] ?? '',
-        dateOfBirth: record.data['dateOfBirth'] != null 
-            ? DateTime.parse(record.data['dateOfBirth']) 
+        dateOfBirth: record.data['dateOfBirth'] != null
+            ? DateTime.parse(record.data['dateOfBirth'])
             : DateTime(2000, 1, 1),
         gender: record.data['gender'] ?? '',
         isVerified: record.data['verified'] ?? false,
@@ -55,15 +55,24 @@ class AuthService {
 
   Future<Account> signup(String email, String password, String name) async {
     await _ensureInitialized();
-    
-    try {
-      final record = await _pb.collection('users').create(body: {
-        'email': email,
-        'password': password,
-        'passwordConfirm': password,
-        'name': name,
-      });
 
+    try {
+      // Xóa session cũ trước khi đăng ký để tránh conflict với tài khoản cũ
+      _pb.authStore.clear();
+
+      final record = await _pb
+          .collection('users')
+          .create(
+            body: {
+              'email': email,
+              'password': password,
+              'passwordConfirm': password,
+              'name': name,
+            },
+          );
+
+      // Không gọi onAuthChange vì user chưa được authenticate
+      // User sẽ phải đăng nhập sau khi đăng ký
       final account = Account(
         id: record.id,
         fullName: record.data['name'] ?? '',
@@ -74,7 +83,6 @@ class AuthService {
         gender: '',
         isVerified: false,
       );
-      onAuthChange?.call(account);
       return account;
     } catch (error) {
       throw _handleError(error);
@@ -83,12 +91,11 @@ class AuthService {
 
   Future<Account> login(String email, String password) async {
     await _ensureInitialized();
-    
+
     try {
-      final authData = await _pb.collection('users').authWithPassword(
-        email,
-        password,
-      );
+      final authData = await _pb
+          .collection('users')
+          .authWithPassword(email, password);
 
       final record = authData.record;
       final account = Account(
@@ -97,8 +104,8 @@ class AuthService {
         email: record.data['email'] ?? '',
         phone: record.data['phone'] ?? '',
         address: record.data['address'] ?? '',
-        dateOfBirth: record.data['dateOfBirth'] != null 
-            ? DateTime.parse(record.data['dateOfBirth']) 
+        dateOfBirth: record.data['dateOfBirth'] != null
+            ? DateTime.parse(record.data['dateOfBirth'])
             : DateTime(2000, 1, 1),
         gender: record.data['gender'] ?? '',
         isVerified: record.data['verified'] ?? false,
@@ -112,7 +119,7 @@ class AuthService {
 
   Future<Account?> getUserFromStore() async {
     await _ensureInitialized();
-    
+
     if (_pb.authStore.isValid && _pb.authStore.record != null) {
       final record = _pb.authStore.record!;
       return Account(
@@ -121,8 +128,8 @@ class AuthService {
         email: record.data['email'] ?? '',
         phone: record.data['phone'] ?? '',
         address: record.data['address'] ?? '',
-        dateOfBirth: record.data['dateOfBirth'] != null 
-            ? DateTime.parse(record.data['dateOfBirth']) 
+        dateOfBirth: record.data['dateOfBirth'] != null
+            ? DateTime.parse(record.data['dateOfBirth'])
             : DateTime(2000, 1, 1),
         gender: record.data['gender'] ?? '',
         isVerified: record.data['verified'] ?? false,
@@ -149,4 +156,3 @@ class AuthService {
     return error.toString();
   }
 }
-

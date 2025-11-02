@@ -5,23 +5,6 @@ import '/ui/transactions/add_transaction_screen.dart';
 import '/ui/categories/categories_screen.dart';
 import '/ui/account/account_screen.dart';
 
-// Custom FloatingActionButtonLocation để giữ vị trí cố định
-class _CustomCenterDockedFabLocation extends FloatingActionButtonLocation {
-  const _CustomCenterDockedFabLocation();
-
-  @override
-  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
-    final double fabX =
-        (scaffoldGeometry.scaffoldSize.width -
-            scaffoldGeometry.floatingActionButtonSize.width) /
-        2.0;
-    final double contentBottom = scaffoldGeometry.contentBottom;
-    final double fabHeight = scaffoldGeometry.floatingActionButtonSize.height;
-    final double fabY = contentBottom - fabHeight / 2.0;
-    return Offset(fabX, fabY);
-  }
-}
-
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
 
@@ -65,43 +48,45 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
-        elevation: 8,
-        child: SizedBox(
-          height: 65,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              // Trang chủ
-              Expanded(child: _buildNavItem(0, Icons.home, 'Trang chủ')),
-              // Sổ giao dịch
-              Expanded(
-                child: _buildNavItem(
-                  1,
-                  Icons.account_balance_wallet,
-                  'Giao dịch',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 15,
+              offset: const Offset(0, -3),
+              spreadRadius: -2,
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Trang chủ
+                Expanded(child: _buildNavItem(0, Icons.home, 'Trang chủ')),
+                // Sổ giao dịch
+                Expanded(
+                  child: _buildNavItem(
+                    1,
+                    Icons.account_balance_wallet,
+                    'Giao dịch',
+                  ),
                 ),
-              ),
-              // Khoảng trống cho nút thêm
-              const SizedBox(width: 56),
-              // Danh mục
-              Expanded(child: _buildNavItem(3, Icons.category, 'Danh mục')),
-              // Tài khoản
-              Expanded(child: _buildNavItem(4, Icons.person, 'Tài khoản')),
-            ],
+                // Nút thêm giao dịch - ngang hàng với các nút khác
+                Expanded(child: _buildAddButton()),
+                // Danh mục
+                Expanded(child: _buildNavItem(3, Icons.category, 'Danh mục')),
+                // Tài khoản
+                Expanded(child: _buildNavItem(4, Icons.person, 'Tài khoản')),
+              ],
+            ),
           ),
         ),
       ),
-      // Nút thêm giao dịch nổi giữa thanh điều hướng
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
-        onPressed: _showAddTransactionScreen,
-        elevation: 4,
-        child: const Icon(Icons.add, color: Colors.white, size: 32),
-      ),
-      floatingActionButtonLocation: const _CustomCenterDockedFabLocation(),
       resizeToAvoidBottomInset: false,
     );
   }
@@ -111,9 +96,9 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     final isSelected = _selectedIndex == index;
     return InkWell(
       onTap: () => _onItemTapped(index),
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -123,18 +108,64 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
               size: 24,
               color: isSelected
                   ? Theme.of(context).colorScheme.primary
-                  : Colors.grey,
+                  : Colors.grey.shade600,
             ),
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Colors.grey,
+                    : Colors.grey.shade600,
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget xây dựng nút thêm giao dịch (đặc biệt)
+  Widget _buildAddButton() {
+    return InkWell(
+      onTap: _showAddTransactionScreen,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xFF11998e),
+                    const Color(0xFF38ef7d),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF11998e).withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.add_rounded,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+            const SizedBox(height: 4)
           ],
         ),
       ),
