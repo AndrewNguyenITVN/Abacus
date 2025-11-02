@@ -9,10 +9,16 @@ class AuthManager with ChangeNotifier {
   Account? _loggedInUser;
 
   AuthManager() {
-    _authService = AuthService(onAuthChange: (Account? account) {
-      _loggedInUser = account;
-      notifyListeners();
-    });
+    _authService = AuthService(
+      onAuthChange: (Account? account) {
+        _loggedInUser = account;
+        notifyListeners();
+      },
+    );
+
+    // Tự động thử khôi phục session khi khởi tạo
+    //để tránh login liên tục khi mở app
+    tryAutoLogin();
   }
 
   bool get isAuth {
@@ -45,4 +51,3 @@ class AuthManager with ChangeNotifier {
     await _authService.logout();
   }
 }
-
