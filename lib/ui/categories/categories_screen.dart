@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/ui/shared/app_drawer.dart';
 import '../../models/my_category.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/categories/edit_category_screen.dart';
@@ -143,7 +142,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
           ],
         ),
       ),
-      drawer: const AppDrawer(),
       body: TabBarView(
         controller: _tabController,
         children: [

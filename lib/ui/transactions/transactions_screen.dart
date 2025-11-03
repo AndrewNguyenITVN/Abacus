@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '/models/transaction.dart';
 import '/ui/categories/categories_manager.dart';
-import '/ui/shared/app_drawer.dart';
 import '/ui/transactions/transactions_manager.dart';
 import '/ui/transactions/edit_transaction_screen.dart';
 
@@ -49,7 +48,6 @@ class TransactionsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Sổ giao dịch'),
       ),
-      drawer: const AppDrawer(),
       body: Column(
         children: [
           _buildSummary(context, transactionsManager),
