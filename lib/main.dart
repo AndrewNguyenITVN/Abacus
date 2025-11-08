@@ -64,6 +64,7 @@ class MyApp extends StatelessWidget {
           update: (context, categoriesManager, previousTransactionsManager) =>
               previousTransactionsManager ?? TransactionsManager(categoriesManager),
         ),
+        ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],
       child: MaterialApp.router(
         title: 'Abacus',

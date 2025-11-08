@@ -29,3 +29,9 @@ export 'shared/dialog_utils.dart';
 
 // Bottom Navigation
 export 'bottom_nav_bar_screen.dart';
+
+// Savings Goals
+export 'savings_goals/savings_goals_manager.dart';
+export 'savings_goals/savings_goals_block.dart';
+export 'savings_goals/savings_goals_screen.dart';
+export 'savings_goals/add_edit_goal_screen.dart';
