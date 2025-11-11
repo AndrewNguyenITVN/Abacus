@@ -5,7 +5,6 @@ import '/ui/shared/app_drawer.dart';
 import '/ui/transactions/transactions_manager.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/savings_goals/savings_goals_block.dart';
-import '/ui/savings_goals/savings_goals_manager.dart';
 
 // Helper functions
 String _formatCurrency(double amount) {
@@ -56,7 +55,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final transactionsManager = context.watch<TransactionsManager>();
     final categoriesManager = context.watch<CategoriesManager>();
-    final savingsGoalsManager = context.watch<SavingsGoalsManager>();
     final balance = transactionsManager.balance;
     final totalIncome = transactionsManager.totalIncome;
     final totalExpense = transactionsManager.totalExpense;
