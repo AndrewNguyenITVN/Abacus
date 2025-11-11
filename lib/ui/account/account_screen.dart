@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/account.dart';
 import '/ui/auth/login_screen.dart';
 import '/ui/account/edit_profile_screen.dart';
 import '/ui/account/account_manager.dart';
+import '/ui/auth/auth_manager.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -368,10 +370,8 @@ class AccountScreen extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (Route<dynamic> route) => false,
-                );
+                context.read<AuthManager>().logout();
+                context.go('/login');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -396,10 +396,8 @@ class AccountScreen extends StatelessWidget {
           Expanded(
             child: ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                  (Route<dynamic> route) => false,
-                );
+                context.read<AuthManager>().logout();
+                context.go('/login');
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
