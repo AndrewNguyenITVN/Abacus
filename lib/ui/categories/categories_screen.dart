@@ -66,10 +66,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (result != null && mounted) {
-      categoriesManager.addCategory(result);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã thêm danh mục mới')),
-      );
+      try {
+        await categoriesManager.addCategory(result);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đã thêm danh mục mới')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -86,10 +96,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (result != null && mounted) {
-      categoriesManager.updateCategory(result);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã cập nhật danh mục')),
-      );
+      try {
+        await categoriesManager.updateCategory(result);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đã cập nhật danh mục')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -114,10 +134,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
 
     if (confirmed == true && mounted) {
-      categoriesManager.deleteCategory(category.id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã xóa danh mục')),
-      );
+      try {
+        await categoriesManager.deleteCategory(category.id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đã xóa danh mục')),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: $e')),
+          );
+        }
+      }
     }
   }
 
