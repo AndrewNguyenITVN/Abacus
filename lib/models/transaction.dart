@@ -16,4 +16,48 @@ class Transaction {
     required this.type,
     this.note,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'amount': amount,
+      'description': description,
+      'date': date.toIso8601String(),
+      'category_id': categoryId,
+      'type': type,
+      'note': note,
+    };
+  }
+
+  factory Transaction.fromMap(Map<String, dynamic> map) {
+    return Transaction(
+      id: map['id'] as String,
+      amount: map['amount'] as double,
+      description: map['description'] as String,
+      date: DateTime.parse(map['date'] as String),
+      categoryId: map['category_id'] as String,
+      type: map['type'] as String,
+      note: map['note'] as String?,
+    );
+  }
+
+  Transaction copyWith({
+    String? id,
+    double? amount,
+    String? description,
+    DateTime? date,
+    String? categoryId,
+    String? type,
+    String? note,
+  }) {
+    return Transaction(
+      id: id ?? this.id,
+      amount: amount ?? this.amount,
+      description: description ?? this.description,
+      date: date ?? this.date,
+      categoryId: categoryId ?? this.categoryId,
+      type: type ?? this.type,
+      note: note ?? this.note,
+    );
+  }
 }
