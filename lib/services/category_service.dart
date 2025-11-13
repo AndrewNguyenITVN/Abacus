@@ -19,64 +19,66 @@ class CategoryService {
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE categories(
-            id TEXT NOT NULL,
-            user_id TEXT NOT NULL,
+            id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             icon TEXT NOT NULL,
             color TEXT NOT NULL,
             type TEXT NOT NULL,
-            is_default INTEGER NOT NULL DEFAULT 0,
-            PRIMARY KEY (id, user_id)
+            is_default INTEGER NOT NULL DEFAULT 0
           )
         ''');
       },
     );
   }
 
-  // Insert category for a specific user
-  Future<void> insertCategory(String userId, MyCategory category) async {
+  // Insert category
+  Future<void> insertCategory(MyCategory category) async {
     final db = await database;
     await db.insert(
       'categories',
-      {
-        ...category.toMap(),
-        'user_id': userId,
-      },
+      category.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  // Update category for a specific user
-  Future<void> updateCategory(String userId, MyCategory category) async {
+  // Update category
+  Future<void> updateCategory(MyCategory category) async {
     final db = await database;
     await db.update(
       'categories',
-      {
-        ...category.toMap(),
-        'user_id': userId,
-      },
-      where: 'user_id = ? AND id = ?',
-      whereArgs: [userId, category.id],
+      category.toMap(),
+      where: 'id = ?',
+      whereArgs: [category.id],
     );
   }
 
-  // Delete category for a specific user
-  Future<void> deleteCategory(String userId, String categoryId) async {
+  // Delete category
+  Future<void> deleteCategory(String categoryId) async {
     final db = await database;
     await db.delete(
       'categories',
-      where: 'user_id = ? AND id = ?',
-      whereArgs: [userId, categoryId],
+      where: 'id = ?',
+      whereArgs: [categoryId],
     );
   }
 
-  // Get all categories for a specific user
-  Future<List<MyCategory>> getCategories(String userId) async {
+  // Get all categories
+  Future<List<MyCategory>> getCategories() async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('categories');
+
+    return List.generate(maps.length, (i) {
+      return MyCategory.fromMap(maps[i]);
+    });
+  }
+
+  // Get expense categories
+  Future<List<MyCategory>> getExpenseCategories() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'categories',
-      where: 'user_id = ?',
-      whereArgs: [userId],
+      where: 'type = ?',
+      whereArgs: ['expense'],
     );
 
     return List.generate(maps.length, (i) {
@@ -84,13 +86,13 @@ class CategoryService {
     });
   }
 
-  // Get expense categories for a specific user
-  Future<List<MyCategory>> getExpenseCategories(String userId) async {
+  // Get income categories
+  Future<List<MyCategory>> getIncomeCategories() async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'categories',
-      where: 'user_id = ? AND type = ?',
-      whereArgs: [userId, 'expense'],
+      where: 'type = ?',
+      whereArgs: ['income'],
     );
 
     return List.generate(maps.length, (i) {
@@ -98,27 +100,9 @@ class CategoryService {
     });
   }
 
-  // Get income categories for a specific user
-  Future<List<MyCategory>> getIncomeCategories(String userId) async {
+  // Clear all categories
+  Future<void> clearCategories() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'categories',
-      where: 'user_id = ? AND type = ?',
-      whereArgs: [userId, 'income'],
-    );
-
-    return List.generate(maps.length, (i) {
-      return MyCategory.fromMap(maps[i]);
-    });
-  }
-
-  // Clear all categories for a specific user
-  Future<void> clearCategories(String userId) async {
-    final db = await database;
-    await db.delete(
-      'categories',
-      where: 'user_id = ?',
-      whereArgs: [userId],
-    );
+    await db.delete('categories');
   }
 }

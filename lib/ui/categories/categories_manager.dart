@@ -4,21 +4,13 @@ import '../../services/category_service.dart';
 
 class CategoriesManager extends ChangeNotifier {
   final CategoryService _categoryService = CategoryService();
-  String? _userId;
   
   List<MyCategory> _expenseCategories = [];
   List<MyCategory> _incomeCategories = [];
   bool _isLoaded = false;
 
-  CategoriesManager();
-
-  // Set userId và load data
-  Future<void> setUserId(String userId) async {
-    if (_userId != userId) {
-      _userId = userId;
-      _isLoaded = false;
-      await _loadCategories();
-    }
+  CategoriesManager() {
+    _loadCategories();
   }
 
   List<MyCategory> get expenseCategories => List.unmodifiable(_expenseCategories);
@@ -40,9 +32,8 @@ class CategoriesManager extends ChangeNotifier {
 
   // Load categories từ SQLite
   Future<void> _loadCategories() async {
-    if (_userId == null) return;
     try {
-      final categories = await _categoryService.getCategories(_userId!);
+      final categories = await _categoryService.getCategories();
       
       // Nếu chưa có category nào, thêm các category mặc định
       if (categories.isEmpty) {
@@ -63,8 +54,6 @@ class CategoriesManager extends ChangeNotifier {
 
   // Khởi tạo các category mặc định
   Future<void> _initDefaultCategories() async {
-    if (_userId == null) return;
-    
     final defaultCategories = [
       MyCategory(id: '1', name: 'Ăn uống', icon: 'restaurant', color: '#FF5722', type: 'expense', isDefault: false),
       MyCategory(id: '2', name: 'Mua sắm', icon: 'shopping_bag', color: '#4CAF50', type: 'expense', isDefault: false),
@@ -75,7 +64,7 @@ class CategoriesManager extends ChangeNotifier {
     ];
 
     for (var category in defaultCategories) {
-      await _categoryService.insertCategory(_userId!, category);
+      await _categoryService.insertCategory(category);
     }
 
     _expenseCategories = defaultCategories.where((c) => c.type == 'expense').toList();
@@ -84,9 +73,8 @@ class CategoriesManager extends ChangeNotifier {
 
   // Thêm danh mục mới
   Future<void> addCategory(MyCategory category) async {
-    if (_userId == null) return;
     try {
-      await _categoryService.insertCategory(_userId!, category);
+      await _categoryService.insertCategory(category);
       
       if (category.type == 'expense') {
         _expenseCategories.add(category);
@@ -102,9 +90,8 @@ class CategoriesManager extends ChangeNotifier {
 
   // Sửa danh mục
   Future<void> updateCategory(MyCategory category) async {
-    if (_userId == null) return;
     try {
-      await _categoryService.updateCategory(_userId!, category);
+      await _categoryService.updateCategory(category);
       
       if (category.type == 'expense') {
         final index = _expenseCategories.indexWhere((c) => c.id == category.id);
@@ -126,9 +113,8 @@ class CategoriesManager extends ChangeNotifier {
 
   // Xóa danh mục
   Future<void> deleteCategory(String id) async {
-    if (_userId == null) return;
     try {
-      await _categoryService.deleteCategory(_userId!, id);
+      await _categoryService.deleteCategory(id);
       
       _expenseCategories.removeWhere((c) => c.id == id);
       _incomeCategories.removeWhere((c) => c.id == id);
