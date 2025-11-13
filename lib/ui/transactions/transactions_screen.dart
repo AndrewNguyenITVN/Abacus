@@ -45,32 +45,72 @@ class TransactionsScreen extends StatelessWidget {
     final transactions = transactionsManager.transactions;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: const Text('Sổ giao dịch'),
+        title: const Text(
+          'Sổ giao dịch',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: const Color(0xFFF8F9FD),
+        surfaceTintColor: Colors.transparent,
       ),
       body: Column(
         children: [
           _buildSummary(context, transactionsManager),
           Expanded(
             child: transactions.isEmpty
-                ? const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet,
-                          size: 100,
-                          color: Colors.deepPurple,
-                        ),
-                        SizedBox(height: 16),
-                        Text(
-                          'Chưa có giao dịch nào',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                      ],
-                    ),
-                  )
+                ? _buildEmptyState()
                 : _buildGroupedTransactionList(transactions, categoriesManager),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.shade100,
+                  Colors.purple.shade100,
+                ],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.receipt_long_rounded,
+              size: 60,
+              color: Colors.blue.shade300,
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Chưa có giao dịch nào',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1a1a2e),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Bắt đầu bằng cách thêm giao dịch đầu tiên',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
           ),
         ],
       ),
@@ -82,55 +122,164 @@ class TransactionsScreen extends StatelessWidget {
     final currencyFormat =
         NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Thu nhập', style: TextStyle(fontSize: 16)),
-                Text(
-                  currencyFormat.format(transactionsManager.totalIncome),
-                  style: const TextStyle(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: -4,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          // Income row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.trending_up_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Thu nhập',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1a1a2e),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                currencyFormat.format(transactionsManager.totalIncome),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF11998e),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Expense row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFee0979), Color(0xFFff6a00)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.trending_down_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Chi tiêu',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1a1a2e),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                currencyFormat.format(transactionsManager.totalExpense),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFFee0979),
+                ),
+              ),
+            ],
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 16),
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.grey.shade200,
+                  Colors.grey.shade100,
+                  Colors.grey.shade200,
+                ],
+              ),
+            ),
+          ),
+          // Balance row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.blue.shade400,
+                          Colors.purple.shade400,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Số dư',
+                    style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green),
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1a1a2e),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                currencyFormat.format(transactionsManager.balance),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1a1a2e),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Chi tiêu', style: TextStyle(fontSize: 16)),
-                Text(
-                  currencyFormat.format(transactionsManager.totalExpense),
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Số dư',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Text(
-                  currencyFormat.format(transactionsManager.balance),
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -168,12 +317,50 @@ class TransactionsScreen extends StatelessWidget {
   Widget _buildDateHeader(DateTime date) {
     final dateText = DateFormat('d MMMM, y', 'vi_VN').format(date);
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-      child: Text(
-        dateText,
-        style: const TextStyle(
-            fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54),
+    return Container(
+      margin: const EdgeInsets.only(top: 16, bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.orange.shade300,
+                  Colors.pink.shade300,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(
+              Icons.calendar_today_rounded,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            dateText,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1a1a2e),
+              letterSpacing: -0.3,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -185,27 +372,119 @@ class TransactionsScreen extends StatelessWidget {
     final category = categoriesManager.items
         .firstWhere((c) => c.id == transaction.categoryId);
     final isIncome = transaction.type == 'income';
+    final categoryColor = _parseColor(category.color);
 
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+            spreadRadius: -2,
+          ),
+        ],
+      ),
       child: Builder(
         builder: (context) {
           return ListTile(
-            leading: CircleAvatar(
-              backgroundColor: _parseColor(category.color),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 10,
+            ),
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    categoryColor.withOpacity(0.8),
+                    categoryColor,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: categoryColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Icon(
                 _getIconData(category.icon),
                 color: Colors.white,
+                size: 22,
               ),
             ),
-            title: Text(transaction.description),
-            subtitle: Text(category.name),
-            trailing: Text(
-              '${isIncome ? '+' : '-'}${currencyFormat.format(transaction.amount)}',
-              style: TextStyle(
-                color: isIncome ? Colors.green : Colors.red,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            title: Text(
+              transaction.description,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Color(0xFF1a1a2e),
+                letterSpacing: -0.2,
+              ),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: categoryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      category.name,
+                      style: TextStyle(
+                        color: categoryColor,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    DateFormat('HH:mm', 'vi_VN').format(transaction.date),
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 6,
+              ),
+              decoration: BoxDecoration(
+                color: isIncome
+                    ? const Color(0xFF11998e).withOpacity(0.1)
+                    : const Color(0xFFee0979).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                '${isIncome ? '+' : '-'}${currencyFormat.format(transaction.amount)}',
+                style: TextStyle(
+                  color: isIncome
+                      ? const Color(0xFF11998e)
+                      : const Color(0xFFee0979),
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  letterSpacing: -0.3,
+                ),
               ),
             ),
             onTap: () {
