@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../models/account.dart';
-import '/ui/auth/login_screen.dart';
 import '/ui/account/edit_profile_screen.dart';
 import '/ui/account/account_manager.dart';
 import '/ui/auth/auth_manager.dart';
@@ -17,7 +16,7 @@ class AccountScreen extends StatelessWidget {
     final account = accountManager.account;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF8F9FD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -25,27 +24,23 @@ class AccountScreen extends StatelessWidget {
             children: [
               // Header Section
               _buildHeader(context, account),
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
 
               // Action Buttons
               _buildActionButtons(),
-              const SizedBox(height: 16),
-              
-              // Utilities Section
-              // _buildUtilitiesSection(),
-              // const SizedBox(height: 16),
+              const SizedBox(height: 20),
               
               // Settings Section
               _buildSettingsSection(context),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               
               // Logout Section
               _buildLogoutSection(context),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               
               // Version Info
               _buildVersionInfo(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -60,61 +55,76 @@ class AccountScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.pink.shade50,
-            Colors.purple.shade50,
-            Colors.blue.shade50,
+            const Color(0xFF667eea).withOpacity(0.15), // Purple
+            const Color(0xFF764ba2).withOpacity(0.15), // Deep purple
+            const Color(0xFFf093fb).withOpacity(0.15), // Pink
           ],
         ),
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 28),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(width: 40),
+              const SizedBox(width: 48),
               Column(
                 children: [
                   // Avatar
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 90,
+                    height: 90,
                     decoration: BoxDecoration(
-                      color: Colors.pink.shade100,
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF667eea), // Purple
+                          Color(0xFF764ba2), // Deep purple
+                        ],
+                      ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                          color: const Color(0xFF667eea).withOpacity(0.4),
+                          blurRadius: 16,
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
                     child: Center(
                       child: Text(
                         account.initials ?? 'NA',
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.pink.shade700,
+                        style: const TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 8),
                   // Verified Badge
                   if (account.isVerified)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
+                        ),
                         borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF11998e).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.check_circle,
+                          Icon(Icons.verified_rounded,
                               color: Colors.white, size: 14),
                           SizedBox(width: 4),
                           Text(
@@ -122,7 +132,8 @@ class AccountScreen extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 11,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: -0.2,
                             ),
                           ),
                         ],
@@ -133,12 +144,24 @@ class AccountScreen extends StatelessWidget {
               // Edit Profile Button
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFee0979), // Pink
+                      Color(0xFFff6a00), // Orange
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFee0979).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.edit_outlined),
-                  color: Colors.deepPurple,
+                  icon: const Icon(Icons.edit_rounded),
+                  color: Colors.white,
                   tooltip: 'Chỉnh sửa thông tin',
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
@@ -154,23 +177,40 @@ class AccountScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           // Name
           Text(
             account.fullName,
             style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              fontSize: 26,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1a1a2e),
+              letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           // Phone
-          Text(
-            account.phone,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.phone_rounded, size: 16, color: Colors.grey.shade700),
+                const SizedBox(width: 6),
+                Text(
+                  account.phone,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade800,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -182,54 +222,80 @@ class AccountScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+              spreadRadius: -4,
             ),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            _buildActionButton(Icons.account_balance_wallet, 'Quản lý\n chi tiêu'),
-            _buildActionButton(Icons.settings, 'Cài đặt\nthanh toán'),
-            _buildActionButton(Icons.security, 'Đăng nhập\nvà bảo mật'),
-            _buildActionButton(Icons.notifications, 'Cài đặt\nthông báo'),
+            _buildActionButton(
+              Icons.account_balance_wallet_rounded,
+              'Quản lý\nchi tiêu',
+              [const Color(0xFF667eea), const Color(0xFF764ba2)], // Purple gradient
+            ),
+            _buildActionButton(
+              Icons.credit_card_rounded,
+              'Cài đặt\nthanh toán',
+              [const Color(0xFFee0979), const Color(0xFFff6a00)], // Pink-Orange gradient
+            ),
+            _buildActionButton(
+              Icons.security_rounded,
+              'Đăng nhập\nvà bảo mật',
+              [const Color(0xFF11998e), const Color(0xFF38ef7d)], // Teal-Green gradient
+            ),
+            _buildActionButton(
+              Icons.notifications_rounded,
+              'Cài đặt\nthông báo',
+              [const Color(0xFFf093fb), const Color(0xFFee0979)], // Pink gradient
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
-  return Column(
-    children: [
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.purple.shade50,
-          borderRadius: BorderRadius.circular(12),
+  Widget _buildActionButton(IconData icon, String label, List<Color> gradientColors) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(colors: gradientColors),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: gradientColors[0].withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Icon(icon, color: Colors.white, size: 26),
         ),
-        child: Icon(icon, color: Colors.deepPurple, size: 28),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        label,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontSize: 11,
-          color: Colors.black87,
+        const SizedBox(height: 10),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1a1a2e),
+            letterSpacing: -0.2,
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
   Widget _buildSettingsSection(BuildContext context) {
     return Padding(
@@ -237,63 +303,69 @@ class AccountScreen extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+              spreadRadius: -4,
             ),
           ],
         ),
         child: Column(
           children: [
             _buildSettingItem(
-              Icons.help_center_outlined,
+              Icons.help_center_rounded,
               'Trung tâm trợ giúp',
+              [const Color(0xFF667eea), const Color(0xFF764ba2)], // Purple gradient
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Trung tâm trợ giúp')),
+                  _buildModernSnackBar('Trung tâm trợ giúp', true),
                 );
               },
             ),
             _buildDivider(),
             _buildSettingItem(
-              Icons.notifications_outlined,
+              Icons.notifications_rounded,
               'Cài đặt thông báo',
+              [const Color(0xFFee0979), const Color(0xFFff6a00)], // Pink-Orange gradient
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Cài đặt thông báo')),
+                  _buildModernSnackBar('Cài đặt thông báo', true),
                 );
               },
             ),
             _buildDivider(),
             _buildSettingItem(
-              Icons.share_outlined,
+              Icons.share_rounded,
               'Chia sẻ góp ý',
+              [const Color(0xFF11998e), const Color(0xFF38ef7d)], // Teal-Green gradient
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Chia sẻ góp ý')),
+                  _buildModernSnackBar('Chia sẻ góp ý', true),
                 );
               },
             ),
             _buildDivider(),
             _buildSettingItem(
-              Icons.info_outline,
+              Icons.info_rounded,
               'Thông tin chung',
+              [const Color(0xFF667eea), const Color(0xFFf093fb)], // Purple-Pink gradient
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Thông tin chung')),
+                  _buildModernSnackBar('Thông tin chung', true),
                 );
               },
             ),
             _buildDivider(),
             _buildSettingItem(
-              Icons.palette_outlined,
+              Icons.palette_rounded,
               'Đổi màu nền',
+              [const Color(0xFFf093fb), const Color(0xFFee0979)], // Pink gradient
               onTap: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đổi màu nền')),
+                  _buildModernSnackBar('Đổi màu nền', true),
                 );
               },
             ),
@@ -305,49 +377,108 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem(IconData icon, String title, {VoidCallback? onTap}) {
+  Widget _buildSettingItem(IconData icon, String title, List<Color> gradientColors, {VoidCallback? onTap}) {
     return ListTile(
-      leading: Icon(icon, color: Colors.black54),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(colors: gradientColors),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: gradientColors[0].withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(icon, color: Colors.white, size: 22),
+      ),
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1a1a2e),
+          letterSpacing: -0.2,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.black38),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        color: Colors.grey.shade400,
+        size: 24,
+      ),
       onTap: onTap,
+    );
+  }
+
+  SnackBar _buildModernSnackBar(String message, bool isSuccess) {
+    return SnackBar(
+      content: Row(
+        children: [
+          Icon(
+            isSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 12),
+          Text(message),
+        ],
+      ),
+      backgroundColor: isSuccess ? const Color(0xFF11998e) : const Color(0xFFee0979),
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      margin: const EdgeInsets.all(16),
     );
   }
 
   Widget _buildLanguageItem() {
     return ListTile(
-      leading: const Icon(Icons.language, color: Colors.black54),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF11998e), Color(0xFF38ef7d)], // Teal-Green gradient
+          ),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF11998e).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Icon(Icons.language_rounded, color: Colors.white, size: 22),
+      ),
       title: const Text(
         'Ngôn ngữ',
         style: TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF1a1a2e),
+          letterSpacing: -0.2,
         ),
       ),
       trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF667eea), Color(0xFFf093fb)], // Purple-Pink gradient
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'VI',
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-          ],
+        child: const Text(
+          'VI',
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: 0.5,
+          ),
         ),
       ),
     );
@@ -368,52 +499,96 @@ class AccountScreen extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                context.read<AuthManager>().logout();
-                context.go('/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade300),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFee0979), Color(0xFFff6a00)], // Pink-Orange gradient
                 ),
-                elevation: 2,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFee0979).withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-              child: const Text(
-                'Đăng xuất',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.read<AuthManager>().logout();
+                  context.go('/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.logout_rounded, color: Colors.white, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Đăng xuất',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: ElevatedButton(
-              onPressed: () {
-                context.read<AuthManager>().logout();
-                context.go('/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black87,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade300),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF667eea), Color(0xFF764ba2)], // Purple gradient
                 ),
-                elevation: 2,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF667eea).withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-              child: const Text(
-                'Đổi tài khoản',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+              child: ElevatedButton(
+                onPressed: () {
+                  context.read<AuthManager>().logout();
+                  context.go('/login');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.swap_horiz_rounded, color: Colors.white, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Đổi tài khoản',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -427,24 +602,51 @@ class AccountScreen extends StatelessWidget {
     return Center(
       child: Column(
         children: [
-          Text(
-            'Phiên bản 1.0.0',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey.shade600,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              'Phiên bản 1.0.0',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade700,
+                letterSpacing: -0.2,
+              ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.security, size: 16, color: Colors.grey.shade600),
-              const SizedBox(width: 4),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
+                  ),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.verified_user_rounded, size: 14, color: Colors.white),
+              ),
+              const SizedBox(width: 8),
               Text(
                 'An toàn tài sản & Bảo mật thông tin của bạn',
                 style: TextStyle(
                   fontSize: 11,
+                  fontWeight: FontWeight.w600,
                   color: Colors.grey.shade600,
+                  letterSpacing: -0.2,
                 ),
               ),
             ],
@@ -454,3 +656,4 @@ class AccountScreen extends StatelessWidget {
     );
   }
 }
+
