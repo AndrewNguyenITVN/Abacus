@@ -551,7 +551,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
+          onTap: () async {
             if (_formKey.currentState!.validate()) {
               final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
               final amount = double.parse(_amountController.text.replaceAll('.', ''));
@@ -568,23 +568,37 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 type: type,
               );
 
-              transactionsManager.addTransaction(newTransaction);
+              try {
+                await transactionsManager.addTransaction(newTransaction);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text(
-                    'Đã thêm giao dịch thành công!',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  backgroundColor: const Color(0xFF11998e),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              );
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Đã thêm giao dịch thành công!',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      backgroundColor: const Color(0xFF11998e),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
 
-              Navigator.pop(context);
+                  Navigator.pop(context);
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Lỗi: $e'),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
             }
           },
           borderRadius: BorderRadius.circular(16),

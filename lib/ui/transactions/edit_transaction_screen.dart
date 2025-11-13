@@ -89,7 +89,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
     _amountController.text = formatter.format(int.parse(currentAmount)).replaceAll(',', '.');
   }
 
-  void _saveTransaction() {
+  Future<void> _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
       final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
       final amount = double.parse(_amountController.text.replaceAll('.', ''));
@@ -108,13 +108,23 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         note: note.isEmpty ? null : note,
       );
 
-      transactionsManager.updateTransaction(updatedTransaction);
+      try {
+        await transactionsManager.updateTransaction(updatedTransaction);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Đã cập nhật giao dịch')),
-      );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đã cập nhật giao dịch')),
+          );
 
-      Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -131,16 +141,28 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
               child: const Text('Hủy'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
-                transactionsManager.deleteTransaction(widget.transaction.id);
                 
-                Navigator.of(context).pop(); // Close dialog
-                Navigator.of(context).pop(); // Return to transactions screen
-                
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Đã xóa giao dịch')),
-                );
+                try {
+                  await transactionsManager.deleteTransaction(widget.transaction.id);
+                  
+                  if (mounted) {
+                    Navigator.of(context).pop(); // Close dialog
+                    Navigator.of(context).pop(); // Return to transactions screen
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Đã xóa giao dịch')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    Navigator.of(context).pop(); // Close dialog
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Lỗi: $e')),
+                    );
+                  }
+                }
               },
               style: TextButton.styleFrom(foregroundColor: Colors.red),
               child: const Text('Xóa'),
