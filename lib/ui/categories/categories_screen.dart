@@ -70,13 +70,41 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
         await categoriesManager.addCategory(result);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã thêm danh mục mới')),
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle_rounded, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Đã thêm danh mục mới'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF11998e),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e')),
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_rounded, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Text('Lỗi: $e'),
+                ],
+              ),
+              backgroundColor: const Color(0xFFee0979),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       }
@@ -100,13 +128,41 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
         await categoriesManager.updateCategory(result);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã cập nhật danh mục')),
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle_rounded, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Đã cập nhật danh mục'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF11998e),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e')),
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_rounded, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Text('Lỗi: $e'),
+                ],
+              ),
+              backgroundColor: const Color(0xFFee0979),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       }
@@ -118,16 +174,64 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn có chắc chắn muốn xóa danh mục "${category.name}"?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_rounded, color: Color(0xFFee0979)),
+            SizedBox(width: 12),
+            Text(
+              'Xác nhận xóa',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 18,
+                color: Color(0xFF1a1a2e),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn xóa danh mục "${category.name}"?',
+          style: const TextStyle(
+            fontSize: 15,
+            color: Color(0xFF4a4a68),
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Hủy'),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(
+              'Hủy',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFee0979), Color(0xFFff6a00)],
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              ),
+              child: const Text(
+                'Xóa',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -138,13 +242,41 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
         await categoriesManager.deleteCategory(category.id);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã xóa danh mục')),
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.check_circle_rounded, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Đã xóa danh mục'),
+                ],
+              ),
+              backgroundColor: const Color(0xFF11998e),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e')),
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_rounded, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Text('Lỗi: $e'),
+                ],
+              ),
+              backgroundColor: const Color(0xFFee0979),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
           );
         }
       }
@@ -156,20 +288,83 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     final categoriesManager = context.watch<CategoriesManager>();
     
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: const Text('Danh mục'),
+        title: const Text(
+          'Danh mục',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: const Color(0xFFF8F9FD),
+        surfaceTintColor: Colors.transparent,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _addCategory,
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.shade400,
+                  Colors.purple.shade400,
+                ],
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blue.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.add_rounded, color: Colors.white),
+              onPressed: _addCategory,
+            ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Chi tiêu'),
-            Tab(text: 'Thu nhập'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: const Color(0xFF1a1a2e),
+              unselectedLabelColor: Colors.grey.shade500,
+              labelStyle: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+                letterSpacing: -0.3,
+              ),
+              unselectedLabelStyle: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+              ),
+              indicator: UnderlineTabIndicator(
+                borderSide: const BorderSide(width: 3),
+                insets: const EdgeInsets.symmetric(horizontal: 40),
+                borderRadius: BorderRadius.circular(2),
+              ),
+              indicatorColor: Colors.blue.shade400,
+              tabs: const [
+                Tab(text: 'Chi tiêu'),
+                Tab(text: 'Thu nhập'),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -184,33 +379,110 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
 
   Widget _buildCategoryList(List<MyCategory> categories) {
     if (categories.isEmpty) {
-      return const Center(child: Text('Chưa có danh mục nào'));
+      return _buildEmptyState();
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final category = categories[index];
-        return Card(
+        final categoryColor = _parseColor(category.color);
+        
+        return Container(
           margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+                spreadRadius: -2,
+              ),
+            ],
+          ),
           child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: _parseColor(category.color),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    categoryColor.withOpacity(0.8),
+                    categoryColor,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: categoryColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
               child: Icon(
                 _getIconData(category.icon),
                 color: Colors.white,
+                size: 22,
               ),
             ),
-            title: Text(category.name),
-            subtitle: category.isDefault
-                ? const Text('Mặc định')
-                : const Text('Tùy chỉnh'),
+            title: Text(
+              category.name,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: Color(0xFF1a1a2e),
+                letterSpacing: -0.2,
+              ),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 2,
+                ),
+                decoration: BoxDecoration(
+                  color: category.isDefault
+                      ? Colors.blue.shade50
+                      : Colors.purple.shade50,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  category.isDefault ? 'Mặc định' : 'Tùy chỉnh',
+                  style: TextStyle(
+                    color: category.isDefault
+                        ? Colors.blue.shade700
+                        : Colors.purple.shade700,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
             trailing: category.isDefault
                 ? null
-                : IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _deleteCategory(category),
+                : Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.delete_rounded,
+                        color: Colors.red.shade400,
+                      ),
+                      onPressed: () => _deleteCategory(category),
+                    ),
                   ),
             onTap: category.isDefault
                 ? null
@@ -218,6 +490,51 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
           ),
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.orange.shade100,
+                  Colors.pink.shade100,
+                ],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.category_rounded,
+              size: 60,
+              color: Colors.orange.shade300,
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Chưa có danh mục nào',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1a1a2e),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Nhấn nút + để thêm danh mục mới',
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
