@@ -1,35 +1,12 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import '../models/transaction.dart' as app_transaction;
+import 'database_service.dart';
 
 class TransactionService {
-  static Database? _database;
+  final DatabaseService _dbService = DatabaseService();
 
   Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
-  }
-
-  Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'transaction_database.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE transactions(
-            id TEXT PRIMARY KEY,
-            amount REAL NOT NULL,
-            description TEXT NOT NULL,
-            date TEXT NOT NULL,
-            category_id TEXT NOT NULL,
-            type TEXT NOT NULL,
-            note TEXT
-          )
-        ''');
-      },
-    );
+    return await _dbService.database;
   }
 
   // Insert transaction

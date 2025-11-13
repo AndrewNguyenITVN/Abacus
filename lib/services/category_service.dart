@@ -1,34 +1,12 @@
 import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
 import '../models/my_category.dart';
+import 'database_service.dart';
 
 class CategoryService {
-  static Database? _database;
+  final DatabaseService _dbService = DatabaseService();
 
   Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
-  }
-
-  Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'category_database.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE categories(
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            icon TEXT NOT NULL,
-            color TEXT NOT NULL,
-            type TEXT NOT NULL,
-            is_default INTEGER NOT NULL DEFAULT 0
-          )
-        ''');
-      },
-    );
+    return await _dbService.database;
   }
 
   // Insert category
