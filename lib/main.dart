@@ -56,26 +56,13 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: authManager),
         ChangeNotifierProvider(create: (context) => AccountManager()),
-        ChangeNotifierProxyProvider<AuthManager, CategoriesManager>(
-          create: (context) {
-            final auth = Provider.of<AuthManager>(context, listen: false);
-            return CategoriesManager(userId: auth.user?.id ?? 'guest');
-          },
-          update: (context, auth, previous) {
-            final userId = auth.user?.id ?? 'guest';
-            // Nếu user thay đổi, tạo CategoriesManager mới
-            if (previous == null || previous.userId != userId) {
-              return CategoriesManager(userId: userId);
-            }
-            return previous;
-          },
-        ),
+        ChangeNotifierProvider(create: (context) => CategoriesManager()),
         ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
           create: (context) => TransactionsManager(
             Provider.of<CategoriesManager>(context, listen: false),
           ),
-          update: (context, categoriesManager, previousTransactionsManager) =>
-              previousTransactionsManager ?? TransactionsManager(categoriesManager),
+          update: (context, categories, previous) =>
+              previous ?? TransactionsManager(categories),
         ),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],
