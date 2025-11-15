@@ -1,53 +1,30 @@
 import 'package:flutter/foundation.dart';
 import '/models/savings_goal.dart';
+import '/services/savings_goal_service.dart';
 
 class SavingsGoalsManager extends ChangeNotifier {
-  final List<SavingsGoal> _goals = [];
+  final SavingsGoalService _goalService = SavingsGoalService();
+  
+  List<SavingsGoal> _goals = [];
+  bool _isLoaded = false;
 
   SavingsGoalsManager() {
-    // Sample data for demonstration
-    final now = DateTime.now();
-    _goals.addAll([
-      SavingsGoal(
-        id: 'g1',
-        userId: 'user1',
-        name: 'Mua xe máy',
-        description: 'Tiết kiệm để mua xe máy mới',
-        targetAmount: 40000000,
-        currentAmount: 15000000,
-        targetDate: now.add(const Duration(days: 180)),
-        icon: 'two_wheeler',
-        color: '#FF5722',
-        createdAt: now.subtract(const Duration(days: 30)),
-        updatedAt: now,
-      ),
-      SavingsGoal(
-        id: 'g2',
-        userId: 'user1',
-        name: 'Mua nhà',
-        description: 'Tiết kiệm để mua nhà',
-        targetAmount: 500000000,
-        currentAmount: 80000000,
-        targetDate: now.add(const Duration(days: 730)),
-        icon: 'home',
-        color: '#4CAF50',
-        createdAt: now.subtract(const Duration(days: 90)),
-        updatedAt: now,
-      ),
-      SavingsGoal(
-        id: 'g3',
-        userId: 'user1',
-        name: 'Du lịch Nhật Bản',
-        description: 'Chuyến du lịch mùa hè',
-        targetAmount: 30000000,
-        currentAmount: 25000000,
-        targetDate: now.add(const Duration(days: 120)),
-        icon: 'flight',
-        color: '#2196F3',
-        createdAt: now.subtract(const Duration(days: 60)),
-        updatedAt: now,
-      ),
-    ]);
+    _loadGoals();
+  }
+
+  bool get isLoaded => _isLoaded;
+
+  // Load goals từ SQLite
+  Future<void> _loadGoals() async {
+    try {
+      _goals = await _goalService.getGoals();
+      _isLoaded = true;
+      notifyListeners();
+    } catch (e) {
+      print('Error loading goals: $e');
+      _isLoaded = true;
+      notifyListeners();
+    }
   }
 
   // Getters
@@ -87,10 +64,11 @@ class SavingsGoalsManager extends ChangeNotifier {
   // Add new goal
   Future<void> addGoal(SavingsGoal goal) async {
     try {
-      // TODO: Save to PocketBase
+      await _goalService.insertGoal(goal);
       _goals.add(goal);
       notifyListeners();
     } catch (error) {
+      print('Error adding goal: $error');
       rethrow;
     }
   }
@@ -98,13 +76,16 @@ class SavingsGoalsManager extends ChangeNotifier {
   // Update goal
   Future<void> updateGoal(SavingsGoal updatedGoal) async {
     try {
+      final goalWithTimestamp = updatedGoal.copyWith(updatedAt: DateTime.now());
+      await _goalService.updateGoal(goalWithTimestamp);
+      
       final index = _goals.indexWhere((g) => g.id == updatedGoal.id);
       if (index != -1) {
-        // TODO: Update in PocketBase
-        _goals[index] = updatedGoal.copyWith(updatedAt: DateTime.now());
+        _goals[index] = goalWithTimestamp;
         notifyListeners();
       }
     } catch (error) {
+      print('Error updating goal: $error');
       rethrow;
     }
   }
@@ -128,10 +109,11 @@ class SavingsGoalsManager extends ChangeNotifier {
   // Delete goal
   Future<void> deleteGoal(String id) async {
     try {
-      // TODO: Delete from PocketBase
+      await _goalService.deleteGoal(id);
       _goals.removeWhere((g) => g.id == id);
       notifyListeners();
     } catch (error) {
+      print('Error deleting goal: $error');
       rethrow;
     }
   }
@@ -165,14 +147,10 @@ class SavingsGoalsManager extends ChangeNotifier {
     }).toList();
   }
 
-  // Load goals from backend (placeholder)
+  // Refresh goals từ database
   Future<void> fetchGoals() async {
-    try {
-      // TODO: Fetch from PocketBase
-      notifyListeners();
-    } catch (error) {
-      rethrow;
-    }
+    _isLoaded = false;
+    await _loadGoals();
   }
 }
 

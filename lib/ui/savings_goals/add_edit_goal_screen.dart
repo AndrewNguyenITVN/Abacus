@@ -529,7 +529,6 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
       initialDate: _targetDate ?? DateTime.now().add(const Duration(days: 30)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 3650)),
-      locale: const Locale('vi', 'VN'),
     );
 
     if (picked != null && picked != _targetDate) {
