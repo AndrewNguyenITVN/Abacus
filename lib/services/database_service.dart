@@ -40,6 +40,22 @@ class DatabaseService {
             note TEXT
           )
         ''');
+
+        // Tạo savings_goals table
+        await db.execute('''
+          CREATE TABLE savings_goals(
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT,
+            target_amount REAL NOT NULL,
+            current_amount REAL NOT NULL DEFAULT 0,
+            target_date TEXT,
+            icon TEXT NOT NULL,
+            color TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+          )
+        ''');
       },
     );
   }

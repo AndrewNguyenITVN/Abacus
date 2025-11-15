@@ -47,6 +47,41 @@ class SavingsGoal {
     return difference.inDays;
   }
 
+  // To Map for SQLite
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'target_amount': targetAmount,
+      'current_amount': currentAmount,
+      'target_date': targetDate?.toIso8601String(),
+      'icon': icon,
+      'color': color,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  // From Map for SQLite
+  factory SavingsGoal.fromMap(Map<String, dynamic> map) {
+    return SavingsGoal(
+      id: map['id'] as String,
+      userId: '', // Không cần userId trong single-user app
+      name: map['name'] as String,
+      description: map['description'] as String?,
+      targetAmount: map['target_amount'] as double,
+      currentAmount: map['current_amount'] as double,
+      targetDate: map['target_date'] != null 
+          ? DateTime.parse(map['target_date'] as String)
+          : null,
+      icon: map['icon'] as String,
+      color: map['color'] as String,
+      createdAt: DateTime.parse(map['created_at'] as String),
+      updatedAt: DateTime.parse(map['updated_at'] as String),
+    );
+  }
+
   // From JSON
   factory SavingsGoal.fromJson(Map<String, dynamic> json) {
     return SavingsGoal(
