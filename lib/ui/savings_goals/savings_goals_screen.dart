@@ -84,6 +84,18 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen>
             Tab(text: 'Hoàn thành'),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AddEditGoalScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: TabBarView(
         controller: _tabController,
@@ -91,18 +103,6 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen>
           _buildGoalsList(isCompleted: false),
           _buildGoalsList(isCompleted: true),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const AddEditGoalScreen(),
-            ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Tạo mục tiêu'),
-        backgroundColor: Colors.purple.shade600,
       ),
     );
   }
