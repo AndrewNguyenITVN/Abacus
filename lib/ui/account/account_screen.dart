@@ -143,25 +143,9 @@ class AccountScreen extends StatelessWidget {
               ),
               // Edit Profile Button
               Container(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFFee0979), // Pink
-                      Color(0xFFff6a00), // Orange
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFee0979).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
                 child: IconButton(
                   icon: const Icon(Icons.edit_rounded),
-                  color: Colors.white,
+                  color: Colors.grey.shade700,
                   tooltip: 'Chỉnh sửa thông tin',
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
