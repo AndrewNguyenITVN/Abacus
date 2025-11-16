@@ -432,12 +432,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
                   horizontal: 8,
                   vertical: 2,
                 ),
-                decoration: BoxDecoration(
-                  color: category.isDefault
-                      ? Colors.blue.shade50
-                      : Colors.purple.shade50,
-                  borderRadius: BorderRadius.circular(6),
-                ),
                 child: Text(
                   category.isDefault ? 'Mặc định' : 'Tùy chỉnh',
                   style: TextStyle(
@@ -453,14 +447,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             trailing: category.isDefault
                 ? null
                 : Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red.shade50,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
                     child: IconButton(
                       icon: Icon(
                         Icons.delete_rounded,
-                        color: Colors.red.shade400,
                       ),
                       onPressed: () => _deleteCategory(category),
                     ),
