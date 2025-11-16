@@ -318,56 +318,36 @@ class AccountScreen extends StatelessWidget {
             _buildSettingItem(
               Icons.help_center_rounded,
               'Trung tâm trợ giúp',
-              [const Color(0xFF667eea), const Color(0xFF764ba2)], // Purple gradient
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  _buildModernSnackBar('Trung tâm trợ giúp', true),
-                );
-              },
+              Colors.grey.shade600,
+              //onTap: () => _showSnackBar(context, 'Trung tâm trợ giúp'),
             ),
             _buildDivider(),
             _buildSettingItem(
               Icons.notifications_rounded,
               'Cài đặt thông báo',
-              [const Color(0xFFee0979), const Color(0xFFff6a00)], // Pink-Orange gradient
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  _buildModernSnackBar('Cài đặt thông báo', true),
-                );
-              },
+              Colors.grey.shade600,
+              //onTap: () => _showSnackBar(context, 'Cài đặt thông báo'),
             ),
             _buildDivider(),
             _buildSettingItem(
               Icons.share_rounded,
               'Chia sẻ góp ý',
-              [const Color(0xFF11998e), const Color(0xFF38ef7d)], // Teal-Green gradient
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  _buildModernSnackBar('Chia sẻ góp ý', true),
-                );
-              },
+              Colors.grey.shade600,
+              //onTap: () => _showSnackBar(context, 'Chia sẻ góp ý'),
             ),
             _buildDivider(),
             _buildSettingItem(
               Icons.info_rounded,
               'Thông tin chung',
-              [const Color(0xFF667eea), const Color(0xFFf093fb)], // Purple-Pink gradient
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  _buildModernSnackBar('Thông tin chung', true),
-                );
-              },
+              Colors.grey.shade600,
+              //onTap: () => _showSnackBar(context, 'Thông tin chung'),
             ),
             _buildDivider(),
             _buildSettingItem(
               Icons.palette_rounded,
               'Đổi màu nền',
-              [const Color(0xFFf093fb), const Color(0xFFee0979)], // Pink gradient
-              onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  _buildModernSnackBar('Đổi màu nền', true),
-                );
-              },
+              Colors.grey.shade600,
+              //onTap: () => _showSnackBar(context, 'Đổi màu nền'),
             ),
             _buildDivider(),
             _buildLanguageItem(),
@@ -377,23 +357,16 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem(IconData icon, String title, List<Color> gradientColors, {VoidCallback? onTap}) {
+  Widget _buildSettingItem(IconData icon, String title, Color iconColor, {VoidCallback? onTap}) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          gradient: LinearGradient(colors: gradientColors),
+          color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: gradientColors[0].withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
-        child: Icon(icon, color: Colors.white, size: 22),
+        child: Icon(icon, color: iconColor, size: 22),
       ),
       title: Text(
         title,
@@ -413,26 +386,25 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  SnackBar _buildModernSnackBar(String message, bool isSuccess) {
-    return SnackBar(
-      content: Row(
-        children: [
-          Icon(
-            isSuccess ? Icons.check_circle_rounded : Icons.error_rounded,
-            color: Colors.white,
-          ),
-          const SizedBox(width: 12),
-          Text(message),
-        ],
-      ),
-      backgroundColor: isSuccess ? const Color(0xFF11998e) : const Color(0xFFee0979),
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      margin: const EdgeInsets.all(16),
-    );
-  }
+  // void _showSnackBar(BuildContext context, String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Row(
+  //         children: [
+  //           const Icon(Icons.check_circle_rounded, color: Colors.white),
+  //           const SizedBox(width: 12),
+  //           Text(message),
+  //         ],
+  //       ),
+  //       backgroundColor: Colors.grey.shade700,
+  //       behavior: SnackBarBehavior.floating,
+  //       shape: RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.circular(12),
+  //       ),
+  //       margin: const EdgeInsets.all(16),
+  //     ),
+  //   );
+  // }
 
   Widget _buildLanguageItem() {
     return ListTile(
@@ -440,19 +412,10 @@ class AccountScreen extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF11998e), Color(0xFF38ef7d)], // Teal-Green gradient
-          ),
+          color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF11998e).withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
-        child: const Icon(Icons.language_rounded, color: Colors.white, size: 22),
+        child: Icon(Icons.language_rounded, color: Colors.grey.shade600, size: 22),
       ),
       title: const Text(
         'Ngôn ngữ',
@@ -466,17 +429,15 @@ class AccountScreen extends StatelessWidget {
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF667eea), Color(0xFFf093fb)], // Purple-Pink gradient
-          ),
+          color: Colors.grey.shade200,
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Text(
+        child: Text(
           'VI',
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: Colors.grey.shade700,
             letterSpacing: 0.5,
           ),
         ),
