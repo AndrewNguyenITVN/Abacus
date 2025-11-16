@@ -302,28 +302,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
         backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.blue.shade400,
-                  Colors.purple.shade400,
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blue.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.add_rounded, color: Colors.white),
-              onPressed: _addCategory,
-            ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () => _addCategory(),
           ),
         ],
         bottom: PreferredSize(
