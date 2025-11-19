@@ -44,6 +44,34 @@ class TransactionsScreen extends StatelessWidget {
     final categoriesManager = context.watch<CategoriesManager>();
     final transactions = transactionsManager.transactions;
 
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.landscape) {
+          return _buildLandscapeLayout(
+            context,
+            transactionsManager,
+            categoriesManager,
+            transactions,
+          );
+        } else {
+          return _buildPortraitLayout(
+            context,
+            transactionsManager,
+            categoriesManager,
+            transactions,
+          );
+        }
+      },
+    );
+  }
+
+  // Layout dọc (Portrait) - giao diện hiện tại
+  Widget _buildPortraitLayout(
+    BuildContext context,
+    TransactionsManager transactionsManager,
+    CategoriesManager categoriesManager,
+    List<Transaction> transactions,
+  ) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
@@ -62,6 +90,51 @@ class TransactionsScreen extends StatelessWidget {
       body: Column(
         children: [
           _buildSummary(context, transactionsManager),
+          Expanded(
+            child: transactions.isEmpty
+                ? _buildEmptyState()
+                : _buildGroupedTransactionList(transactions, categoriesManager),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Layout ngang (Landscape) - giao diện 2 cột
+  Widget _buildLandscapeLayout(
+    BuildContext context,
+    TransactionsManager transactionsManager,
+    CategoriesManager categoriesManager,
+    List<Transaction> transactions,
+  ) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FD),
+      appBar: AppBar(
+        title: const Text(
+          'Sổ giao dịch',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: const Color(0xFFF8F9FD),
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // LEFT COLUMN (35%) - Summary Card
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.35,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: _buildSummary(context, transactionsManager),
+            ),
+          ),
+
+          // RIGHT COLUMN (65%) - Transaction List
           Expanded(
             child: transactions.isEmpty
                 ? _buildEmptyState()
