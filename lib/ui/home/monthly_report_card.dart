@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'home_helpers.dart';
+import 'package:intl/intl.dart';
+
+String _formatCurrency(double amount) {
+  final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+  return formatter.format(amount);
+}
 
 /// Card báo cáo tháng này với biểu đồ cột
 class MonthlyReportCard extends StatelessWidget {
@@ -65,7 +70,7 @@ class MonthlyReportCard extends StatelessWidget {
             ],
           ),
           Text(
-            formatCurrency(totalExpense),
+            _formatCurrency(totalExpense),
             style: TextStyle(
               color: Colors.red.shade700,
               fontSize: 26,
