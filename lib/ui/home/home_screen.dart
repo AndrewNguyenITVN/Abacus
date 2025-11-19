@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '/models/transaction.dart';
-import '/ui/shared/app_drawer.dart';
 import '/ui/transactions/transactions_manager.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/savings_goals/savings_goals_block.dart';
@@ -178,7 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      drawer: const AppDrawer(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -540,6 +538,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   TextButton(
                     onPressed: () {
                       // Navigate to transactions screen
+                      DefaultTabController.of(context).animateTo(1);
                     },
                     child: const Text('Xem tất cả'),
                   ),
@@ -619,14 +618,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           title: Text(
-                            transaction.description,
+                            category.name,
                             style: const TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
                             ),
                           ),
                           subtitle: Text(
-                            '${category.name} • ${_formatDate(transaction.date)}',
+                            _formatDate(transaction.date),
                             style: TextStyle(
                               color: Colors.grey.shade600,
                               fontSize: 13,
@@ -727,7 +726,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      drawer: const AppDrawer(),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -1097,7 +1095,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          DefaultTabController.of(context).animateTo(1);
+                        },
                         child: const Text('Xem tất cả'),
                       ),
                     ],
