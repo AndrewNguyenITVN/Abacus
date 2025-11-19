@@ -44,6 +44,34 @@ class TransactionsScreen extends StatelessWidget {
     final categoriesManager = context.watch<CategoriesManager>();
     final transactions = transactionsManager.transactions;
 
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        if (orientation == Orientation.landscape) {
+          return _buildLandscapeLayout(
+            context,
+            transactionsManager,
+            categoriesManager,
+            transactions,
+          );
+        } else {
+          return _buildPortraitLayout(
+            context,
+            transactionsManager,
+            categoriesManager,
+            transactions,
+          );
+        }
+      },
+    );
+  }
+
+  // Layout dọc (Portrait) - giao diện hiện tại
+  Widget _buildPortraitLayout(
+    BuildContext context,
+    TransactionsManager transactionsManager,
+    CategoriesManager categoriesManager,
+    List<Transaction> transactions,
+  ) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
@@ -72,6 +100,51 @@ class TransactionsScreen extends StatelessWidget {
     );
   }
 
+  // Layout ngang (Landscape) - giao diện 2 cột
+  Widget _buildLandscapeLayout(
+    BuildContext context,
+    TransactionsManager transactionsManager,
+    CategoriesManager categoriesManager,
+    List<Transaction> transactions,
+  ) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FD),
+      appBar: AppBar(
+        title: const Text(
+          'Sổ giao dịch',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: const Color(0xFFF8F9FD),
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // LEFT COLUMN (35%) - Summary Card
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.35,
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: _buildSummary(context, transactionsManager),
+            ),
+          ),
+
+          // RIGHT COLUMN (65%) - Transaction List
+          Expanded(
+            child: transactions.isEmpty
+                ? _buildEmptyState()
+                : _buildGroupedTransactionList(transactions, categoriesManager),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildEmptyState() {
     return Center(
       child: Column(
@@ -82,10 +155,7 @@ class TransactionsScreen extends StatelessWidget {
             height: 120,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.blue.shade100,
-                  Colors.purple.shade100,
-                ],
+                colors: [Colors.blue.shade100, Colors.purple.shade100],
               ),
               shape: BoxShape.circle,
             ),
@@ -107,10 +177,7 @@ class TransactionsScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Bắt đầu bằng cách thêm giao dịch đầu tiên',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
           ),
         ],
       ),
@@ -118,9 +185,10 @@ class TransactionsScreen extends StatelessWidget {
   }
 
   Widget _buildSummary(
-      BuildContext context, TransactionsManager transactionsManager) {
-    final currencyFormat =
-        NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    BuildContext context,
+    TransactionsManager transactionsManager,
+  ) {
+    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -245,10 +313,7 @@ class TransactionsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [
-                          Colors.blue.shade400,
-                          Colors.purple.shade400,
-                        ],
+                        colors: [Colors.blue.shade400, Colors.purple.shade400],
                       ),
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -285,13 +350,18 @@ class TransactionsScreen extends StatelessWidget {
   }
 
   Widget _buildGroupedTransactionList(
-      List<Transaction> transactions, CategoriesManager categoriesManager) {
+    List<Transaction> transactions,
+    CategoriesManager categoriesManager,
+  ) {
     final items = [];
     DateTime? lastDate;
 
     for (var transaction in transactions) {
       final transactionDate = DateTime(
-          transaction.date.year, transaction.date.month, transaction.date.day);
+        transaction.date.year,
+        transaction.date.month,
+        transaction.date.day,
+      );
       if (lastDate == null || transactionDate.isBefore(lastDate)) {
         items.add(transactionDate);
         lastDate = transactionDate;
@@ -337,10 +407,7 @@ class TransactionsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.orange.shade300,
-                  Colors.pink.shade300,
-                ],
+                colors: [Colors.orange.shade300, Colors.pink.shade300],
               ),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -366,11 +433,13 @@ class TransactionsScreen extends StatelessWidget {
   }
 
   Widget _buildTransactionTile(
-      Transaction transaction, CategoriesManager categoriesManager) {
-    final currencyFormat =
-        NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
-    final category = categoriesManager.items
-        .firstWhere((c) => c.id == transaction.categoryId);
+    Transaction transaction,
+    CategoriesManager categoriesManager,
+  ) {
+    final currencyFormat = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
+    final category = categoriesManager.items.firstWhere(
+      (c) => c.id == transaction.categoryId,
+    );
     final isIncome = transaction.type == 'income';
     final categoryColor = _parseColor(category.color);
 
@@ -400,10 +469,7 @@ class TransactionsScreen extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    categoryColor.withOpacity(0.8),
-                    categoryColor,
-                  ],
+                  colors: [categoryColor.withOpacity(0.8), categoryColor],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -423,7 +489,7 @@ class TransactionsScreen extends StatelessWidget {
               ),
             ),
             title: Text(
-              transaction.description,
+              category.name,
               style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
@@ -431,44 +497,20 @@ class TransactionsScreen extends StatelessWidget {
                 letterSpacing: -0.2,
               ),
             ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: categoryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
+            subtitle: transaction.description.isNotEmpty
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      category.name,
+                      transaction.description,
                       style: TextStyle(
-                        color: categoryColor,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade600,
+                        fontSize: 14,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    DateFormat('HH:mm', 'vi_VN').format(transaction.date),
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                  )
+                : null,
             trailing: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: isIncome
                     ? const Color(0xFF11998e).withOpacity(0.1)
@@ -490,12 +532,13 @@ class TransactionsScreen extends StatelessWidget {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (context) => EditTransactionScreen(transaction: transaction),
+                  builder: (context) =>
+                      EditTransactionScreen(transaction: transaction),
                 ),
               );
             },
           );
-        }
+        },
       ),
     );
   }
