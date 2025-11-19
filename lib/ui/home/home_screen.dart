@@ -12,6 +12,16 @@ String _formatCurrency(double amount) {
   return formatter.format(amount);
 }
 
+// Format tiền tệ ngắn gọn cho biểu đồ
+String _formatCurrencyShort(double value) {
+  if (value >= 1000000) {
+    return '${(value / 1000000).toStringAsFixed(1)} M';
+  } else if (value >= 1000) {
+    return '${(value / 1000).toStringAsFixed(0)} K';
+  }
+  return '${value.toStringAsFixed(0)}đ';
+}
+
 String _formatDate(DateTime date) {
   final formatter = DateFormat('dd/MM/yyyy', 'vi_VN');
   return formatter.format(date);
@@ -42,12 +52,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentReportPage = 0;
-  final PageController _reportPageController = PageController();
-
   @override
   void dispose() {
-    _reportPageController.dispose();
     super.dispose();
   }
 
@@ -353,90 +359,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 24),
 
-            // Reports Carousel
-            SizedBox(
-              height: 320,
-              child: Stack(
-                children: [
-                  PageView(
-                    controller: _reportPageController,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentReportPage = index;
-                      });
-                    },
-                    children: [
-                      // Report 1: Báo cáo tháng này
-                      _buildMonthlyReportCard(totalExpense),
-                      // Report 2: Báo cáo xu hướng
-                      _buildTrendReportCard(totalExpense, totalIncome),
-                    ],
-                  ),
-                  // Navigation buttons
-                  Positioned(
-                    left: 8,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.chevron_left,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {
-                          if (_currentReportPage > 0) {
-                            _reportPageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 8,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.chevron_right,
-                          color: Colors.green,
-                        ),
-                        onPressed: () {
-                          if (_currentReportPage < 1) {
-                            _reportPageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Dots indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(
-                2,
-                (index) => Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentReportPage == index ? 12 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentReportPage == index
-                        ? Colors.green
-                        : Colors.grey.shade400,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-              ),
-            ),
+            // Báo cáo tháng này
+            _buildMonthlyReportCard(transactionsManager),
 
             const SizedBox(height: 24),
 
@@ -574,8 +498,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Báo cáo tháng này
-  Widget _buildMonthlyReportCard(double totalExpense) {
+  // Tính tổng chi tiêu tháng trước
+  double _getPreviousMonthExpense(TransactionsManager transactionsManager) {
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1);
+    final startOfLastMonth = DateTime(lastMonth.year, lastMonth.month, 1);
+    final endOfLastMonth = DateTime(lastMonth.year, lastMonth.month + 1, 0, 23, 59, 59);
+
+    return transactionsManager.transactions
+        .where((t) =>
+            t.type == 'expense' &&
+            t.date.isAfter(startOfLastMonth.subtract(const Duration(seconds: 1))) &&
+            t.date.isBefore(endOfLastMonth.add(const Duration(seconds: 1))))
+        .fold(0.0, (sum, t) => sum + t.amount);
+  }
+
+  // Báo cáo tháng này với dữ liệu thật
+  Widget _buildMonthlyReportCard(TransactionsManager transactionsManager) {
+    final currentMonth = transactionsManager.totalExpense;
+    final previousMonth = _getPreviousMonthExpense(transactionsManager);
+    
+    // Tính % thay đổi
+    String percentageText;
+    if (previousMonth == 0) {
+      percentageText = currentMonth > 0 ? 'Mới bắt đầu' : 'Chưa có chi tiêu';
+    } else {
+      final change = ((currentMonth - previousMonth) / previousMonth) * 100;
+      percentageText = change > 0 
+          ? '+${change.toStringAsFixed(1)}%'
+          : '${change.toStringAsFixed(1)}%';
+    }
+
+    // Tính chiều cao cột cho bar chart
+    final maxValue = currentMonth > previousMonth ? currentMonth : previousMonth;
+    final currentHeight = maxValue > 0 ? (currentMonth / maxValue) * 100 : 50.0;
+    final previousHeight = maxValue > 0 ? (previousMonth / maxValue) * 100 : 50.0;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
@@ -629,7 +587,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           Text(
-            _formatCurrency(totalExpense),
+            _formatCurrency(currentMonth),
             style: TextStyle(
               color: Colors.red.shade700,
               fontSize: 26,
@@ -638,11 +596,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 2),
           Text(
-            'Tổng chi tháng này - 0%',
-            style: TextStyle(color: Colors.black54, fontSize: 12),
+            'Tổng chi tháng này - $percentageText',
+            style: const TextStyle(color: Colors.black54, fontSize: 12),
           ),
           const SizedBox(height: 16),
-          // Bar Chart
+          // Bar Chart với dữ liệu thật
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -652,7 +610,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Container(
                     width: 70,
-                    height: 70,
+                    height: previousHeight.clamp(30.0, 100.0),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
@@ -680,7 +638,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '1 M',
+                    _formatCurrencyShort(currentMonth),
                     style: TextStyle(
                       color: Colors.red.shade700,
                       fontSize: 11,
@@ -690,7 +648,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 3),
                   Container(
                     width: 70,
-                    height: 100,
+                    height: currentHeight.clamp(30.0, 100.0),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [Colors.red.shade400, Colors.red.shade600],
@@ -724,252 +682,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Báo cáo xu hướng
-  Widget _buildTrendReportCard(double totalExpense, double totalIncome) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Colors.blue.shade50, Colors.purple.shade50],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.blue.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Báo cáo xu hướng',
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  minimumSize: const Size(0, 30),
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'Xem báo cáo',
-                  style: TextStyle(
-                    color: Colors.blue.shade700,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Tổng đã chi',
-                    style: TextStyle(color: Colors.black54, fontSize: 11),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formatCurrency(totalExpense),
-                    style: TextStyle(
-                      color: Colors.red.shade700,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Tổng thu',
-                    style: TextStyle(color: Colors.black54, fontSize: 11),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _formatCurrency(totalIncome),
-                    style: TextStyle(
-                      color: Colors.green.shade700,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Line Chart Area
-          SizedBox(
-            height: 120,
-            child: Stack(
-              children: [
-                // Grid lines
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildGridLine('900 K'),
-                    _buildGridLine('600 K'),
-                    _buildGridLine('300 K'),
-                    _buildGridLine('0'),
-                  ],
-                ),
-                // Chart
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  right: 40,
-                  top: 10,
-                  child: CustomPaint(painter: _TrendChartPainter(totalExpense)),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 4),
-          // Date labels
-          const Padding(
-            padding: EdgeInsets.only(left: 10, right: 40),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '01/10',
-                  style: TextStyle(color: Colors.black54, fontSize: 10),
-                ),
-                Text(
-                  '31/10',
-                  style: TextStyle(color: Colors.black54, fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGridLine(String label) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 1,
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(color: Colors.black.withOpacity(0.1), width: 1),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: TextStyle(color: Colors.black.withOpacity(0.4), fontSize: 10),
-        ),
-      ],
-    );
-  }
 }
-// Custom painter for trend chart
-class _TrendChartPainter extends CustomPainter {
-  final double totalExpense;
-
-  _TrendChartPainter(this.totalExpense);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.red.shade600
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3;
-
-    final fillPaint = Paint()
-      ..shader = LinearGradient(
-        colors: [
-          Colors.red.shade300.withOpacity(0.3),
-          Colors.red.shade100.withOpacity(0.1),
-        ],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill;
-
-    // Create chart path
-    final path = Path();
-    final fillPath = Path();
-
-    // Simulated data points
-    final points = [
-      Offset(0, size.height * 0.8),
-      Offset(size.width * 0.3, size.height * 0.6),
-      Offset(size.width * 0.6, size.height * 0.3),
-      Offset(size.width, size.height * 0.1),
-    ];
-
-    // Line path
-    path.moveTo(points[0].dx, points[0].dy);
-    for (int i = 1; i < points.length; i++) {
-      path.lineTo(points[i].dx, points[i].dy);
-    }
-
-    // Fill path
-    fillPath.moveTo(points[0].dx, size.height);
-    fillPath.lineTo(points[0].dx, points[0].dy);
-    for (int i = 1; i < points.length; i++) {
-      fillPath.lineTo(points[i].dx, points[i].dy);
-    }
-    fillPath.lineTo(size.width, size.height);
-    fillPath.close();
-
-    // Draw fill and line
-    canvas.drawPath(fillPath, fillPaint);
-    canvas.drawPath(path, paint);
-
-    // Draw points
-    final pointPaint = Paint()
-      ..color = Colors.red.shade600
-      ..style = PaintingStyle.fill;
-
-    final pointBorderPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    for (final point in points) {
-      canvas.drawCircle(point, 5, pointBorderPaint);
-      canvas.drawCircle(point, 3, pointPaint);
-    }
-
-    // Draw selected point (last one) - larger
-    canvas.drawCircle(points.last, 6, pointBorderPaint);
-    canvas.drawCircle(points.last, 4, pointPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-

@@ -10,11 +10,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('vi_VN', null);
   await dotenv.load();
-  
+
   // Initialize notification service
   final notificationService = NotificationService();
   await notificationService.initialize();
-  
+
   runApp(const MyApp());
 }
 
@@ -32,9 +32,10 @@ class MyApp extends StatelessWidget {
       redirect: (context, state) {
         final authFromProvider = context.read<AuthManager>();
         final isLoggedIn = authFromProvider.isAuth;
-        
+
         final isAtAuthScreen =
-            state.matchedLocation == '/login' || state.matchedLocation == '/signup';
+            state.matchedLocation == '/login' ||
+            state.matchedLocation == '/signup';
 
         if (isLoggedIn && isAtAuthScreen) {
           return '/';
@@ -88,4 +89,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
