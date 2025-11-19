@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -158,6 +159,72 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin>();
 
     return await androidImplementation?.areNotificationsEnabled() ?? false;
+  }
+
+
+  static const String _thresholdKey = 'spending_threshold';
+  static const String _enabledKey = 'spending_notifications_enabled';
+  static const String _savingsGoalEnabledKey = 'savings_goal_notifications_enabled';
+
+  /// Get user-defined spending threshold (%). Default 70.
+  static Future<int> getThreshold() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_thresholdKey) ?? 70;
+  }
+
+  /// Check if spending notifications are enabled (default true)
+  static Future<bool> isEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_enabledKey) ?? true;
+  }
+
+  /// Set enable/disable spending notifications
+  static Future<void> setEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_enabledKey, value);
+  }
+
+  /// Check if savings goal notifications are enabled (default true)
+  static Future<bool> isSavingsGoalEnabled() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_savingsGoalEnabledKey) ?? true;
+  }
+
+  /// Set enable/disable savings goal notifications
+  static Future<void> setSavingsGoalEnabled(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_savingsGoalEnabledKey, value);
+  }
+
+  /// Save user-defined threshold
+  static Future<void> setThreshold(int value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_thresholdKey, value);
+  }
+
+  /// Key for last notified percent eg last_notified_percent_2025_11
+  static String _notifiedKeyForMonth(DateTime date) =>
+      'last_notified_percent_${date.year}_${date.month}';
+
+  /// Get last percent notified this month
+  static Future<double> getLastNotifiedPercent(DateTime date) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = _notifiedKeyForMonth(date);
+    final storedPercent = prefs.getDouble(key) ?? -5; // ensure first alert
+
+    if (storedPercent.truncate() != storedPercent && storedPercent != -5) {
+      print('--- [Data Correction] Found old invalid lastPercent: $storedPercent. Resetting. ---');
+      await prefs.remove(key); // Remove the bad data
+      return -5; // Return default to allow notifications to resume this month
+    }
+
+    return storedPercent;
+  }
+
+  /// Save last notified percent
+  static Future<void> setLastNotifiedPercent(DateTime date, double percent) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_notifiedKeyForMonth(date), percent);
   }
 }
 
