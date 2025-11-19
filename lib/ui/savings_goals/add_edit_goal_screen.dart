@@ -166,6 +166,11 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 },
               ),
 
+              const SizedBox(height: 8),
+
+              // Quick amount buttons for target amount
+              _buildQuickAmountButtons(_targetAmountController),
+
               const SizedBox(height: 16),
 
               // Current Amount
@@ -191,6 +196,11 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                   return null;
                 },
               ),
+
+              const SizedBox(height: 8),
+
+              // Quick amount buttons for current amount
+              _buildQuickAmountButtons(_currentAmountController),
 
               const SizedBox(height: 16),
 
@@ -608,6 +618,75 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
         );
       }
     }
+  }
+
+  // Build quick amount buttons
+  Widget _buildQuickAmountButtons(TextEditingController controller) {
+    return Row(
+      children: [
+        for (var i = 0; i < ['10000', '100000', '1000000', '000'].length; i++)
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: i < 3 ? 8 : 0),
+              child: _buildQuickAmountButton(
+                ['10000', '100000', '1000000', '000'][i],
+                controller,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildQuickAmountButton(
+    String amount,
+    TextEditingController controller,
+  ) {
+    return InkWell(
+      onTap: () => _addAmount(amount, controller),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            amount == '000'
+                ? '+000'
+                : '+${NumberFormat.compact().format(int.parse(amount))}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _addAmount(String amount, TextEditingController controller) {
+    if (amount == '000') {
+      // Thêm 3 số 0
+      controller.text += '000';
+    } else {
+      // Cộng thêm số tiền
+      final current = double.tryParse(controller.text.replaceAll(',', '')) ?? 0;
+      final add = double.parse(amount);
+      controller.text = (current + add).toStringAsFixed(0);
+    }
+    // Trigger setState để update preview
+    setState(() {});
   }
 }
 

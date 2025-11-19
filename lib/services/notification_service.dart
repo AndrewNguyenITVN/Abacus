@@ -25,9 +25,7 @@ class NotificationService {
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
     const InitializationSettings initializationSettings =
-        InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
+        InitializationSettings(android: initializationSettingsAndroid);
 
     // Initialize the plugin
     await _notifications.initialize(
@@ -44,8 +42,10 @@ class NotificationService {
   /// Request notification permissions
   Future<void> _requestPermissions() async {
     final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        _notifications.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
 
     await androidImplementation?.requestNotificationsPermission();
   }
@@ -61,23 +61,25 @@ class NotificationService {
     required double amount,
   }) async {
     final title = '🎉 Chúc mừng! Bạn đã đạt mục tiêu!';
-    final body = 'Bạn đã đủ tiền để $goalName với số tiền ${_formatCurrency(amount)}!';
+    final body =
+        'Bạn đã đủ tiền để $goalName với số tiền ${_formatCurrency(amount)}!';
 
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'savings_goals',
-      'Savings Goals',
-      channelDescription: 'Notifications for savings goals achievements',
-      importance: Importance.high,
-      priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
-      color: Color(0xFF4CAF50),
-      playSound: true,
-      enableVibration: true,
-    );
+          'savings_goals',
+          'Savings Goals',
+          channelDescription: 'Notifications for savings goals achievements',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          color: Color(0xFF4CAF50),
+          playSound: true,
+          enableVibration: true,
+        );
 
-    const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidDetails);
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
 
     await _notifications.show(
       _generateNotificationId(),
@@ -115,19 +117,20 @@ class NotificationService {
 
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'spending_warnings',
-      'Spending Warnings',
-      channelDescription: 'Notifications for spending alerts',
-      importance: Importance.high,
-      priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
-      color: Color(color),
-      playSound: true,
-      enableVibration: true,
-    );
+          'spending_warnings',
+          'Spending Warnings',
+          channelDescription: 'Notifications for spending alerts',
+          importance: Importance.high,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+          color: Color(color),
+          playSound: true,
+          enableVibration: true,
+        );
 
-    final NotificationDetails notificationDetails =
-        NotificationDetails(android: androidDetails);
+    final NotificationDetails notificationDetails = NotificationDetails(
+      android: androidDetails,
+    );
 
     await _notifications.show(
       _generateNotificationId(),
@@ -138,13 +141,8 @@ class NotificationService {
     );
 
     // Lưu vào storage
-    _saveToStorage(
-      title: title,
-      body: body,
-      type: NotificationType.spending,
-    );
+    _saveToStorage(title: title, body: body, type: NotificationType.spending);
   }
-
 
   /// Cancel all notifications
   Future<void> cancelAllNotifications() async {
@@ -176,16 +174,18 @@ class NotificationService {
   /// Check if notifications are enabled
   Future<bool> areNotificationsEnabled() async {
     final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        _notifications.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+        _notifications
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
 
     return await androidImplementation?.areNotificationsEnabled() ?? false;
   }
 
-
   static const String _thresholdKey = 'spending_threshold';
   static const String _enabledKey = 'spending_notifications_enabled';
-  static const String _savingsGoalEnabledKey = 'savings_goal_notifications_enabled';
+  static const String _savingsGoalEnabledKey =
+      'savings_goal_notifications_enabled';
 
   /// Get user-defined spending threshold (%). Default 70.
   static Future<int> getThreshold() async {
@@ -234,7 +234,9 @@ class NotificationService {
     final storedPercent = prefs.getDouble(key) ?? -5; // ensure first alert
 
     if (storedPercent.truncate() != storedPercent && storedPercent != -5) {
-      print('--- [Data Correction] Found old invalid lastPercent: $storedPercent. Resetting. ---');
+      print(
+        '--- [Data Correction] Found old invalid lastPercent: $storedPercent. Resetting. ---',
+      );
       await prefs.remove(key); // Remove the bad data
       return -5; // Return default to allow notifications to resume this month
     }
@@ -243,7 +245,10 @@ class NotificationService {
   }
 
   /// Save last notified percent
-  static Future<void> setLastNotifiedPercent(DateTime date, double percent) async {
+  static Future<void> setLastNotifiedPercent(
+    DateTime date,
+    double percent,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_notifiedKeyForMonth(date), percent);
   }
@@ -266,4 +271,3 @@ class NotificationService {
     }
   }
 }
-

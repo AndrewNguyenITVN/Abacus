@@ -497,61 +497,65 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen>
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Text(isAdd ? 'Thêm tiền vào mục tiêu' : 'Rút tiền từ mục tiêu'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                goal.name,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Số dư hiện tại: ${_formatCurrency(goal.currentAmount)}',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey.shade600,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: controller,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Số tiền',
-                  hintText: 'Nhập số tiền',
-                  prefixText: '₫ ',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Text(isAdd ? 'Thêm tiền vào mục tiêu' : 'Rút tiền từ mục tiêu'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  goal.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số tiền';
-                  }
-                  final amount = double.tryParse(value);
-                  if (amount == null || amount <= 0) {
-                    return 'Số tiền không hợp lệ';
-                  }
-                  if (!isAdd && amount > goal.currentAmount) {
-                    return 'Số tiền vượt quá số dư hiện tại';
-                  }
-                  return null;
-                },
-              ),
-            ],
+                const SizedBox(height: 8),
+                Text(
+                  'Số dư hiện tại: ${_formatCurrency(goal.currentAmount)}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: controller,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Số tiền',
+                    hintText: 'Nhập số tiền',
+                    prefixText: '₫ ',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập số tiền';
+                    }
+                    final amount = double.tryParse(value);
+                    if (amount == null || amount <= 0) {
+                      return 'Số tiền không hợp lệ';
+                    }
+                    if (!isAdd && amount > goal.currentAmount) {
+                      return 'Số tiền vượt quá số dư hiện tại';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 8),
+                // Quick amount buttons
+                _buildDialogQuickAmountButtons(controller, setDialogState),
+              ],
+            ),
           ),
-        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
@@ -600,6 +604,7 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen>
             child: Text(isAdd ? 'Thêm tiền' : 'Rút tiền'),
           ),
         ],
+        ),
       ),
     );
   }
@@ -651,6 +656,85 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen>
         ],
       ),
     );
+  }
+
+  // Build quick amount buttons for dialog
+  Widget _buildDialogQuickAmountButtons(
+    TextEditingController controller,
+    StateSetter setDialogState,
+  ) {
+    return Row(
+      children: [
+        for (var i = 0; i < ['10000', '100000', '1000000', '000'].length; i++)
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: i < 3 ? 8 : 0),
+              child: _buildDialogQuickAmountButton(
+                ['10000', '100000', '1000000', '000'][i],
+                controller,
+                setDialogState,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildDialogQuickAmountButton(
+    String amount,
+    TextEditingController controller,
+    StateSetter setDialogState,
+  ) {
+    return InkWell(
+      onTap: () => _addDialogAmount(amount, controller, setDialogState),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            amount == '000'
+                ? '+000'
+                : '+${NumberFormat.compact().format(int.parse(amount))}',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _addDialogAmount(
+    String amount,
+    TextEditingController controller,
+    StateSetter setDialogState,
+  ) {
+    setDialogState(() {
+      if (amount == '000') {
+        // Thêm 3 số 0
+        controller.text += '000';
+      } else {
+        // Cộng thêm số tiền
+        final current =
+            double.tryParse(controller.text.replaceAll(',', '')) ?? 0;
+        final add = double.parse(amount);
+        controller.text = (current + add).toStringAsFixed(0);
+      }
+    });
   }
 }
 
