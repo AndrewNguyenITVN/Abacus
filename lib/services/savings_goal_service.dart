@@ -1,9 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import '../models/savings_goal.dart';
 import 'database_service.dart';
+import 'notification_service.dart';
 
 class SavingsGoalService {
   final DatabaseService _dbService = DatabaseService();
+  final NotificationService _notificationService = NotificationService();
 
   Future<Database> get database async {
     return await _dbService.database;
@@ -21,6 +23,9 @@ class SavingsGoalService {
 
   // Update savings goal
   Future<void> updateGoal(SavingsGoal goal) async {
+    // Get old goal to check if it just reached 100%
+    final oldGoal = await getGoalById(goal.id);
+    
     final db = await database;
     await db.update(
       'savings_goals',
@@ -28,6 +33,17 @@ class SavingsGoalService {
       where: 'id = ?',
       whereArgs: [goal.id],
     );
+
+    // Check if savings goal notifications are enabled
+    final isEnabled = await NotificationService.isSavingsGoalEnabled();
+    
+    // Check if goal just reached 100% (was not completed before, but is now)
+    if (isEnabled && oldGoal != null && oldGoal.isCompleted == false && goal.isCompleted) {
+      await _notificationService.showSavingsGoalReachedNotification(
+        goalName: goal.name,
+        amount: goal.targetAmount,
+      );
+    }
   }
 
   // Delete savings goal
