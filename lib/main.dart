@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'ui/screens.dart';
 import 'services/notification_service.dart';
+import 'ui/notifications/notifications_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,11 +16,22 @@ void main() async {
   final notificationService = NotificationService();
   await notificationService.initialize();
 
-  runApp(const MyApp());
+  // Initialize notifications manager
+  final notificationsManager = NotificationsManager();
+  await notificationsManager.loadNotifications();
+
+  // Setup callback để lưu notifications khi có thông báo mới
+  notificationService.onNotificationCreated = (notification) {
+    notificationsManager.addNotification(notification);
+  };
+
+  runApp(MyApp(notificationsManager: notificationsManager));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final NotificationsManager notificationsManager;
+
+  const MyApp({super.key, required this.notificationsManager});
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +74,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: authManager),
+        ChangeNotifierProvider.value(value: notificationsManager),
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
         ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(

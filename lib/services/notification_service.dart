@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '/models/app_notification.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -11,6 +12,9 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
+
+  // Callback để lưu notification vào storage
+  Function(AppNotification)? onNotificationCreated;
 
   /// Initialize notification service
   Future<void> initialize() async {
@@ -56,6 +60,9 @@ class NotificationService {
     required String goalName,
     required double amount,
   }) async {
+    final title = '🎉 Chúc mừng! Bạn đã đạt mục tiêu!';
+    final body = 'Bạn đã đủ tiền để $goalName với số tiền ${_formatCurrency(amount)}!';
+
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
       'savings_goals',
@@ -74,10 +81,17 @@ class NotificationService {
 
     await _notifications.show(
       _generateNotificationId(),
-      '🎉 Chúc mừng! Bạn đã đạt mục tiêu!',
-      'Bạn đã đủ tiền để $goalName với số tiền ${_formatCurrency(amount)}!',
+      title,
+      body,
       notificationDetails,
       payload: 'savings_goal_reached',
+    );
+
+    // Lưu vào storage
+    _saveToStorage(
+      title: title,
+      body: body,
+      type: NotificationType.savingsGoal,
     );
   }
 
@@ -91,6 +105,13 @@ class NotificationService {
     final bool isCritical = percentage >= 90;
     final String emoji = isCritical ? '🚨' : '⚠️';
     final int color = isCritical ? 0xFFFF5252 : 0xFFFF9800;
+
+    final String title = isCritical
+        ? '$emoji Cảnh báo: Chi tiêu vượt mức!'
+        : '$emoji Thông báo: Chi tiêu cao!';
+
+    final String body =
+        'Bạn đã chi ${_formatCurrency(totalSpent)} (${percentage.toStringAsFixed(0)}% thu nhập tháng ${_formatCurrency(monthlyIncome)})';
 
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
@@ -108,19 +129,19 @@ class NotificationService {
     final NotificationDetails notificationDetails =
         NotificationDetails(android: androidDetails);
 
-    final String title = isCritical
-        ? '$emoji Cảnh báo: Chi tiêu vượt mức!'
-        : '$emoji Thông báo: Chi tiêu cao!';
-
-    final String body =
-        'Bạn đã chi ${_formatCurrency(totalSpent)} (${percentage.toStringAsFixed(0)}% thu nhập tháng ${_formatCurrency(monthlyIncome)})';
-
     await _notifications.show(
       _generateNotificationId(),
       title,
       body,
       notificationDetails,
       payload: 'spending_warning_$percentage',
+    );
+
+    // Lưu vào storage
+    _saveToStorage(
+      title: title,
+      body: body,
+      type: NotificationType.spending,
     );
   }
 
@@ -225,6 +246,24 @@ class NotificationService {
   static Future<void> setLastNotifiedPercent(DateTime date, double percent) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble(_notifiedKeyForMonth(date), percent);
+  }
+
+  /// Lưu notification vào storage thông qua callback
+  void _saveToStorage({
+    required String title,
+    required String body,
+    required NotificationType type,
+  }) {
+    if (onNotificationCreated != null) {
+      final notification = AppNotification(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: title,
+        body: body,
+        type: type,
+        createdAt: DateTime.now(),
+      );
+      onNotificationCreated!(notification);
+    }
   }
 }
 
