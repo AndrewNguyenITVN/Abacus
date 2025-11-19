@@ -52,8 +52,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  int _currentReportPage = 0;
+  final PageController _reportPageController = PageController();
+
   @override
   void dispose() {
+    _reportPageController.dispose();
     super.dispose();
   }
 
@@ -359,15 +363,97 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 24),
 
-            // Báo cáo tháng này
-            _buildMonthlyReportCard(transactionsManager),
+            // Reports Carousel với Navigation
+            SizedBox(
+              height: 280,
+              child: Stack(
+                children: [
+                  PageView(
+                    controller: _reportPageController,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentReportPage = index;
+                      });
+                    },
+                    children: [
+                      _buildMonthlyReportCard(transactionsManager),
+                      _buildMonthlyIncomeReportCard(transactionsManager),
+                    ],
+                  ),
+                  // Left Arrow Button
+                  Positioned(
+                    left: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.chevron_left,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          if (_currentReportPage > 0) {
+                            _reportPageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  // Right Arrow Button
+                  Positioned(
+                    right: 8,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.chevron_right,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          if (_currentReportPage < 1) {
+                            _reportPageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
+            // Dots Indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                2,
+                (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentReportPage == index ? 12 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentReportPage == index
+                        ? Colors.green
+                        : Colors.grey.shade400,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
 
             const SizedBox(height: 24),
 
             // Savings Goals
             SavingsGoalsBlock(),
             const SizedBox(height: 24),
-
 
             // Recent Transactions
             Padding(
@@ -503,36 +589,77 @@ class _HomeScreenState extends State<HomeScreen> {
     final now = DateTime.now();
     final lastMonth = DateTime(now.year, now.month - 1);
     final startOfLastMonth = DateTime(lastMonth.year, lastMonth.month, 1);
-    final endOfLastMonth = DateTime(lastMonth.year, lastMonth.month + 1, 0, 23, 59, 59);
+    final endOfLastMonth = DateTime(
+      lastMonth.year,
+      lastMonth.month + 1,
+      0,
+      23,
+      59,
+      59,
+    );
 
     return transactionsManager.transactions
-        .where((t) =>
-            t.type == 'expense' &&
-            t.date.isAfter(startOfLastMonth.subtract(const Duration(seconds: 1))) &&
-            t.date.isBefore(endOfLastMonth.add(const Duration(seconds: 1))))
+        .where(
+          (t) =>
+              t.type == 'expense' &&
+              t.date.isAfter(
+                startOfLastMonth.subtract(const Duration(seconds: 1)),
+              ) &&
+              t.date.isBefore(endOfLastMonth.add(const Duration(seconds: 1))),
+        )
         .fold(0.0, (sum, t) => sum + t.amount);
   }
 
-  // Báo cáo tháng này với dữ liệu thật
+  // Tính tổng thu nhập tháng trước
+  double _getPreviousMonthIncome(TransactionsManager transactionsManager) {
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1);
+    final startOfLastMonth = DateTime(lastMonth.year, lastMonth.month, 1);
+    final endOfLastMonth = DateTime(
+      lastMonth.year,
+      lastMonth.month + 1,
+      0,
+      23,
+      59,
+      59,
+    );
+
+    return transactionsManager.transactions
+        .where(
+          (t) =>
+              t.type == 'income' &&
+              t.date.isAfter(
+                startOfLastMonth.subtract(const Duration(seconds: 1)),
+              ) &&
+              t.date.isBefore(endOfLastMonth.add(const Duration(seconds: 1))),
+        )
+        .fold(0.0, (sum, t) => sum + t.amount);
+  }
+
+  // Báo cáo chi tiêu tháng này với dữ liệu thật
   Widget _buildMonthlyReportCard(TransactionsManager transactionsManager) {
     final currentMonth = transactionsManager.totalExpense;
     final previousMonth = _getPreviousMonthExpense(transactionsManager);
-    
+
     // Tính % thay đổi
     String percentageText;
     if (previousMonth == 0) {
       percentageText = currentMonth > 0 ? 'Mới bắt đầu' : 'Chưa có chi tiêu';
     } else {
       final change = ((currentMonth - previousMonth) / previousMonth) * 100;
-      percentageText = change > 0 
+      percentageText = change > 0
           ? '+${change.toStringAsFixed(1)}%'
           : '${change.toStringAsFixed(1)}%';
     }
 
     // Tính chiều cao cột cho bar chart
-    final maxValue = currentMonth > previousMonth ? currentMonth : previousMonth;
+    final maxValue = currentMonth > previousMonth
+        ? currentMonth
+        : previousMonth;
     final currentHeight = maxValue > 0 ? (currentMonth / maxValue) * 100 : 50.0;
-    final previousHeight = maxValue > 0 ? (previousMonth / maxValue) * 100 : 50.0;
+    final previousHeight = maxValue > 0
+        ? (previousMonth / maxValue) * 100
+        : 50.0;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -682,4 +809,181 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Báo cáo thu nhập tháng này với dữ liệu thật
+  Widget _buildMonthlyIncomeReportCard(
+    TransactionsManager transactionsManager,
+  ) {
+    final currentMonth = transactionsManager.totalIncome;
+    final previousMonth = _getPreviousMonthIncome(transactionsManager);
+
+    // Tính % thay đổi
+    String percentageText;
+    if (previousMonth == 0) {
+      percentageText = currentMonth > 0 ? 'Mới bắt đầu' : 'Chưa có thu nhập';
+    } else {
+      final change = ((currentMonth - previousMonth) / previousMonth) * 100;
+      percentageText = change > 0
+          ? '+${change.toStringAsFixed(1)}%'
+          : '${change.toStringAsFixed(1)}%';
+    }
+
+    // Tính chiều cao cột cho bar chart
+    final maxValue = currentMonth > previousMonth
+        ? currentMonth
+        : previousMonth;
+    final currentHeight = maxValue > 0 ? (currentMonth / maxValue) * 100 : 50.0;
+    final previousHeight = maxValue > 0
+        ? (previousMonth / maxValue) * 100
+        : 50.0;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.green.shade50, Colors.teal.shade50],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.green.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Báo cáo thu nhập',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              TextButton(
+                onPressed: () {},
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  minimumSize: const Size(0, 30),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Xem báo cáo',
+                  style: TextStyle(
+                    color: Colors.green.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Text(
+            _formatCurrency(currentMonth),
+            style: TextStyle(
+              color: Colors.green.shade700,
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Tổng thu tháng này - $percentageText',
+            style: const TextStyle(color: Colors.black54, fontSize: 12),
+          ),
+          const SizedBox(height: 16),
+          // Bar Chart với dữ liệu thật
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 70,
+                    height: previousHeight.clamp(30.0, 100.0),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.green.shade300.withOpacity(0.6),
+                          Colors.green.shade400.withOpacity(0.4),
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                      border: Border.all(
+                        color: Colors.green.shade300,
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tháng trước',
+                    style: TextStyle(color: Colors.black54, fontSize: 11),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 24),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    _formatCurrencyShort(currentMonth),
+                    style: TextStyle(
+                      color: Colors.green.shade700,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Container(
+                    width: 70,
+                    height: currentHeight.clamp(30.0, 100.0),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.green.shade400, Colors.green.shade600],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                      border: Border.all(
+                        color: Colors.green.shade700,
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Tháng này',
+                    style: TextStyle(
+                      color: Colors.black87,
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
