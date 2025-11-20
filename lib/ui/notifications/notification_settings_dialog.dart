@@ -118,15 +118,17 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(Icons.savings_rounded, size: 18, color: Color(0xFF4CAF50)),
-                            SizedBox(width: 6),
-                            Text(
-                              'Đạt mục tiêu tiết kiệm',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                            const Icon(Icons.savings_rounded, size: 18, color: Color(0xFF4CAF50)),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'Đạt mục tiêu tiết kiệm',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
@@ -169,15 +171,17 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
+                        Row(
                           children: [
-                            Icon(Icons.warning_rounded, size: 18, color: Color(0xFFFF9800)),
-                            SizedBox(width: 6),
-                            Text(
-                              'Cảnh báo chi tiêu',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
+                            const Icon(Icons.warning_rounded, size: 18, color: Color(0xFFFF9800)),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                'Cảnh báo chi tiêu',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ],
