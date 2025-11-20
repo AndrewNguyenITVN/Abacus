@@ -35,6 +35,63 @@ class TransactionsManager extends ChangeNotifier {
 
   double get balance => totalIncome - totalExpense;
 
+  // Lấy danh sách giao dịch gần đây (giới hạn số lượng)
+  List<Transaction> getRecentTransactions(int limit) {
+    return transactions.take(limit).toList();
+  }
+
+  // Tính tổng thu nhập tháng trước
+  double get previousMonthIncome {
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1);
+    final startOfLastMonth = DateTime(lastMonth.year, lastMonth.month, 1);
+    final endOfLastMonth = DateTime(
+      lastMonth.year,
+      lastMonth.month + 1,
+      0,
+      23,
+      59,
+      59,
+    );
+
+    return transactions
+        .where(
+          (t) =>
+              t.type == 'income' &&
+              t.date.isAfter(
+                startOfLastMonth.subtract(const Duration(seconds: 1)),
+              ) &&
+              t.date.isBefore(endOfLastMonth.add(const Duration(seconds: 1))),
+        )
+        .fold(0.0, (sum, t) => sum + t.amount);
+  }
+
+  // Tính tổng chi tiêu tháng trước
+  double get previousMonthExpense {
+    final now = DateTime.now();
+    final lastMonth = DateTime(now.year, now.month - 1);
+    final startOfLastMonth = DateTime(lastMonth.year, lastMonth.month, 1);
+    final endOfLastMonth = DateTime(
+      lastMonth.year,
+      lastMonth.month + 1,
+      0,
+      23,
+      59,
+      59,
+    );
+
+    return transactions
+        .where(
+          (t) =>
+              t.type == 'expense' &&
+              t.date.isAfter(
+                startOfLastMonth.subtract(const Duration(seconds: 1)),
+              ) &&
+              t.date.isBefore(endOfLastMonth.add(const Duration(seconds: 1))),
+        )
+        .fold(0.0, (sum, t) => sum + t.amount);
+  }
+
   // Load transactions từ SQLite
   Future<void> _loadTransactions() async {
     try {
