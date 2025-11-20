@@ -10,11 +10,7 @@ class AuthCard extends StatefulWidget {
   final AuthMode mode;
   final VoidCallback? onSwitchMode;
 
-  const AuthCard({
-    super.key,
-    required this.mode,
-    this.onSwitchMode,
-  });
+  const AuthCard({super.key, required this.mode, this.onSwitchMode});
 
   @override
   State<AuthCard> createState() => _AuthCardState();
@@ -51,16 +47,16 @@ class _AuthCardState extends State<AuthCard> {
       if (widget.mode == AuthMode.login) {
         // Log user in
         await context.read<AuthManager>().login(
-              _emailController.text,
-              _passwordController.text,
-            );
+          _emailController.text,
+          _passwordController.text,
+        );
       } else {
         // Sign user up
         await context.read<AuthManager>().signup(
-              _emailController.text,
-              _passwordController.text,
-              _nameController.text,
-            );
+          _emailController.text,
+          _passwordController.text,
+          _nameController.text,
+        );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -86,9 +82,7 @@ class _AuthCardState extends State<AuthCard> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(
@@ -120,32 +114,26 @@ class _AuthCardState extends State<AuthCard> {
     return Column(
       children: [
         const Icon(
-          Icons.calculate,
+          Icons.account_balance_wallet,
           size: 80,
-          color: Colors.deepPurple,
+          color: Color(0xFF11998e),
         ),
         const SizedBox(height: 16),
         const Text(
           'Abacus',
-          style: TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         const Text(
           'Quản lý chi tiêu thông minh',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
+          style: TextStyle(fontSize: 16, color: Colors.grey),
         ),
         const SizedBox(height: 8),
         Text(
           widget.mode == AuthMode.login ? 'Đăng nhập' : 'Tạo tài khoản',
           style: const TextStyle(
             fontSize: 24,
-            color: Colors.deepPurple,
+            color: Color(0xFF11998e),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -291,9 +279,7 @@ class _AuthCardState extends State<AuthCard> {
         ),
         TextButton(
           onPressed: widget.onSwitchMode,
-          child: Text(
-            widget.mode == AuthMode.login ? 'Đăng ký' : 'Đăng nhập',
-          ),
+          child: Text(widget.mode == AuthMode.login ? 'Đăng ký' : 'Đăng nhập'),
         ),
       ],
     );
