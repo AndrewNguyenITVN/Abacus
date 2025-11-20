@@ -440,9 +440,10 @@ class AccountScreen extends StatelessWidget {
   }
 
   Future<void> _showSpendingSettingsDialog(BuildContext context) async {
-    int threshold = await NotificationService.getThreshold();
-    bool enabled = await NotificationService.isEnabled();
-    bool savingsGoalEnabled = await NotificationService.isSavingsGoalEnabled();
+    final notificationService = NotificationService();
+    int threshold = await notificationService.getThreshold();
+    bool enabled = await notificationService.isEnabled();
+    bool savingsGoalEnabled = await notificationService.isSavingsGoalEnabled();
 
     await showDialog(
       context: context,
@@ -670,9 +671,10 @@ class AccountScreen extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    await NotificationService.setThreshold(threshold);
-                    await NotificationService.setEnabled(enabled);
-                    await NotificationService.setSavingsGoalEnabled(savingsGoalEnabled);
+                    final notificationService = NotificationService();
+                    await notificationService.setThreshold(threshold);
+                    await notificationService.setEnabled(enabled);
+                    await notificationService.setSavingsGoalEnabled(savingsGoalEnabled);
                     if (context.mounted) {
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(

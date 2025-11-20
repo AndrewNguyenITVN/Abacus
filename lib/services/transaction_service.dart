@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import '../models/transaction.dart' as app_transaction;
+import '../models/app_notification.dart';
 import 'database_service.dart';
 import 'notification_service.dart';
 
@@ -134,7 +135,7 @@ class TransactionService {
   // Check monthly spending and send notification if needed
   Future<void> _checkMonthlySpending() async {
     // Check if notifications enabled
-    if (!await NotificationService.isEnabled()) return;
+    if (!await _notificationService.isEnabled()) return;
 
     final totals = await getMonthlyTotals();
     final monthlyIncome = totals['income'] ?? 0;
@@ -144,15 +145,15 @@ class TransactionService {
     if (monthlyIncome <= 0) return;
 
     final spendingPercentage = (monthlyExpense / monthlyIncome) * 100;
-    final threshold = await NotificationService.getThreshold();
+    final threshold = await _notificationService.getThreshold();
     
     final now = DateTime.now();
-    final lastPercent = await NotificationService.getLastNotifiedPercent(now);
+    final lastPercent = await _notificationService.getLastNotifiedPercent(now);
 
     // Case 1: Spending dropped below previous notification level (e.g. deleted transaction)
     if (spendingPercentage < lastPercent) {
       // Reset the high water mark to current level so we can be notified again if it rises
-      await NotificationService.setLastNotifiedPercent(now, spendingPercentage);
+      await _notificationService.setLastNotifiedPercent(now, spendingPercentage);
       return;
     }
 
@@ -164,7 +165,6 @@ class TransactionService {
 
     // Case 3: Spending increased and is above threshold
     // Calculate ALL milestones that need notification
-    // Example: threshold=70, lastPercent=74, current=84 -> notify for 75, 80
     
     List<int> milestonesToNotify = [];
     int currentMilestone = threshold;
@@ -180,18 +180,41 @@ class TransactionService {
     // Send notification if we crossed any milestones
     // Even if we crossed multiple milestones (e.g. +15%), we only send ONE notification
     if (milestonesToNotify.isNotEmpty) {
-      await _notificationService.showSpendingWarningNotification(
-        percentage: spendingPercentage,
-        totalSpent: monthlyExpense,
-        monthlyIncome: monthlyIncome,
+      // Determine severity based on percentage
+      final bool isCritical = spendingPercentage >= 90;
+      final String emoji = isCritical ? '🚨' : '⚠️';
+
+      final String title = isCritical
+          ? '$emoji Cảnh báo: Chi tiêu vượt mức!'
+          : '$emoji Thông báo: Chi tiêu cao!';
+
+      final String body =
+          'Bạn đã chi ${_formatCurrency(monthlyExpense)} (${spendingPercentage.toStringAsFixed(0)}% thu nhập tháng ${_formatCurrency(monthlyIncome)})';
+
+      await _notificationService.showNotification(
+        title: title,
+        body: body,
+        type: NotificationType.spending,
+        payload: 'spending_warning_$spendingPercentage',
       );
     }
 
     // Save the highest milestone we've notified
     if (milestonesToNotify.isNotEmpty) {
       final highestMilestone = milestonesToNotify.last;
-      await NotificationService.setLastNotifiedPercent(now, highestMilestone.toDouble());
+      await _notificationService.setLastNotifiedPercent(now, highestMilestone.toDouble());
     }
   }
-}
 
+  /// Format currency helper
+  String _formatCurrency(double amount) {
+    if (amount >= 1000000000) {
+      return '${(amount / 1000000000).toStringAsFixed(1)} tỷ';
+    } else if (amount >= 1000000) {
+      return '${(amount / 1000000).toStringAsFixed(1)} triệu';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(0)} nghìn';
+    }
+    return amount.toStringAsFixed(0);
+  }
+}

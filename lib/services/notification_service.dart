@@ -55,78 +55,33 @@ class NotificationService {
     print('Notification tapped: ${response.payload}');
   }
 
-  /// Show notification when savings goal is reached (100%)
-  Future<void> showSavingsGoalReachedNotification({
-    required String goalName,
-    required double amount,
+  /// Show a generic notification
+  Future<void> showNotification({
+    required String title,
+    required String body,
+    String? payload,
+    required NotificationType type,
   }) async {
-    final title = '🎉 Chúc mừng! Bạn đã đạt mục tiêu!';
-    final body =
-        'Bạn đã đủ tiền để $goalName với số tiền ${_formatCurrency(amount)}!';
-
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-          'savings_goals',
-          'Savings Goals',
-          channelDescription: 'Notifications for savings goals achievements',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          color: Color(0xFF4CAF50),
-          playSound: true,
-          enableVibration: true,
-        );
-
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidDetails,
-    );
-
-    await _notifications.show(
-      _generateNotificationId(),
-      title,
-      body,
-      notificationDetails,
-      payload: 'savings_goal_reached',
-    );
-
-    // Lưu vào storage
-    _saveToStorage(
-      title: title,
-      body: body,
-      type: NotificationType.savingsGoal,
-    );
-  }
-
-  /// Show notification when spending exceeds threshold
-  Future<void> showSpendingWarningNotification({
-    required double percentage,
-    required double totalSpent,
-    required double monthlyIncome,
-  }) async {
-    // Determine severity based on percentage
-    final bool isCritical = percentage >= 90;
-    final String emoji = isCritical ? '🚨' : '⚠️';
-    final int color = isCritical ? 0xFFFF5252 : 0xFFFF9800;
-
-    final String title = isCritical
-        ? '$emoji Cảnh báo: Chi tiêu vượt mức!'
-        : '$emoji Thông báo: Chi tiêu cao!';
-
-    final String body =
-        'Bạn đã chi ${_formatCurrency(totalSpent)} (${percentage.toStringAsFixed(0)}% thu nhập tháng ${_formatCurrency(monthlyIncome)})';
+    // Determine color based on type
+    Color color = const Color(0xFF2196F3); // Default blue
+    if (type == NotificationType.spending) {
+      color = const Color(0xFFFF9800); // Orange
+    } else if (type == NotificationType.savingsGoal) {
+      color = const Color(0xFF4CAF50); // Green
+    }
 
     final AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'spending_warnings',
-          'Spending Warnings',
-          channelDescription: 'Notifications for spending alerts',
-          importance: Importance.high,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-          color: Color(color),
-          playSound: true,
-          enableVibration: true,
-        );
+      'abacus_notifications',
+      'Abacus Notifications',
+      channelDescription: 'General notifications for Abacus',
+      importance: Importance.high,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      color: color,
+      playSound: true,
+      enableVibration: true,
+    );
 
     final NotificationDetails notificationDetails = NotificationDetails(
       android: androidDetails,
@@ -137,11 +92,15 @@ class NotificationService {
       title,
       body,
       notificationDetails,
-      payload: 'spending_warning_$percentage',
+      payload: payload,
     );
 
     // Lưu vào storage
-    _saveToStorage(title: title, body: body, type: NotificationType.spending);
+    _saveToStorage(
+      title: title,
+      body: body,
+      type: type,
+    );
   }
 
   /// Cancel all notifications
@@ -159,28 +118,16 @@ class NotificationService {
     return DateTime.now().millisecondsSinceEpoch.remainder(100000);
   }
 
-  /// Format currency for Vietnamese Dong
-  String _formatCurrency(double amount) {
-    if (amount >= 1000000000) {
-      return '${(amount / 1000000000).toStringAsFixed(1)} tỷ';
-    } else if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)} triệu';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(0)} nghìn';
-    }
-    return amount.toStringAsFixed(0);
-  }
-
   /// Check if notifications are enabled
   Future<bool> areNotificationsEnabled() async {
     final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
-        _notifications
-            .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+        _notifications.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
 
     return await androidImplementation?.areNotificationsEnabled() ?? false;
   }
+
+  // --- Settings Management (Instance Methods now) ---
 
   static const String _thresholdKey = 'spending_threshold';
   static const String _enabledKey = 'spending_notifications_enabled';
@@ -188,64 +135,63 @@ class NotificationService {
       'savings_goal_notifications_enabled';
 
   /// Get user-defined spending threshold (%). Default 70.
-  static Future<int> getThreshold() async {
+  Future<int> getThreshold() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt(_thresholdKey) ?? 70;
   }
 
   /// Check if spending notifications are enabled (default true)
-  static Future<bool> isEnabled() async {
+  Future<bool> isEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_enabledKey) ?? true;
   }
 
   /// Set enable/disable spending notifications
-  static Future<void> setEnabled(bool value) async {
+  Future<void> setEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_enabledKey, value);
   }
 
   /// Check if savings goal notifications are enabled (default true)
-  static Future<bool> isSavingsGoalEnabled() async {
+  Future<bool> isSavingsGoalEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_savingsGoalEnabledKey) ?? true;
   }
 
   /// Set enable/disable savings goal notifications
-  static Future<void> setSavingsGoalEnabled(bool value) async {
+  Future<void> setSavingsGoalEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_savingsGoalEnabledKey, value);
   }
 
   /// Save user-defined threshold
-  static Future<void> setThreshold(int value) async {
+  Future<void> setThreshold(int value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_thresholdKey, value);
   }
 
+  // --- State Management for Notifications ---
+
   /// Key for last notified percent eg last_notified_percent_2025_11
-  static String _notifiedKeyForMonth(DateTime date) =>
+  String _notifiedKeyForMonth(DateTime date) =>
       'last_notified_percent_${date.year}_${date.month}';
 
   /// Get last percent notified this month
-  static Future<double> getLastNotifiedPercent(DateTime date) async {
+  Future<double> getLastNotifiedPercent(DateTime date) async {
     final prefs = await SharedPreferences.getInstance();
     final key = _notifiedKeyForMonth(date);
     final storedPercent = prefs.getDouble(key) ?? -5; // ensure first alert
 
     if (storedPercent.truncate() != storedPercent && storedPercent != -5) {
-      print(
-        '--- [Data Correction] Found old invalid lastPercent: $storedPercent. Resetting. ---',
-      );
-      await prefs.remove(key); // Remove the bad data
-      return -5; // Return default to allow notifications to resume this month
+      await prefs.remove(key);
+      return -5;
     }
 
     return storedPercent;
   }
 
   /// Save last notified percent
-  static Future<void> setLastNotifiedPercent(
+  Future<void> setLastNotifiedPercent(
     DateTime date,
     double percent,
   ) async {

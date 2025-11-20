@@ -1,5 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import '../models/savings_goal.dart';
+import '../models/app_notification.dart';
 import 'database_service.dart';
 import 'notification_service.dart';
 
@@ -35,13 +36,19 @@ class SavingsGoalService {
     );
 
     // Check if savings goal notifications are enabled
-    final isEnabled = await NotificationService.isSavingsGoalEnabled();
+    final isEnabled = await _notificationService.isSavingsGoalEnabled();
     
     // Check if goal just reached 100% (was not completed before, but is now)
     if (isEnabled && oldGoal != null && oldGoal.isCompleted == false && goal.isCompleted) {
-      await _notificationService.showSavingsGoalReachedNotification(
-        goalName: goal.name,
-        amount: goal.targetAmount,
+      final title = '🎉 Chúc mừng! Bạn đã đạt mục tiêu!';
+      final body =
+          'Bạn đã đủ tiền để ${goal.name} với số tiền ${_formatCurrency(goal.targetAmount)}!';
+
+      await _notificationService.showNotification(
+        title: title,
+        body: body,
+        type: NotificationType.savingsGoal,
+        payload: 'savings_goal_reached',
       );
     }
   }
@@ -99,5 +106,16 @@ class SavingsGoalService {
     final db = await database;
     await db.delete('savings_goals');
   }
-}
 
+  /// Format currency helper
+  String _formatCurrency(double amount) {
+    if (amount >= 1000000000) {
+      return '${(amount / 1000000000).toStringAsFixed(1)} tỷ';
+    } else if (amount >= 1000000) {
+      return '${(amount / 1000000).toStringAsFixed(1)} triệu';
+    } else if (amount >= 1000) {
+      return '${(amount / 1000).toStringAsFixed(0)} nghìn';
+    }
+    return amount.toStringAsFixed(0);
+  }
+}
