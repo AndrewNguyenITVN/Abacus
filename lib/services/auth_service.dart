@@ -22,7 +22,8 @@ class AuthService {
         if (event.token.isEmpty) {
           onAuthChange?.call(null);
         } else {
-          _loadUser();
+          // Don't load user here to avoid loops or race conditions if needed, 
+          // or just let the UI trigger load
         }
       });
     }
@@ -34,46 +35,41 @@ class AuthService {
     }
   }
 
-  void _loadUser() {
-    if (_pb.authStore.isValid && _pb.authStore.record != null) {
-      final record = _pb.authStore.record!;
-      final account = Account(
-        id: record.id,
-        fullName: record.data['name'] ?? '',
-        email: record.data['email'] ?? '',
-        phone: record.data['phone'] ?? '',
-        address: record.data['address'] ?? '',
-        dateOfBirth: record.data['dateOfBirth'] != null
-            ? DateTime.parse(record.data['dateOfBirth'])
-            : DateTime(2000, 1, 1),
-        gender: record.data['gender'] ?? '',
-        isVerified: record.data['verified'] ?? false,
-      );
-      onAuthChange?.call(account);
-    }
+  // Helper to map RecordModel to Account
+  Account _mapRecordToAccount(RecordModel record) {
+    final bool isVerified = record.data['verified'] ?? false;
+
+    return Account(
+      id: record.id,
+      fullName: record.data['name'] ?? '',
+      email: record.data['email'] ?? '',
+      phone: record.data['phone'] ?? '',
+      address: record.data['address'] ?? '',
+      dateOfBirth: record.data['dateOfBirth'] != null &&
+              record.data['dateOfBirth'].toString().isNotEmpty
+          ? DateTime.parse(record.data['dateOfBirth'])
+          : DateTime(2000, 1, 1),
+      gender: record.data['gender'] ?? '',
+      isVerified: isVerified,
+    );
   }
 
   Future<Account> signup(String email, String password, String name) async {
     await _ensureInitialized();
 
     try {
-      // Xóa session cũ trước khi đăng ký để tránh conflict với tài khoản cũ
       _pb.authStore.clear();
 
-      final record = await _pb
-          .collection('users')
-          .create(
-            body: {
-              'email': email,
-              'password': password,
-              'passwordConfirm': password,
-              'name': name,
-            },
-          );
+      final record = await _pb.collection('users').create(
+        body: {
+          'email': email,
+          'password': password,
+          'passwordConfirm': password,
+          'name': name,
+        },
+      );
 
-      // Không gọi onAuthChange vì user chưa được authenticate
-      // User sẽ phải đăng nhập sau khi đăng ký
-      final account = Account(
+      return Account(
         id: record.id,
         fullName: record.data['name'] ?? '',
         email: record.data['email'] ?? '',
@@ -83,7 +79,6 @@ class AuthService {
         gender: '',
         isVerified: false,
       );
-      return account;
     } catch (error) {
       throw _handleError(error);
     }
@@ -93,23 +88,34 @@ class AuthService {
     await _ensureInitialized();
 
     try {
-      final authData = await _pb
-          .collection('users')
-          .authWithPassword(email, password);
+      final authData =
+          await _pb.collection('users').authWithPassword(email, password);
 
-      final record = authData.record;
-      final account = Account(
-        id: record.id,
-        fullName: record.data['name'] ?? '',
-        email: record.data['email'] ?? '',
-        phone: record.data['phone'] ?? '',
-        address: record.data['address'] ?? '',
-        dateOfBirth: record.data['dateOfBirth'] != null
-            ? DateTime.parse(record.data['dateOfBirth'])
-            : DateTime(2000, 1, 1),
-        gender: record.data['gender'] ?? '',
-        isVerified: record.data['verified'] ?? false,
-      );
+      final account = _mapRecordToAccount(authData.record!);
+      onAuthChange?.call(account);
+      return account;
+    } catch (error) {
+      throw _handleError(error);
+    }
+  }
+
+  Future<Account> updateProfile(String id, Map<String, dynamic> body) async {
+    await _ensureInitialized();
+
+    try {
+      final record = await _pb.collection('users').update(id, body: body);
+      final account = _mapRecordToAccount(record);
+
+      // Update local auth store if it's the current user
+      // Note: Updating the record in authStore manually might be tricky, 
+      // usually we rely on authRefresh or just updating the UI state.
+      // We call authRefresh to be safe and keep the token valid/extended if configured.
+      try {
+        await _pb.collection('users').authRefresh();
+      } catch (_) {
+        // Ignore refresh errors (e.g. network) if the update succeeded
+      }
+
       onAuthChange?.call(account);
       return account;
     } catch (error) {
@@ -120,20 +126,20 @@ class AuthService {
   Future<Account?> getUserFromStore() async {
     await _ensureInitialized();
 
-    if (_pb.authStore.isValid && _pb.authStore.record != null) {
-      final record = _pb.authStore.record!;
-      return Account(
-        id: record.id,
-        fullName: record.data['name'] ?? '',
-        email: record.data['email'] ?? '',
-        phone: record.data['phone'] ?? '',
-        address: record.data['address'] ?? '',
-        dateOfBirth: record.data['dateOfBirth'] != null
-            ? DateTime.parse(record.data['dateOfBirth'])
-            : DateTime(2000, 1, 1),
-        gender: record.data['gender'] ?? '',
-        isVerified: record.data['verified'] ?? false,
-      );
+    if (_pb.authStore.isValid) {
+      try {
+        // FORCE REFRESH from server to get latest data (like verified status)
+        // This updates the local authStore with the fresh record from DB
+        final authData = await _pb.collection('users').authRefresh();
+        final account = _mapRecordToAccount(authData.record);
+        return account;
+      } catch (e) {
+        print('Auth refresh failed (offline?): $e');
+        // Fallback to cached record if refresh fails (e.g. no internet)
+        if (_pb.authStore.record != null) {
+          return _mapRecordToAccount(_pb.authStore.record!);
+        }
+      }
     }
     return null;
   }
@@ -147,11 +153,12 @@ class AuthService {
   String _handleError(dynamic error) {
     if (error is ClientException) {
       if (error.statusCode == 400) {
-        return 'Email hoặc mật khẩu không đúng';
+        return 'Thông tin không hợp lệ hoặc đã tồn tại';
       } else if (error.statusCode == 401) {
         return 'Không có quyền truy cập';
       }
-      return error.response['message'] ?? 'Đã xảy ra lỗi';
+      return error.response['message'] ??
+          'Đã xảy ra lỗi: ${error.statusCode}';
     }
     return error.toString();
   }
