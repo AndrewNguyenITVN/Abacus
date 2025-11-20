@@ -5,6 +5,7 @@ import '/ui/categories/categories_manager.dart';
 import '/ui/savings_goals/savings_goals_block.dart';
 import '/ui/notifications/notifications_manager.dart';
 import '/ui/notifications/notifications_bottom_sheet.dart';
+import '/ui/bottom_nav_bar_screen.dart';
 import 'home_summary_cards.dart';
 import 'monthly_report_cards.dart';
 import 'recent_transactions_list.dart';
@@ -40,10 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildPortraitLayout() {
-    return Scaffold(
-      appBar: _buildAppBar(),
-      body: _buildBody(),
-    );
+    return Scaffold(appBar: _buildAppBar(), body: _buildBody());
   }
 
   Widget _buildLandscapeLayout() {
@@ -183,7 +181,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       TextButton(
                         onPressed: () {
-                          DefaultTabController.of(context).animateTo(1);
+                          // Navigate đến Transactions screen (index 1)
+                          final bottomNavState = context
+                              .findAncestorStateOfType<
+                                BottomNavBarScreenState
+                              >();
+                          bottomNavState?.navigateToIndex(1);
                         },
                         child: const Text('Xem tất cả'),
                       ),
@@ -192,8 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 8),
                   // Transaction List
                   RecentTransactionsList(
-                    transactions:
-                        transactionsManager.getRecentTransactions(7),
+                    transactions: transactionsManager.getRecentTransactions(7),
                     categories: categoriesManager.items,
                   ),
                 ],
@@ -416,8 +418,9 @@ class _HomeScreenState extends State<HomeScreen> {
           width: _currentReportPage == index ? 12 : 8,
           height: 8,
           decoration: BoxDecoration(
-            color:
-                _currentReportPage == index ? Colors.green : Colors.grey.shade400,
+            color: _currentReportPage == index
+                ? Colors.green
+                : Colors.grey.shade400,
             borderRadius: BorderRadius.circular(4),
           ),
         ),
@@ -448,8 +451,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigate to transactions screen
-                  DefaultTabController.of(context).animateTo(1);
+                  // Navigate đến Transactions screen (index 1)
+                  final bottomNavState = context
+                      .findAncestorStateOfType<BottomNavBarScreenState>();
+                  bottomNavState?.navigateToIndex(1);
                 },
                 child: const Text('Xem tất cả'),
               ),

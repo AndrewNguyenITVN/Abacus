@@ -9,10 +9,10 @@ class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
 
   @override
-  State<BottomNavBarScreen> createState() => _BottomNavBarScreenState();
+  State<BottomNavBarScreen> createState() => BottomNavBarScreenState();
 }
 
-class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
+class BottomNavBarScreenState extends State<BottomNavBarScreen> {
   int _selectedIndex = 0;
 
   // Danh sách các màn hình
@@ -35,6 +35,15 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  // Public method để navigate từ child widgets
+  void navigateToIndex(int index) {
+    if (index != 2 && index >= 0 && index < _screens.length) {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   // Hiển thị màn hình thêm giao dịch
@@ -143,10 +152,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
               height: 48,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF11998e),
-                    const Color(0xFF38ef7d),
-                  ],
+                  colors: [const Color(0xFF11998e), const Color(0xFF38ef7d)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -165,7 +171,7 @@ class _BottomNavBarScreenState extends State<BottomNavBarScreen> {
                 size: 28,
               ),
             ),
-            const SizedBox(height: 4)
+            const SizedBox(height: 4),
           ],
         ),
       ),
