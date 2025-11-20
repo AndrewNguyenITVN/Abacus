@@ -5,9 +5,9 @@ import '/ui/categories/categories_manager.dart';
 import '/ui/savings_goals/savings_goals_block.dart';
 import '/ui/notifications/notifications_manager.dart';
 import '/ui/notifications/notifications_bottom_sheet.dart';
-import 'widgets/home_summary_cards.dart';
-import 'widgets/monthly_report_cards.dart';
-import 'widgets/recent_transactions_list.dart';
+import 'home_summary_cards.dart';
+import 'monthly_report_cards.dart';
+import 'recent_transactions_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -104,17 +104,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             });
                           },
                           children: [
-                            MonthlyReportExpenseCard(
-                              currentMonthExpense:
+                            MonthlyReportCard(
+                              currentMonthAmount:
                                   transactionsManager.totalExpense,
-                              previousMonthExpense:
+                              previousMonthAmount:
                                   transactionsManager.previousMonthExpense,
+                              reportType: ReportType.expense,
                             ),
-                            MonthlyReportIncomeCard(
-                              currentMonthIncome:
+                            MonthlyReportCard(
+                              currentMonthAmount:
                                   transactionsManager.totalIncome,
-                              previousMonthIncome:
+                              previousMonthAmount:
                                   transactionsManager.previousMonthIncome,
+                              reportType: ReportType.income,
                             ),
                           ],
                         ),
@@ -350,13 +352,15 @@ class _HomeScreenState extends State<HomeScreen> {
               });
             },
             children: [
-              MonthlyReportExpenseCard(
-                currentMonthExpense: transactionsManager.totalExpense,
-                previousMonthExpense: transactionsManager.previousMonthExpense,
+              MonthlyReportCard(
+                currentMonthAmount: transactionsManager.totalExpense,
+                previousMonthAmount: transactionsManager.previousMonthExpense,
+                reportType: ReportType.expense,
               ),
-              MonthlyReportIncomeCard(
-                currentMonthIncome: transactionsManager.totalIncome,
-                previousMonthIncome: transactionsManager.previousMonthIncome,
+              MonthlyReportCard(
+                currentMonthAmount: transactionsManager.totalIncome,
+                previousMonthAmount: transactionsManager.previousMonthIncome,
+                reportType: ReportType.income,
               ),
             ],
           ),
