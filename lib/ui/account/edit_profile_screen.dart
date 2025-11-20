@@ -23,6 +23,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   DateTime? _selectedDate;
   String _selectedGender = 'Nam';
   
+  final List<String> _genderOptions = ['Nam', 'Nữ', 'Khác'];
+
   @override
   void initState() {
     super.initState();
@@ -32,9 +34,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _phoneController.text = widget.account.phone;
     _addressController.text = widget.account.address;
     _selectedDate = widget.account.dateOfBirth;
-    _dobController.text =
-        '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}';
-    _selectedGender = widget.account.gender;
+    if (_selectedDate != null) {
+      _dobController.text =
+          '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}';
+    }
+    
+    // Validate gender value
+    if (_genderOptions.contains(widget.account.gender)) {
+      _selectedGender = widget.account.gender;
+    } else {
+      _selectedGender = 'Nam'; // Default fallback
+    }
   }
   
   @override
@@ -70,22 +80,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         email: _emailController.text,
         phone: _phoneController.text,
         address: _addressController.text,
-        dateOfBirth: _selectedDate,
+        dateOfBirth: _selectedDate ?? DateTime(2000, 1, 1),
         gender: _selectedGender,
       );
-      // Log for now (in a real app, you would update user profile in database)
-      print('Full Name: ${updatedAccount.fullName}');
-      print('Email: ${updatedAccount.email}');
-      print('Phone: ${updatedAccount.phone}');
-      print('Address: ${updatedAccount.address}');
-      print('Date of Birth: ${updatedAccount.dateOfBirth}');
-      print('Gender: ${updatedAccount.gender}');
       
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cập nhật thông tin thành công'),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
+          content: Text('Đang cập nhật thông tin...'),
+          backgroundColor: Colors.blue,
+          duration: Duration(seconds: 1),
         ),
       );
       
@@ -113,7 +116,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Chụp ảnh từ camera')),
+                      const SnackBar(content: Text('Chức năng chưa khả dụng')),
                     );
                   },
                 ),
@@ -123,17 +126,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onTap: () {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Chọn ảnh từ thư viện')),
-                    );
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.delete, color: Colors.red),
-                  title: const Text('Xóa ảnh đại diện'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đã xóa ảnh đại diện')),
+                      const SnackBar(content: Text('Chức năng chưa khả dụng')),
                     );
                   },
                 ),
@@ -273,6 +266,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       fillColor: Colors.grey.shade50,
                     ),
                     keyboardType: TextInputType.emailAddress,
+                    readOnly: true, // Prevent editing email for now as it might affect login
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Vui lòng nhập email';
@@ -299,12 +293,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     keyboardType: TextInputType.phone,
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập số điện thoại';
-                      }
-                      if (value.length < 10) {
-                        return 'Số điện thoại không hợp lệ';
-                      }
+                      // Optional phone validation
                       return null;
                     },
                   ),
@@ -322,16 +311,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       filled: true,
                       fillColor: Colors.grey.shade50,
                     ),
-                    items: ['Nam', 'Nữ', 'Khác'].map((String value) {
+                    items: _genderOptions.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
                         child: Text(value),
                       );
                     }).toList(),
                     onChanged: (String? newValue) {
-                      setState(() {
-                        _selectedGender = newValue!;
-                      });
+                      if (newValue != null) {
+                        setState(() {
+                          _selectedGender = newValue;
+                        });
+                      }
                     },
                   ),
                   const SizedBox(height: 16),
@@ -350,12 +341,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     readOnly: true,
                     onTap: () => _selectDate(context),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng chọn ngày sinh';
-                      }
-                      return null;
-                    },
                   ),
                   const SizedBox(height: 16),
                   
@@ -372,12 +357,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       fillColor: Colors.grey.shade50,
                     ),
                     maxLines: 2,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Vui lòng nhập địa chỉ';
-                      }
-                      return null;
-                    },
                   ),
                 ],
               ),
@@ -431,4 +410,3 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
-

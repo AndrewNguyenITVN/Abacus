@@ -6,7 +6,7 @@ import '../../models/account.dart';
 import '/ui/account/edit_profile_screen.dart';
 import '/ui/account/account_manager.dart';
 import '/ui/auth/auth_manager.dart';
-import '../../services/notification_service.dart';
+import '../notifications/notification_settings_dialog.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -15,6 +15,18 @@ class AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final accountManager = Provider.of<AccountManager>(context);
     final account = accountManager.account;
+
+    if (accountManager.isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (account == null) {
+      return const Scaffold(
+        body: Center(child: Text('Không tìm thấy thông tin tài khoản')),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
@@ -34,7 +46,7 @@ class AccountScreen extends StatelessWidget {
               // Settings Section
               _buildSettingsSection(context),
               const SizedBox(height: 20),
-              
+
               // Logout Section
               _buildLogoutSection(context),
               const SizedBox(height: 20),
@@ -187,7 +199,7 @@ class AccountScreen extends StatelessWidget {
                 Icon(Icons.phone_rounded, size: 16, color: Colors.grey.shade700),
                 const SizedBox(width: 6),
                 Text(
-                  account.phone,
+                  account.phone.isNotEmpty ? account.phone : 'Chưa cập nhật SĐT',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -342,9 +354,10 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingItem(IconData icon, String title, Color iconColor, {VoidCallback? onTap}) {
+  Widget _buildSettingItem(IconData icon, String title, Color iconColor,
+      {VoidCallback? onTap, Widget? trailing}) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -362,34 +375,15 @@ class AccountScreen extends StatelessWidget {
           letterSpacing: -0.2,
         ),
       ),
-      trailing: Icon(
-        Icons.chevron_right_rounded,
-        color: Colors.grey.shade400,
-        size: 24,
-      ),
+      trailing: trailing ??
+          Icon(
+            Icons.chevron_right_rounded,
+            color: Colors.grey.shade400,
+            size: 24,
+          ),
       onTap: onTap,
     );
   }
-
-  // void _showSnackBar(BuildContext context, String message) {
-  //   ScaffoldMessenger.of(context).showSnackBar(
-  //     SnackBar(
-  //       content: Row(
-  //         children: [
-  //           const Icon(Icons.check_circle_rounded, color: Colors.white),
-  //           const SizedBox(width: 12),
-  //           Text(message),
-  //         ],
-  //       ),
-  //       backgroundColor: Colors.grey.shade700,
-  //       behavior: SnackBarBehavior.floating,
-  //       shape: RoundedRectangleBorder(
-  //         borderRadius: BorderRadius.circular(12),
-  //       ),
-  //       margin: const EdgeInsets.all(16),
-  //     ),
-  //   );
-  // }
 
   Widget _buildLanguageItem() {
     return ListTile(
@@ -439,381 +433,39 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _showSpendingSettingsDialog(BuildContext context) async {
-    final notificationService = NotificationService();
-    int threshold = await notificationService.getThreshold();
-    bool enabled = await notificationService.isEnabled();
-    bool savingsGoalEnabled = await notificationService.isSavingsGoalEnabled();
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.notifications_rounded,
-                      color: Colors.grey.shade700,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Cài đặt thông báo',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                ],
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Toggle savings goal alerts
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Row(
-                                  children: [
-                                    Icon(Icons.savings_rounded, size: 18, color: Color(0xFF4CAF50)),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Đạt mục tiêu tiết kiệm',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Thông báo khi đạt 100% mục tiêu',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Switch(
-                            value: savingsGoalEnabled,
-                            onChanged: (v) {
-                              setState(() {
-                                savingsGoalEnabled = v;
-                              });
-                            },
-                            activeColor: const Color(0xFF4CAF50),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // Toggle spending alerts
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Row(
-                                  children: [
-                                    Icon(Icons.warning_rounded, size: 18, color: Color(0xFFFF9800)),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'Cảnh báo chi tiêu',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Nhận thông báo khi vượt ngưỡng',
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Switch(
-                            value: enabled,
-                            onChanged: (v) {
-                              setState(() {
-                                enabled = v;
-                              });
-                            },
-                            activeColor: const Color(0xFFFF9800),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  
-                    // Threshold slider
-                    Text(
-                      'Ngưỡng cảnh báo: $threshold%',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Cảnh báo lặp lại mỗi +5% sau khi vượt ngưỡng',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: const Color(0xFFFF9800),
-                        inactiveTrackColor: Colors.grey.shade300,
-                        thumbColor: const Color(0xFFFF9800),
-                        overlayColor: const Color(0xFFFF9800).withOpacity(0.2),
-                        valueIndicatorColor: const Color(0xFFFF9800),
-                        valueIndicatorTextStyle: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      child: Slider(
-                        value: threshold.toDouble(),
-                        min: 50,
-                        max: 100,
-                        divisions: 10,
-                        label: '$threshold%',
-                        onChanged: enabled
-                            ? (v) {
-                                setState(() {
-                                  threshold = v.round();
-                                });
-                              }
-                            : null,
-                      ),
-                    ),
-                    
-                    // Info box
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.blue.shade200,
-                          width: 1,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.info_outline_rounded,
-                            color: Colors.blue.shade700,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'Ví dụ: Ngưỡng 70% → báo ở 70%, 75%, 80%, 85%...',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.blue.shade900,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'Hủy',
-                    style: TextStyle(color: Colors.grey.shade600),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    final notificationService = NotificationService();
-                    await notificationService.setThreshold(threshold);
-                    await notificationService.setEnabled(enabled);
-                    await notificationService.setSavingsGoalEnabled(savingsGoalEnabled);
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Row(
-                            children: [
-                              Icon(Icons.check_circle_rounded, color: Colors.white),
-                              SizedBox(width: 12),
-                              Text('Đã lưu cài đặt thông báo'),
-                            ],
-                          ),
-                          backgroundColor: const Color(0xFF4CAF50),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          margin: const EdgeInsets.all(16),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Text('Lưu'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
   Widget _buildLogoutSection(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFee0979), Color(0xFFff6a00)], // Pink-Orange gradient
-                ),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFee0979).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  context.read<AuthManager>().logout();
-                  context.go('/login');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.logout_rounded, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Đăng xuất',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                  ],
-                ),
+      child: ElevatedButton(
+        onPressed: () {
+          context.read<AuthManager>().logout();
+          context.go('/login');
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.red,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: BorderSide(color: Colors.red.shade100),
+          ),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.logout_rounded, size: 20),
+            SizedBox(width: 8),
+            Text(
+              'Đăng xuất',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.2,
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF667eea), Color(0xFF764ba2)], // Purple gradient
-                ),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF667eea).withOpacity(0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: ElevatedButton(
-                onPressed: () {
-                  context.read<AuthManager>().logout();
-                  context.go('/login');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.swap_horiz_rounded, color: Colors.white, size: 20),
-                    SizedBox(width: 8),
-                    Text(
-                      'Đổi tài khoản',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -875,5 +527,11 @@ class AccountScreen extends StatelessWidget {
       ),
     );
   }
+  
+  void _showSpendingSettingsDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => const NotificationSettingsDialog(),
+    );
+  }
 }
-
