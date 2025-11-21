@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
 
     final router = GoRouter(
       debugLogDiagnostics: true,
-      initialLocation: '/login', // Start at login screen
+      initialLocation: '/splash', // Start at splash screen
       refreshListenable: authManager,
       redirect: (context, state) {
         final authFromProvider = context.read<AuthManager>();
@@ -56,6 +56,10 @@ class MyApp extends StatelessWidget {
         return null;
       },
       routes: [
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) => const SplashScreen(),
+        ),
         GoRoute(
           path: '/login',
           builder: (context, state) => const LoginScreen(),

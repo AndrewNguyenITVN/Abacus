@@ -1,3 +1,6 @@
+// Splash
+export 'splash/splash_screen.dart';
+
 // Auth
 export 'auth/auth_manager.dart';
 export 'auth/login_screen.dart';
