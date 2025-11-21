@@ -1,40 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '/ui/savings_goals/savings_goals_manager.dart';
 import '/ui/savings_goals/savings_goals_screen.dart';
-import '/models/savings_goal.dart';
-
-// Helper function to format currency
-String _formatCurrency(double amount) {
-  final formatter = NumberFormat.currency(locale: 'vi_VN', symbol: '₫');
-  return formatter.format(amount);
-}
-
-// Helper function to get icon data
-IconData _getIconData(String iconName) {
-  const iconMap = {
-    'home': Icons.home,
-    'two_wheeler': Icons.two_wheeler,
-    'directions_car': Icons.directions_car,
-    'flight': Icons.flight,
-    'beach_access': Icons.beach_access,
-    'school': Icons.school,
-    'laptop': Icons.laptop,
-    'phone_android': Icons.phone_android,
-    'shopping_bag': Icons.shopping_bag,
-    'savings': Icons.savings,
-    'account_balance': Icons.account_balance,
-    'card_giftcard': Icons.card_giftcard,
-  };
-  return iconMap[iconName] ?? Icons.savings;
-}
-
-// Helper function to parse color
-Color _parseColor(String hexColor) {
-  final hexCode = hexColor.replaceAll('#', '');
-  return Color(int.parse('FF$hexCode', radix: 16));
-}
+import 'savings_helpers.dart';
+import 'savings_goal_card.dart';
 
 class SavingsGoalsBlock extends StatelessWidget {
   const SavingsGoalsBlock({super.key});
@@ -179,7 +148,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      _formatCurrency(goalsManager.totalSaved),
+                      SavingsHelpers.formatCurrency(goalsManager.totalSaved),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -187,7 +156,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      _formatCurrency(goalsManager.totalTarget),
+                      SavingsHelpers.formatCurrency(goalsManager.totalTarget),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -202,7 +171,7 @@ class SavingsGoalsBlock extends StatelessWidget {
           const SizedBox(height: 16),
 
           // Goals List
-          ...activeGoals.map((goal) => _buildGoalItem(context, goal)),
+          ...activeGoals.map((goal) => SavingsGoalCard(goal: goal, isDetailMode: false)),
 
           // Show more if there are more goals
           if (goalsManager.activeGoalsCount > 3)
@@ -226,134 +195,6 @@ class SavingsGoalsBlock extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildGoalItem(BuildContext context, SavingsGoal goal) {
-    final color = _parseColor(goal.color);
-    final daysRemaining = goal.daysRemaining;
-
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => SavingsGoalsScreen(selectedGoalId: goal.id),
-          ),
-        );
-      },
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.2)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    _getIconData(goal.icon),
-                    color: color,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        goal.name,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      if (daysRemaining != null)
-                        Text(
-                          daysRemaining > 0
-                              ? 'Còn $daysRemaining ngày'
-                              : 'Đã đến hạn',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: daysRemaining > 30
-                                ? Colors.grey.shade600
-                                : Colors.orange.shade700,
-                            fontWeight: daysRemaining <= 30
-                                ? FontWeight.w600
-                                : FontWeight.normal,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${goal.progressPercentage.toStringAsFixed(0)}%',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: color,
-                      ),
-                    ),
-                    Text(
-                      _formatCurrency(goal.remainingAmount),
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: goal.progressPercentage / 100,
-                minHeight: 6,
-                backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _formatCurrency(goal.currentAmount),
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.green.shade700,
-                  ),
-                ),
-                Text(
-                  _formatCurrency(goal.targetAmount),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -433,4 +274,3 @@ class SavingsGoalsBlock extends StatelessWidget {
     );
   }
 }
-

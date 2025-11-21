@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '/ui/savings_goals/savings_goals_manager.dart';
 import '/models/savings_goal.dart';
+import 'savings_helpers.dart';
+import 'quick_amount_selector.dart';
+import 'package:intl/intl.dart';
 
 class AddEditGoalScreen extends StatefulWidget {
   final SavingsGoal? goal;
@@ -26,46 +28,16 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
 
   bool get _isEditing => widget.goal != null;
 
-  // Icon options
-  final List<Map<String, dynamic>> _iconOptions = [
-    {'name': 'savings', 'icon': Icons.savings, 'label': 'Tiết kiệm'},
-    {'name': 'home', 'icon': Icons.home, 'label': 'Nhà'},
-    {'name': 'directions_car', 'icon': Icons.directions_car, 'label': 'Ô tô'},
-    {'name': 'two_wheeler', 'icon': Icons.two_wheeler, 'label': 'Xe máy'},
-    {'name': 'flight', 'icon': Icons.flight, 'label': 'Du lịch'},
-    {'name': 'beach_access', 'icon': Icons.beach_access, 'label': 'Nghỉ dưỡng'},
-    {'name': 'school', 'icon': Icons.school, 'label': 'Học tập'},
-    {'name': 'laptop', 'icon': Icons.laptop, 'label': 'Laptop'},
-    {'name': 'phone_android', 'icon': Icons.phone_android, 'label': 'Điện thoại'},
-    {'name': 'shopping_bag', 'icon': Icons.shopping_bag, 'label': 'Mua sắm'},
-    {'name': 'account_balance', 'icon': Icons.account_balance, 'label': 'Ngân hàng'},
-    {'name': 'card_giftcard', 'icon': Icons.card_giftcard, 'label': 'Quà tặng'},
-  ];
-
-  // Color options
-  final List<Map<String, dynamic>> _colorOptions = [
-    {'hex': '#4CAF50', 'color': const Color(0xFF4CAF50), 'label': 'Xanh lá'},
-    {'hex': '#2196F3', 'color': const Color(0xFF2196F3), 'label': 'Xanh dương'},
-    {'hex': '#FF5722', 'color': const Color(0xFFFF5722), 'label': 'Đỏ cam'},
-    {'hex': '#9C27B0', 'color': const Color(0xFF9C27B0), 'label': 'Tím'},
-    {'hex': '#FF9800', 'color': const Color(0xFFFF9800), 'label': 'Cam'},
-    {'hex': '#F44336', 'color': const Color(0xFFF44336), 'label': 'Đỏ'},
-    {'hex': '#00BCD4', 'color': const Color(0xFF00BCD4), 'label': 'Xanh cyan'},
-    {'hex': '#FFEB3B', 'color': const Color(0xFFFFEB3B), 'label': 'Vàng'},
-    {'hex': '#795548', 'color': const Color(0xFF795548), 'label': 'Nâu'},
-    {'hex': '#607D8B', 'color': const Color(0xFF607D8B), 'label': 'Xám xanh'},
-    {'hex': '#E91E63', 'color': const Color(0xFFE91E63), 'label': 'Hồng'},
-    {'hex': '#009688', 'color': const Color(0xFF009688), 'label': 'Xanh ngọc'},
-  ];
-
   @override
   void initState() {
     super.initState();
     if (_isEditing) {
       _nameController.text = widget.goal!.name;
       _descriptionController.text = widget.goal!.description ?? '';
-      _targetAmountController.text = widget.goal!.targetAmount.toString();
-      _currentAmountController.text = widget.goal!.currentAmount.toString();
+      // Format numbers when loading
+      final formatter = NumberFormat.decimalPattern('vi_VN');
+      _targetAmountController.text = formatter.format(widget.goal!.targetAmount);
+      _currentAmountController.text = formatter.format(widget.goal!.currentAmount);
       _targetDate = widget.goal!.targetDate;
       _selectedIcon = widget.goal!.icon;
       _selectedColor = widget.goal!.color;
@@ -110,17 +82,11 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 decoration: InputDecoration(
                   labelText: 'Tên mục tiêu *',
                   hintText: 'VD: Mua xe máy, Du lịch,...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   prefixIcon: const Icon(Icons.label),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập tên mục tiêu';
-                  }
-                  return null;
-                },
+                validator: (value) =>
+                    (value == null || value.isEmpty) ? 'Vui lòng nhập tên mục tiêu' : null,
               ),
 
               const SizedBox(height: 16),
@@ -131,9 +97,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 decoration: InputDecoration(
                   labelText: 'Mô tả',
                   hintText: 'Mô tả chi tiết về mục tiêu...',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   prefixIcon: const Icon(Icons.description),
                 ),
                 maxLines: 3,
@@ -148,28 +112,23 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 decoration: InputDecoration(
                   labelText: 'Số tiền mục tiêu *',
                   hintText: 'Nhập số tiền',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   prefixIcon: const Icon(Icons.attach_money),
                   suffixText: '₫',
                 ),
                 validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số tiền mục tiêu';
-                  }
-                  final amount = double.tryParse(value);
-                  if (amount == null || amount <= 0) {
-                    return 'Số tiền không hợp lệ';
-                  }
+                  if (value == null || value.isEmpty) return 'Vui lòng nhập số tiền mục tiêu';
+                  final amount = SavingsHelpers.parseAmount(value);
+                  if (amount == null || amount <= 0) return 'Số tiền không hợp lệ';
                   return null;
                 },
               ),
 
               const SizedBox(height: 8),
-
-              // Quick amount buttons for target amount
-              _buildQuickAmountButtons(_targetAmountController),
+              QuickAmountSelector(
+                controller: _targetAmountController,
+                onChanged: () => setState(() {}),
+              ),
 
               const SizedBox(height: 16),
 
@@ -180,27 +139,24 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 decoration: InputDecoration(
                   labelText: 'Số tiền hiện tại',
                   hintText: 'Nhập số tiền đã tiết kiệm',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   prefixIcon: const Icon(Icons.account_balance_wallet),
                   suffixText: '₫',
                 ),
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
-                    final amount = double.tryParse(value);
-                    if (amount == null || amount < 0) {
-                      return 'Số tiền không hợp lệ';
-                    }
+                    final amount = SavingsHelpers.parseAmount(value);
+                    if (amount == null || amount < 0) return 'Số tiền không hợp lệ';
                   }
                   return null;
                 },
               ),
 
               const SizedBox(height: 8),
-
-              // Quick amount buttons for current amount
-              _buildQuickAmountButtons(_currentAmountController),
+              QuickAmountSelector(
+                controller: _currentAmountController,
+                onChanged: () => setState(() {}),
+              ),
 
               const SizedBox(height: 16),
 
@@ -211,29 +167,21 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 child: InputDecorator(
                   decoration: InputDecoration(
                     labelText: 'Hạn hoàn thành',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                     prefixIcon: const Icon(Icons.calendar_today),
                     suffixIcon: _targetDate != null
                         ? IconButton(
                             icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                _targetDate = null;
-                              });
-                            },
+                            onPressed: () => setState(() => _targetDate = null),
                           )
                         : null,
                   ),
                   child: Text(
                     _targetDate != null
-                        ? DateFormat('dd/MM/yyyy', 'vi_VN').format(_targetDate!)
+                        ? SavingsHelpers.formatDate(_targetDate!)
                         : 'Chọn ngày hoàn thành (tùy chọn)',
                     style: TextStyle(
-                      color: _targetDate != null
-                          ? Colors.black87
-                          : Colors.grey.shade600,
+                      color: _targetDate != null ? Colors.black87 : Colors.grey.shade600,
                     ),
                   ),
                 ),
@@ -255,16 +203,11 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.purple.shade600,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
                     _isEditing ? 'Cập nhật mục tiêu' : 'Tạo mục tiêu',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -276,15 +219,8 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
   }
 
   Widget _buildIconColorSelection() {
-    final selectedColor = _colorOptions.firstWhere(
-      (c) => c['hex'] == _selectedColor,
-      orElse: () => _colorOptions[0],
-    )['color'] as Color;
-
-    final selectedIconData = _iconOptions.firstWhere(
-      (i) => i['name'] == _selectedIcon,
-      orElse: () => _iconOptions[0],
-    )['icon'] as IconData;
+    final selectedColor = SavingsHelpers.parseColor(_selectedColor);
+    final selectedIconData = SavingsHelpers.getIconData(_selectedIcon);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -302,47 +238,28 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
               color: selectedColor.withOpacity(0.2),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              selectedIconData,
-              size: 48,
-              color: selectedColor,
-            ),
+            child: Icon(selectedIconData, size: 48, color: selectedColor),
           ),
-
           const SizedBox(height: 16),
 
           // Icon selection
-          const Text(
-            'Chọn biểu tượng',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const Text('Chọn biểu tượng', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _iconOptions.map((option) {
+            children: SavingsHelpers.iconOptions.map((option) {
               final isSelected = option['name'] == _selectedIcon;
               return InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedIcon = option['name'] as String;
-                  });
-                },
+                onTap: () => setState(() => _selectedIcon = option['name'] as String),
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? selectedColor.withOpacity(0.2)
-                        : Colors.grey.shade100,
+                    color: isSelected ? selectedColor.withOpacity(0.2) : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isSelected
-                          ? selectedColor
-                          : Colors.grey.shade300,
+                      color: isSelected ? selectedColor : Colors.grey.shade300,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
@@ -359,26 +276,16 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
           const SizedBox(height: 16),
 
           // Color selection
-          const Text(
-            'Chọn màu sắc',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          const Text('Chọn màu sắc', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _colorOptions.map((option) {
+            children: SavingsHelpers.colorOptions.map((option) {
               final isSelected = option['hex'] == _selectedColor;
               final color = option['color'] as Color;
               return InkWell(
-                onTap: () {
-                  setState(() {
-                    _selectedColor = option['hex'] as String;
-                  });
-                },
+                onTap: () => setState(() => _selectedColor = option['hex'] as String),
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
                   width: 40,
@@ -392,11 +299,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                     ),
                   ),
                   child: isSelected
-                      ? const Icon(
-                          Icons.check,
-                          color: Colors.white,
-                          size: 20,
-                        )
+                      ? const Icon(Icons.check, color: Colors.white, size: 20)
                       : null,
                 ),
               );
@@ -408,24 +311,16 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
   }
 
   Widget _buildPreview() {
-    if (_nameController.text.isEmpty &&
-        _targetAmountController.text.isEmpty) {
+    if (_nameController.text.isEmpty && _targetAmountController.text.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    final targetAmount = double.tryParse(_targetAmountController.text) ?? 0;
-    final currentAmount = double.tryParse(_currentAmountController.text) ?? 0;
+    final targetAmount = SavingsHelpers.parseAmount(_targetAmountController.text) ?? 0;
+    final currentAmount = SavingsHelpers.parseAmount(_currentAmountController.text) ?? 0;
     final progress = targetAmount > 0 ? (currentAmount / targetAmount * 100).clamp(0, 100) : 0;
 
-    final selectedColor = _colorOptions.firstWhere(
-      (c) => c['hex'] == _selectedColor,
-      orElse: () => _colorOptions[0],
-    )['color'] as Color;
-
-    final selectedIconData = _iconOptions.firstWhere(
-      (i) => i['name'] == _selectedIcon,
-      orElse: () => _iconOptions[0],
-    )['icon'] as IconData;
+    final selectedColor = SavingsHelpers.parseColor(_selectedColor);
+    final selectedIconData = SavingsHelpers.getIconData(_selectedIcon);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -437,14 +332,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Xem trước',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
+          const Text('Xem trước', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -454,11 +342,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                   color: selectedColor.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(
-                  selectedIconData,
-                  color: selectedColor,
-                  size: 24,
-                ),
+                child: Icon(selectedIconData, color: selectedColor, size: 24),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -466,32 +350,20 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _nameController.text.isEmpty
-                          ? 'Tên mục tiêu'
-                          : _nameController.text,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      _nameController.text.isEmpty ? 'Tên mục tiêu' : _nameController.text,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
                     ),
                     if (_targetDate != null)
                       Text(
-                        'Đến ${DateFormat('dd/MM/yyyy').format(_targetDate!)}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
+                        'Đến ${SavingsHelpers.formatDate(_targetDate!)}',
+                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                   ],
                 ),
               ),
               Text(
                 '${progress.toStringAsFixed(0)}%',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: selectedColor,
-                ),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: selectedColor),
               ),
             ],
           ),
@@ -510,21 +382,12 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
-                    .format(currentAmount),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.green.shade700,
-                ),
+                SavingsHelpers.formatCurrency(currentAmount),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.green.shade700),
               ),
               Text(
-                NumberFormat.currency(locale: 'vi_VN', symbol: '₫')
-                    .format(targetAmount),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                ),
+                SavingsHelpers.formatCurrency(targetAmount),
+                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             ],
           ),
@@ -540,33 +403,24 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 3650)),
     );
-
     if (picked != null && picked != _targetDate) {
-      setState(() {
-        _targetDate = picked;
-      });
+      setState(() => _targetDate = picked);
     }
   }
 
   Future<void> _saveGoal() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final goalsManager = context.read<SavingsGoalsManager>();
-    final targetAmount = double.parse(_targetAmountController.text);
-    final currentAmount = _currentAmountController.text.isEmpty
-        ? 0.0
-        : double.parse(_currentAmountController.text);
+    
+    final targetAmount = SavingsHelpers.parseAmount(_targetAmountController.text)!;
+    final currentAmount = SavingsHelpers.parseAmount(_currentAmountController.text) ?? 0.0;
 
     try {
       if (_isEditing) {
-        // Update existing goal
         final updatedGoal = widget.goal!.copyWith(
           name: _nameController.text,
-          description: _descriptionController.text.isEmpty
-              ? null
-              : _descriptionController.text,
+          description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           targetAmount: targetAmount,
           currentAmount: currentAmount,
           targetDate: _targetDate,
@@ -576,14 +430,10 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
         );
         await goalsManager.updateGoal(updatedGoal);
       } else {
-        // Create new goal
         final newGoal = SavingsGoal(
           id: 'g${DateTime.now().millisecondsSinceEpoch}',
-          userId: 'user1', // TODO: Get from auth
           name: _nameController.text,
-          description: _descriptionController.text.isEmpty
-              ? null
-              : _descriptionController.text,
+          description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           targetAmount: targetAmount,
           currentAmount: currentAmount,
           targetDate: _targetDate,
@@ -597,96 +447,19 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
 
       if (mounted) {
         Navigator.of(context).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              _isEditing
-                  ? 'Đã cập nhật mục tiêu'
-                  : 'Đã tạo mục tiêu mới',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(_isEditing ? 'Đã cập nhật mục tiêu' : 'Đã tạo mục tiêu mới'),
+          backgroundColor: Colors.green,
+        ));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Có lỗi xảy ra: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Có lỗi xảy ra: $e'),
+          backgroundColor: Colors.red,
+        ));
       }
     }
   }
 
-  // Build quick amount buttons
-  Widget _buildQuickAmountButtons(TextEditingController controller) {
-    return Row(
-      children: [
-        for (var i = 0; i < ['10000', '100000', '1000000', '000'].length; i++)
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: i < 3 ? 8 : 0),
-              child: _buildQuickAmountButton(
-                ['10000', '100000', '1000000', '000'][i],
-                controller,
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildQuickAmountButton(
-    String amount,
-    TextEditingController controller,
-  ) {
-    return InkWell(
-      onTap: () => _addAmount(amount, controller),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Text(
-            amount == '000'
-                ? '+000'
-                : '+${NumberFormat.compact().format(int.parse(amount))}',
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _addAmount(String amount, TextEditingController controller) {
-    if (amount == '000') {
-      // Thêm 3 số 0
-      controller.text += '000';
-    } else {
-      // Cộng thêm số tiền
-      final current = double.tryParse(controller.text.replaceAll(',', '')) ?? 0;
-      final add = double.parse(amount);
-      controller.text = (current + add).toStringAsFixed(0);
-    }
-    // Trigger setState để update preview
-    setState(() {});
-  }
 }
-
