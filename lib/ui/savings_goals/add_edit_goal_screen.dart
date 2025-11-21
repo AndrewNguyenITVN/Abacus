@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/ui/savings_goals/savings_goals_manager.dart';
 import '/models/savings_goal.dart';
-import 'savings_helpers.dart';
+import '../shared/app_helpers.dart';
+import '../shared/app_constants.dart';
 import 'quick_amount_selector.dart';
 import 'package:intl/intl.dart';
 
@@ -118,7 +119,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Vui lòng nhập số tiền mục tiêu';
-                  final amount = SavingsHelpers.parseAmount(value);
+                  final amount = AppHelpers.parseAmount(value);
                   if (amount == null || amount <= 0) return 'Số tiền không hợp lệ';
                   return null;
                 },
@@ -145,7 +146,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 ),
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
-                    final amount = SavingsHelpers.parseAmount(value);
+                    final amount = AppHelpers.parseAmount(value);
                     if (amount == null || amount < 0) return 'Số tiền không hợp lệ';
                   }
                   return null;
@@ -178,7 +179,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                   ),
                   child: Text(
                     _targetDate != null
-                        ? SavingsHelpers.formatDate(_targetDate!)
+                        ? AppHelpers.formatDate(_targetDate!)
                         : 'Chọn ngày hoàn thành (tùy chọn)',
                     style: TextStyle(
                       color: _targetDate != null ? Colors.black87 : Colors.grey.shade600,
@@ -219,8 +220,8 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
   }
 
   Widget _buildIconColorSelection() {
-    final selectedColor = SavingsHelpers.parseColor(_selectedColor);
-    final selectedIconData = SavingsHelpers.getIconData(_selectedIcon);
+    final selectedColor = AppHelpers.parseColor(_selectedColor);
+    final selectedIconData = AppHelpers.getIconData(_selectedIcon);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -245,32 +246,44 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
           // Icon selection
           const Text('Chọn biểu tượng', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: SavingsHelpers.iconOptions.map((option) {
-              final isSelected = option['name'] == _selectedIcon;
-              return InkWell(
-                onTap: () => setState(() => _selectedIcon = option['name'] as String),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: isSelected ? selectedColor.withOpacity(0.2) : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: isSelected ? selectedColor : Colors.grey.shade300,
-                      width: isSelected ? 2 : 1,
+          
+          // Using GridView for Icons (Similar to Categories)
+          Container(
+            height: 150,
+            decoration: BoxDecoration(
+               color: Colors.white.withOpacity(0.5),
+               borderRadius: BorderRadius.circular(12),
+            ),
+            child: GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 6,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemCount: AppConstants.iconMap.length,
+              itemBuilder: (context, index) {
+                final entry = AppConstants.iconMap.entries.elementAt(index);
+                final isSelected = entry.key == _selectedIcon;
+                
+                return InkWell(
+                  onTap: () => setState(() => _selectedIcon = entry.key),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isSelected ? selectedColor.withOpacity(0.2) : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      border: isSelected ? Border.all(color: selectedColor) : null,
+                    ),
+                    child: Icon(
+                      entry.value,
+                      size: 20,
+                      color: isSelected ? selectedColor : Colors.grey.shade600,
                     ),
                   ),
-                  child: Icon(
-                    option['icon'] as IconData,
-                    size: 24,
-                    color: isSelected ? selectedColor : Colors.grey.shade600,
-                  ),
-                ),
-              );
-            }).toList(),
+                );
+              },
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -281,7 +294,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: SavingsHelpers.colorOptions.map((option) {
+            children: AppConstants.colorOptions.map((option) {
               final isSelected = option['hex'] == _selectedColor;
               final color = option['color'] as Color;
               return InkWell(
@@ -315,12 +328,12 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
       return const SizedBox.shrink();
     }
 
-    final targetAmount = SavingsHelpers.parseAmount(_targetAmountController.text) ?? 0;
-    final currentAmount = SavingsHelpers.parseAmount(_currentAmountController.text) ?? 0;
+    final targetAmount = AppHelpers.parseAmount(_targetAmountController.text) ?? 0;
+    final currentAmount = AppHelpers.parseAmount(_currentAmountController.text) ?? 0;
     final progress = targetAmount > 0 ? (currentAmount / targetAmount * 100).clamp(0, 100) : 0;
 
-    final selectedColor = SavingsHelpers.parseColor(_selectedColor);
-    final selectedIconData = SavingsHelpers.getIconData(_selectedIcon);
+    final selectedColor = AppHelpers.parseColor(_selectedColor);
+    final selectedIconData = AppHelpers.getIconData(_selectedIcon);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -355,7 +368,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                     ),
                     if (_targetDate != null)
                       Text(
-                        'Đến ${SavingsHelpers.formatDate(_targetDate!)}',
+                        'Đến ${AppHelpers.formatDate(_targetDate!)}',
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                   ],
@@ -382,11 +395,11 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                SavingsHelpers.formatCurrency(currentAmount),
+                AppHelpers.formatCurrency(currentAmount),
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.green.shade700),
               ),
               Text(
-                SavingsHelpers.formatCurrency(targetAmount),
+                AppHelpers.formatCurrency(targetAmount),
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             ],
@@ -413,8 +426,8 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
 
     final goalsManager = context.read<SavingsGoalsManager>();
     
-    final targetAmount = SavingsHelpers.parseAmount(_targetAmountController.text)!;
-    final currentAmount = SavingsHelpers.parseAmount(_currentAmountController.text) ?? 0.0;
+    final targetAmount = AppHelpers.parseAmount(_targetAmountController.text)!;
+    final currentAmount = AppHelpers.parseAmount(_currentAmountController.text) ?? 0.0;
 
     try {
       if (_isEditing) {

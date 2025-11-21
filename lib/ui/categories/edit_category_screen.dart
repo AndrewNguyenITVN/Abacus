@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/my_category.dart';
 import 'category_form.dart';
-import 'categories_helpers.dart';
+import '../shared/app_constants.dart';
 
 class EditCategoryScreen extends StatefulWidget {
   final MyCategory? category; // null khi thêm mới
@@ -28,7 +28,8 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.category?.name ?? '');
     _selectedIcon = widget.category?.icon ?? 'shopping_bag';
-    _selectedColor = widget.category?.color ?? CategoriesHelpers.defaultColors[0];
+    // Use colorOptions instead of defaultColors
+    _selectedColor = widget.category?.color ?? AppConstants.colorOptions[0]['hex'] as String;
   }
 
   @override

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '/models/transaction.dart';
 import '/models/my_category.dart';
-import 'transaction_helpers.dart';
+import '../shared/app_helpers.dart';
 
 class TransactionItem extends StatelessWidget {
   final Transaction transaction;
@@ -18,7 +18,7 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isIncome = transaction.type == 'income';
-    final categoryColor = TransactionHelpers.parseColor(category.color);
+    final categoryColor = AppHelpers.parseColor(category.color);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -58,7 +58,7 @@ class TransactionItem extends StatelessWidget {
             ],
           ),
           child: Icon(
-            TransactionHelpers.getIconData(category.icon),
+            AppHelpers.getIconData(category.icon),
             color: Colors.white,
             size: 22,
           ),
@@ -95,7 +95,7 @@ class TransactionItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
-            '${isIncome ? '+' : '-'}${TransactionHelpers.formatCurrency(transaction.amount)}',
+            '${isIncome ? '+' : '-'}${AppHelpers.formatCurrency(transaction.amount)}',
             style: TextStyle(
               color: isIncome
                   ? const Color(0xFF11998e)
@@ -111,5 +111,3 @@ class TransactionItem extends StatelessWidget {
     );
   }
 }
-
-

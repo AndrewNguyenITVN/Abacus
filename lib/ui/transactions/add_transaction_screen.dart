@@ -5,7 +5,7 @@ import '/models/transaction_type.dart';
 import '/models/my_category.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/transactions/transactions_manager.dart';
-import 'transaction_helpers.dart';
+import '../shared/app_helpers.dart';
 import 'transaction_form.dart';
 
 class AddTransactionScreen extends StatefulWidget {
@@ -51,7 +51,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     if (_formKey.currentState!.validate()) {
       final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
       
-      final amount = TransactionHelpers.parseAmount(_amountController.text)!;
+      final amount = AppHelpers.parseAmount(_amountController.text)!;
       final description = _descriptionController.text;
       final categoryId = _selectedCategoryId!;
       final type = _selectedType.toString().split('.').last;

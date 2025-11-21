@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'savings_helpers.dart';
+import '../shared/app_helpers.dart';
 
 class QuickAmountSelector extends StatelessWidget {
   final TextEditingController controller;
@@ -71,7 +71,7 @@ class QuickAmountSelector extends StatelessWidget {
   }
 
   void _addAmount(String amount) {
-    double current = SavingsHelpers.parseAmount(controller.text) ?? 0;
+    double current = AppHelpers.parseAmount(controller.text) ?? 0;
 
     if (amount == '00') {
       current *= 100;

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '/models/transaction_type.dart';
 import '/models/my_category.dart';
 import '../savings_goals/quick_amount_selector.dart';
-import 'transaction_helpers.dart';
+import '../shared/app_constants.dart';
+import '../shared/app_helpers.dart';
 
 class TransactionForm extends StatelessWidget {
   final TransactionType selectedType;
@@ -82,7 +82,7 @@ class TransactionForm extends StatelessWidget {
               type: TransactionType.expense,
               label: 'Chi tiêu',
               icon: Icons.trending_down_rounded,
-              gradient: TransactionHelpers.expenseGradient,
+              gradient: AppConstants.expenseGradient,
             ),
           ),
           const SizedBox(width: 8),
@@ -91,7 +91,7 @@ class TransactionForm extends StatelessWidget {
               type: TransactionType.income,
               label: 'Thu nhập',
               icon: Icons.trending_up_rounded,
-              gradient: TransactionHelpers.incomeGradient,
+              gradient: AppConstants.incomeGradient,
             ),
           ),
         ],
@@ -143,8 +143,8 @@ class TransactionForm extends StatelessWidget {
 
   Widget _buildAmountInputCard() {
     final gradient = selectedType == TransactionType.expense
-        ? TransactionHelpers.expenseGradient
-        : TransactionHelpers.incomeGradient;
+        ? AppConstants.expenseGradient
+        : AppConstants.incomeGradient;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -219,7 +219,7 @@ class TransactionForm extends StatelessWidget {
               if (value == null || value.isEmpty) {
                 return 'Vui lòng nhập số tiền';
               }
-              final amount = TransactionHelpers.parseAmount(value);
+              final amount = AppHelpers.parseAmount(value);
               if (amount == null || amount <= 0) {
                 return 'Số tiền không hợp lệ';
               }
@@ -314,9 +314,9 @@ class TransactionForm extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(
-                      TransactionHelpers.getIconData(category.icon),
+                      AppHelpers.getIconData(category.icon),
                       size: 18,
-                      color: TransactionHelpers.parseColor(category.color),
+                      color: AppHelpers.parseColor(category.color),
                     ),
                     const SizedBox(width: 8),
                     Text(category.name),
@@ -412,24 +412,9 @@ class TransactionForm extends StatelessWidget {
   // --- Action Button ---
 
   Widget _buildActionButton(BuildContext context) {
-    if (isDelete && onDeleteTap != null) {
-      // For Edit screen, usually we want a separate delete button or a save button.
-      // But the design asked for a big button.
-      // In Edit screen we usually have Update button and maybe a Delete icon in AppBar.
-      // But if user wants the delete logic in the form, we can support it.
-      // However, based on previous file, Delete was an icon in AppBar in EditTransactionScreen.
-      // This button is for "Save" / "Update".
-      // If isDelete is passed true to this button, it means the button ITSELF is delete?
-      // Re-reading previous code: TransactionActionButton had `isDelete` param.
-      // But `EditTransactionScreen` had delete in AppBar.
-      // So `isDelete` param in TransactionActionButton might be unused or used for something else?
-      // Ah, looking at `transaction_form_components.dart` (previous version), `TransactionActionButton` handled styling for delete too.
-      // I'll keep the logic for the main action button here.
-    }
-
     final gradient = selectedType == TransactionType.expense
-        ? TransactionHelpers.expenseGradient
-        : TransactionHelpers.incomeGradient;
+        ? AppConstants.expenseGradient
+        : AppConstants.incomeGradient;
 
     final shadowColor = selectedType == TransactionType.expense
         ? const Color(0xFFee0979)

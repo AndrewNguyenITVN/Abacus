@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'categories_helpers.dart';
+import '../shared/app_constants.dart';
+import '../shared/app_helpers.dart';
 
 class CategoryForm extends StatefulWidget {
   final TextEditingController nameController;
@@ -105,16 +106,18 @@ class _CategoryFormState extends State<CategoryForm> {
           child: Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: CategoriesHelpers.defaultColors.map((color) {
-              final isSelected = widget.selectedColor == color;
-              final colorValue = CategoriesHelpers.parseColor(color);
+            children: AppConstants.colorOptions.map((option) {
+              final hex = option['hex'] as String;
+              final color = option['color'] as Color;
+              final isSelected = widget.selectedColor == hex;
+              
               return GestureDetector(
-                onTap: () => widget.onColorChanged(color),
+                onTap: () => widget.onColorChanged(hex),
                 child: Container(
                   width: 45,
                   height: 45,
                   decoration: BoxDecoration(
-                    color: colorValue,
+                    color: color,
                     shape: BoxShape.circle,
                     border: isSelected
                         ? Border.all(color: Colors.black, width: 3)
@@ -122,7 +125,7 @@ class _CategoryFormState extends State<CategoryForm> {
                     boxShadow: [
                       if (isSelected)
                         BoxShadow(
-                          color: colorValue.withOpacity(0.4),
+                          color: color.withOpacity(0.4),
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -174,11 +177,11 @@ class _CategoryFormState extends State<CategoryForm> {
               crossAxisSpacing: 12,
               mainAxisSpacing: 12,
             ),
-            itemCount: CategoriesHelpers.defaultIcons.length,
+            itemCount: AppConstants.iconMap.length,
             itemBuilder: (context, index) {
-              final entry = CategoriesHelpers.defaultIcons.entries.elementAt(index);
+              final entry = AppConstants.iconMap.entries.elementAt(index);
               final isSelected = widget.selectedIcon == entry.key;
-              final colorValue = CategoriesHelpers.parseColor(widget.selectedColor);
+              final colorValue = AppHelpers.parseColor(widget.selectedColor);
               
               return GestureDetector(
                 onTap: () => widget.onIconChanged(entry.key),
@@ -225,8 +228,8 @@ class _CategoryFormState extends State<CategoryForm> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    CategoriesHelpers.parseColor(widget.selectedColor).withOpacity(0.8),
-                    CategoriesHelpers.parseColor(widget.selectedColor),
+                    AppHelpers.parseColor(widget.selectedColor).withOpacity(0.8),
+                    AppHelpers.parseColor(widget.selectedColor),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -234,14 +237,14 @@ class _CategoryFormState extends State<CategoryForm> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: CategoriesHelpers.parseColor(widget.selectedColor).withOpacity(0.3),
+                    color: AppHelpers.parseColor(widget.selectedColor).withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
                 ],
               ),
               child: Icon(
-                CategoriesHelpers.getIconData(widget.selectedIcon),
+                AppHelpers.getIconData(widget.selectedIcon),
                 color: Colors.white,
                 size: 28,
               ),
@@ -325,4 +328,3 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 }
-

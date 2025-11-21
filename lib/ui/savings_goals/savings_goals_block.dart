@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/ui/savings_goals/savings_goals_manager.dart';
 import '/ui/savings_goals/savings_goals_screen.dart';
-import 'savings_helpers.dart';
+import '../shared/app_helpers.dart';
 import 'savings_goal_card.dart';
 
 class SavingsGoalsBlock extends StatelessWidget {
@@ -148,7 +148,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      SavingsHelpers.formatCurrency(goalsManager.totalSaved),
+                      AppHelpers.formatCurrency(goalsManager.totalSaved),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -156,7 +156,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      SavingsHelpers.formatCurrency(goalsManager.totalTarget),
+                      AppHelpers.formatCurrency(goalsManager.totalTarget),
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,

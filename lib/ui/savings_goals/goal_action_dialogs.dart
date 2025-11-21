@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/models/savings_goal.dart';
-import 'savings_helpers.dart';
+import '../shared/app_helpers.dart';
 import 'savings_goals_manager.dart';
 import 'add_edit_goal_screen.dart';
 import 'quick_amount_selector.dart';
@@ -30,7 +30,7 @@ void showUpdateProgressDialog(BuildContext context, SavingsGoal goal, {required 
               ),
               const SizedBox(height: 8),
               Text(
-                'Số dư hiện tại: ${SavingsHelpers.formatCurrency(goal.currentAmount)}',
+                'Số dư hiện tại: ${AppHelpers.formatCurrency(goal.currentAmount)}',
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 16),
@@ -45,7 +45,7 @@ void showUpdateProgressDialog(BuildContext context, SavingsGoal goal, {required 
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Vui lòng nhập số tiền';
-                  final amount = SavingsHelpers.parseAmount(value);
+                  final amount = AppHelpers.parseAmount(value);
                   if (amount == null || amount <= 0) return 'Số tiền không hợp lệ';
                   if (!isAdd && amount > goal.currentAmount) return 'Số tiền vượt quá số dư hiện tại';
                   return null;
@@ -64,7 +64,7 @@ void showUpdateProgressDialog(BuildContext context, SavingsGoal goal, {required 
           ElevatedButton(
             onPressed: () async {
               if (formKey.currentState!.validate()) {
-                final amount = SavingsHelpers.parseAmount(controller.text)!;
+                final amount = AppHelpers.parseAmount(controller.text)!;
                 final goalsManager = context.read<SavingsGoalsManager>();
                 try {
                   await goalsManager.updateProgress(goal.id, isAdd ? amount : -amount);
@@ -72,8 +72,8 @@ void showUpdateProgressDialog(BuildContext context, SavingsGoal goal, {required 
                     Navigator.of(context).pop();
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text(isAdd
-                          ? 'Đã thêm ${SavingsHelpers.formatCurrency(amount)} vào mục tiêu'
-                          : 'Đã rút ${SavingsHelpers.formatCurrency(amount)} từ mục tiêu'),
+                          ? 'Đã thêm ${AppHelpers.formatCurrency(amount)} vào mục tiêu'
+                          : 'Đã rút ${AppHelpers.formatCurrency(amount)} từ mục tiêu'),
                       backgroundColor: Colors.green,
                     ));
                   }
@@ -97,7 +97,7 @@ void showUpdateProgressDialog(BuildContext context, SavingsGoal goal, {required 
 // --- Goal Detail Dialog ---
 
 void showGoalDetailDialog(BuildContext context, SavingsGoal goal) {
-  final color = SavingsHelpers.parseColor(goal.color);
+  final color = AppHelpers.parseColor(goal.color);
   
   Widget buildDetailRow(String label, String value) {
     return Padding(
@@ -124,7 +124,7 @@ void showGoalDetailDialog(BuildContext context, SavingsGoal goal) {
               color: color.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(SavingsHelpers.getIconData(goal.icon), color: color, size: 24),
+            child: Icon(AppHelpers.getIconData(goal.icon), color: color, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(child: Text(goal.name, style: const TextStyle(fontSize: 18))),
@@ -139,12 +139,12 @@ void showGoalDetailDialog(BuildContext context, SavingsGoal goal) {
               Text(goal.description!, style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
               const SizedBox(height: 16),
             ],
-            buildDetailRow('Mục tiêu', SavingsHelpers.formatCurrency(goal.targetAmount)),
-            buildDetailRow('Đã tiết kiệm', SavingsHelpers.formatCurrency(goal.currentAmount)),
-            buildDetailRow('Còn lại', SavingsHelpers.formatCurrency(goal.remainingAmount)),
+            buildDetailRow('Mục tiêu', AppHelpers.formatCurrency(goal.targetAmount)),
+            buildDetailRow('Đã tiết kiệm', AppHelpers.formatCurrency(goal.currentAmount)),
+            buildDetailRow('Còn lại', AppHelpers.formatCurrency(goal.remainingAmount)),
             buildDetailRow('Tiến độ', '${goal.progressPercentage.toStringAsFixed(1)}%'),
             if (goal.targetDate != null)
-              buildDetailRow('Hạn hoàn thành', SavingsHelpers.formatDate(goal.targetDate!)),
+              buildDetailRow('Hạn hoàn thành', AppHelpers.formatDate(goal.targetDate!)),
             if (goal.daysRemaining != null)
               buildDetailRow(
                 'Còn lại',

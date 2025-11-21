@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '/models/my_category.dart';
-import 'categories_helpers.dart';
+import '../../models/my_category.dart';
+import '../shared/app_helpers.dart';
 
 class CategoryItem extends StatelessWidget {
   final MyCategory category;
@@ -16,7 +16,7 @@ class CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoryColor = CategoriesHelpers.parseColor(category.color);
+    final categoryColor = AppHelpers.parseColor(category.color);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -59,7 +59,7 @@ class CategoryItem extends StatelessWidget {
             ],
           ),
           child: Icon(
-            CategoriesHelpers.getIconData(category.icon),
+            AppHelpers.getIconData(category.icon),
             color: Colors.white,
             size: 22,
           ),
@@ -107,4 +107,3 @@ class CategoryItem extends StatelessWidget {
     );
   }
 }
-

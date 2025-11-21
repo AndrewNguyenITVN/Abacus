@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '/models/savings_goal.dart';
-import 'savings_helpers.dart';
+import '../shared/app_helpers.dart';
 import 'goal_action_dialogs.dart';
 import 'add_edit_goal_screen.dart';
+import 'savings_goals_manager.dart';
 
 class SavingsGoalCard extends StatelessWidget {
   final SavingsGoal goal;
@@ -16,7 +18,7 @@ class SavingsGoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = SavingsHelpers.parseColor(goal.color);
+    final color = AppHelpers.parseColor(goal.color);
     final daysRemaining = goal.daysRemaining;
 
     return Card(
@@ -47,7 +49,7 @@ class SavingsGoalCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
-                      SavingsHelpers.getIconData(goal.icon),
+                      AppHelpers.getIconData(goal.icon),
                       color: color,
                       size: 28,
                     ),
@@ -143,7 +145,7 @@ class SavingsGoalCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    SavingsHelpers.formatCurrency(goal.currentAmount),
+                    AppHelpers.formatCurrency(goal.currentAmount),
                     style: TextStyle(
                       fontSize: isDetailMode ? 13 : 11,
                       fontWeight: FontWeight.w600,
@@ -151,7 +153,7 @@ class SavingsGoalCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    SavingsHelpers.formatCurrency(goal.targetAmount),
+                    AppHelpers.formatCurrency(goal.targetAmount),
                     style: TextStyle(
                       fontSize: isDetailMode ? 13 : 11,
                       color: Colors.grey.shade600,
@@ -195,7 +197,7 @@ class SavingsGoalCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Còn ${SavingsHelpers.formatCurrency(goal.remainingAmount)}',
+                      'Còn ${AppHelpers.formatCurrency(goal.remainingAmount)}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey.shade600,
@@ -255,7 +257,7 @@ class SavingsGoalCard extends StatelessWidget {
           ),
         ),
         Text(
-          SavingsHelpers.formatCurrency(goal.remainingAmount),
+          AppHelpers.formatCurrency(goal.remainingAmount),
           style: TextStyle(
             fontSize: 10,
             color: Colors.grey.shade600,
@@ -315,7 +317,24 @@ class SavingsGoalCard extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Hủy'),
           ),
-          // ... delete action ...
+          ElevatedButton(
+            onPressed: () async {
+              final goalsManager = context.read<SavingsGoalsManager>();
+              await goalsManager.deleteGoal(goal.id);
+              
+              if (context.mounted) {
+                Navigator.of(context).pop(); // Close dialog
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Đã xóa mục tiêu')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Xóa'),
+          ),
         ],
       ),
     );

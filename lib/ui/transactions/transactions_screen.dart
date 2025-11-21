@@ -5,7 +5,7 @@ import '/models/transaction.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/transactions/transactions_manager.dart';
 import '/ui/transactions/edit_transaction_screen.dart';
-import 'transaction_helpers.dart';
+import '../shared/app_helpers.dart';
 import 'transaction_item.dart';
 import 'transaction_summary_card.dart';
 
@@ -249,7 +249,7 @@ class TransactionsScreen extends StatelessWidget {
           ),
           const SizedBox(width: 12),
           Text(
-            TransactionHelpers.formatDate(date),
+            AppHelpers.formatLongDate(date),
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'transaction_helpers.dart';
+import '../shared/app_constants.dart';
+import '../shared/app_helpers.dart';
 
 class TransactionSummaryCard extends StatelessWidget {
   final double totalIncome;
@@ -38,8 +38,8 @@ class TransactionSummaryCard extends StatelessWidget {
             label: 'Thu nhập',
             amount: totalIncome,
             icon: Icons.trending_up_rounded,
-            colors: TransactionHelpers.incomeGradient,
-            amountColor: TransactionHelpers.incomeColor,
+            colors: AppConstants.incomeGradient,
+            amountColor: AppConstants.incomeColor,
             isPositive: true,
           ),
           const SizedBox(height: 16),
@@ -49,8 +49,8 @@ class TransactionSummaryCard extends StatelessWidget {
             label: 'Chi tiêu',
             amount: totalExpense,
             icon: Icons.trending_down_rounded,
-            colors: TransactionHelpers.expenseGradient,
-            amountColor: TransactionHelpers.expenseColor,
+            colors: AppConstants.expenseGradient,
+            amountColor: AppConstants.expenseColor,
             isPositive: false,
           ),
           
@@ -100,7 +100,7 @@ class TransactionSummaryCard extends StatelessWidget {
                 ],
               ),
               Text(
-                TransactionHelpers.formatCurrency(balance),
+                AppHelpers.formatCurrency(balance),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -151,7 +151,7 @@ class TransactionSummaryCard extends StatelessWidget {
           ],
         ),
         Text(
-          TransactionHelpers.formatCurrency(amount),
+          AppHelpers.formatCurrency(amount),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -162,5 +162,3 @@ class TransactionSummaryCard extends StatelessWidget {
     );
   }
 }
-
-
