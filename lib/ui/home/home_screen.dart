@@ -90,113 +90,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Reports Carousel
-                  SizedBox(
-                    height: 280,
-                    child: Stack(
-                      children: [
-                        PageView(
-                          controller: _reportPageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentReportPage = index;
-                            });
-                          },
-                          children: [
-                            MonthlyReportCard(
-                              currentMonthAmount:
-                                  transactionsManager.totalExpense,
-                              previousMonthAmount:
-                                  transactionsManager.previousMonthExpense,
-                              reportType: ReportType.expense,
-                            ),
-                            MonthlyReportCard(
-                              currentMonthAmount:
-                                  transactionsManager.totalIncome,
-                              previousMonthAmount:
-                                  transactionsManager.previousMonthIncome,
-                              reportType: ReportType.income,
-                            ),
-                          ],
-                        ),
-                        Positioned(
-                          left: 8,
-                          top: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.chevron_left,
-                                color: Colors.green,
-                              ),
-                              onPressed: () {
-                                if (_currentReportPage > 0) {
-                                  _reportPageController.previousPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          right: 8,
-                          top: 0,
-                          bottom: 0,
-                          child: Center(
-                            child: IconButton(
-                              icon: const Icon(
-                                Icons.chevron_right,
-                                color: Colors.green,
-                              ),
-                              onPressed: () {
-                                if (_currentReportPage < 1) {
-                                  _reportPageController.nextPage(
-                                    duration: const Duration(milliseconds: 300),
-                                    curve: Curves.easeInOut,
-                                  );
-                                }
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildReportsCarousel(transactionsManager),
                   const SizedBox(height: 8),
                   // Dots Indicator
                   _buildDotsIndicator(),
                   const SizedBox(height: 20),
-                  // Recent Transactions Header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Giao dịch gần đây',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // Navigate đến Transactions screen (index 1)
-                          final bottomNavState = context
-                              .findAncestorStateOfType<
-                                BottomNavBarScreenState
-                              >();
-                          bottomNavState?.navigateToIndex(1);
-                        },
-                        child: const Text('Xem tất cả'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // Transaction List
-                  RecentTransactionsList(
-                    transactions: transactionsManager.getRecentTransactions(7),
-                    categories: categoriesManager.items,
+                  // Recent Transactions Header & List
+                  _buildRecentTransactionsSection(
+                    transactionsManager,
+                    categoriesManager,
                   ),
                 ],
               ),
