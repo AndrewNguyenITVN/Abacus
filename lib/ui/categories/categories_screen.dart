@@ -3,35 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/my_category.dart';
 import '/ui/categories/categories_manager.dart';
 import '/ui/categories/edit_category_screen.dart';
-
-// Helper functions to mock dialogs and helpers from the original project
-Color _parseColor(String hexCode) {
-  return Color(int.parse(hexCode.substring(1, 7), radix: 16) + 0xFF000000);
-}
-
-IconData _getIconData(String iconName) {
-  // A simple map to mock the icon picker
-  const iconMap = {
-    'shopping_bag': Icons.shopping_bag,
-    'restaurant': Icons.restaurant,
-    'movie': Icons.movie,
-    'house': Icons.house,
-    'local_gas_station': Icons.local_gas_station,
-    'school': Icons.school,
-    'work': Icons.work,
-    'attach_money': Icons.attach_money,
-    'local_hospital': Icons.local_hospital,
-    'fitness_center': Icons.fitness_center,
-    'flight': Icons.flight,
-    'phone': Icons.phone,
-    'computer': Icons.computer,
-    'directions_car': Icons.directions_car,
-    'pets': Icons.pets,
-    'games': Icons.games,
-  };
-  return iconMap[iconName] ?? Icons.help_outline;
-}
-
+import 'category_item.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -69,42 +41,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       try {
         await categoriesManager.addCategory(result);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.check_circle_rounded, color: Colors.white),
-                  SizedBox(width: 12),
-                  Text('Đã thêm danh mục mới'),
-                ],
-              ),
-              backgroundColor: const Color(0xFF11998e),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          _showSnackBar(
+            context,
+            'Đã thêm danh mục mới',
+            Icons.check_circle_rounded,
+            const Color(0xFF11998e),
           );
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_rounded, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text('Lỗi: $e'),
-                ],
-              ),
-              backgroundColor: const Color(0xFFee0979),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          _showSnackBar(
+            context,
+            'Lỗi: $e',
+            Icons.error_rounded,
+            const Color(0xFFee0979),
           );
         }
       }
@@ -127,42 +77,20 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       try {
         await categoriesManager.updateCategory(result);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.check_circle_rounded, color: Colors.white),
-                  SizedBox(width: 12),
-                  Text('Đã cập nhật danh mục'),
-                ],
-              ),
-              backgroundColor: const Color(0xFF11998e),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          _showSnackBar(
+            context,
+            'Đã cập nhật danh mục',
+            Icons.check_circle_rounded,
+            const Color(0xFF11998e),
           );
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_rounded, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text('Lỗi: $e'),
-                ],
-              ),
-              backgroundColor: const Color(0xFFee0979),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          _showSnackBar(
+            context,
+            'Lỗi: $e',
+            Icons.error_rounded,
+            const Color(0xFFee0979),
           );
         }
       }
@@ -241,46 +169,44 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
       try {
         await categoriesManager.deleteCategory(category.id);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.check_circle_rounded, color: Colors.white),
-                  SizedBox(width: 12),
-                  Text('Đã xóa danh mục'),
-                ],
-              ),
-              backgroundColor: const Color(0xFF11998e),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          _showSnackBar(
+            context,
+            'Đã xóa danh mục',
+            Icons.check_circle_rounded,
+            const Color(0xFF11998e),
           );
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_rounded, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Text('Lỗi: $e'),
-                ],
-              ),
-              backgroundColor: const Color(0xFFee0979),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
+          _showSnackBar(
+            context,
+            'Lỗi: $e',
+            Icons.error_rounded,
+            const Color(0xFFee0979),
           );
         }
       }
     }
+  }
+
+  void _showSnackBar(BuildContext context, String message, IconData icon, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   @override
@@ -306,24 +232,26 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             icon: const Icon(Icons.add),
             onPressed: () => _addCategory(),
           ),
+          const SizedBox(width: 8),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
+          preferredSize: const Size.fromHeight(60),
           child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.04),
                   blurRadius: 10,
-                  offset: const Offset(0, -2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: TabBar(
               controller: _tabController,
-              labelColor: const Color(0xFF1a1a2e),
+              labelColor: const Color(0xFF11998e),
               unselectedLabelColor: Colors.grey.shade500,
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.w700,
@@ -334,12 +262,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
               ),
-              indicator: UnderlineTabIndicator(
-                borderSide: const BorderSide(width: 3),
-                insets: const EdgeInsets.symmetric(horizontal: 40),
-                borderRadius: BorderRadius.circular(2),
+              indicator: BoxDecoration(
+                color: const Color(0xFF11998e).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
               ),
-              indicatorColor: Colors.blue.shade400,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              padding: const EdgeInsets.all(4),
               tabs: const [
                 Tab(text: 'Chi tiêu'),
                 Tab(text: 'Thu nhập'),
@@ -364,100 +293,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       itemCount: categories.length,
       itemBuilder: (context, index) {
         final category = categories[index];
-        final categoryColor = _parseColor(category.color);
-        
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 2),
-                spreadRadius: -2,
-              ),
-            ],
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
-            leading: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    categoryColor.withOpacity(0.8),
-                    categoryColor,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: categoryColor.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(
-                _getIconData(category.icon),
-                color: Colors.white,
-                size: 22,
-              ),
-            ),
-            title: Text(
-              category.name,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-                color: Color(0xFF1a1a2e),
-                letterSpacing: -0.2,
-              ),
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 2,
-                ),
-                child: Text(
-                  category.isDefault ? 'Mặc định' : 'Tùy chỉnh',
-                  style: TextStyle(
-                    color: category.isDefault
-                        ? Colors.blue.shade700
-                        : Colors.purple.shade700,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-            trailing: category.isDefault
-                ? null
-                : Container(
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.delete_rounded,
-                      ),
-                      onPressed: () => _deleteCategory(category),
-                    ),
-                  ),
-            onTap: category.isDefault
-                ? null
-                : () => _editCategory(category),
-          ),
+        return CategoryItem(
+          category: category,
+          onTap: () => _editCategory(category),
+          onDelete: () => _deleteCategory(category),
         );
       },
     );
@@ -508,5 +351,3 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     );
   }
 }
-
-
