@@ -4,6 +4,7 @@ import '/ui/transactions/transactions_screen.dart';
 import '/ui/transactions/add_transaction_screen.dart';
 import '/ui/categories/categories_screen.dart';
 import '/ui/account/account_screen.dart';
+import '/ui/shared/custom_page_transitions.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
@@ -48,15 +49,33 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   // Hiển thị màn hình thêm giao dịch
   void _showAddTransactionScreen() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(SlideUpPageRoute(page: const AddTransactionScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: Stack(
+        children: _screens.asMap().entries.map((entry) {
+          final index = entry.key;
+          final screen = entry.value;
+          final isSelected = _selectedIndex == index;
+
+          return AnimatedScale(
+            scale: isSelected ? 1.0 : 1.15,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: AnimatedOpacity(
+              opacity: isSelected ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: IgnorePointer(ignoring: !isSelected, child: screen),
+            ),
+          );
+        }).toList(),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,

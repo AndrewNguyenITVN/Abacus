@@ -1,3 +1,6 @@
+// Splash
+export 'splash/splash_screen.dart';
+
 // Auth
 export 'auth/auth_manager.dart';
 export 'auth/login_screen.dart';
@@ -20,6 +23,7 @@ export 'home/home_screen.dart';
 // Shared
 export 'shared/app_drawer.dart';
 export 'shared/dialog_utils.dart';
+export 'shared/custom_page_transitions.dart';
 
 // Bottom Navigation
 export 'bottom_nav_bar_screen.dart';
