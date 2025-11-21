@@ -56,7 +56,25 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: Stack(
+        children: _screens.asMap().entries.map((entry) {
+          final index = entry.key;
+          final screen = entry.value;
+          final isSelected = _selectedIndex == index;
+
+          return AnimatedScale(
+            scale: isSelected ? 1.0 : 1.15,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: AnimatedOpacity(
+              opacity: isSelected ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: IgnorePointer(ignoring: !isSelected, child: screen),
+            ),
+          );
+        }).toList(),
+      ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.white,
