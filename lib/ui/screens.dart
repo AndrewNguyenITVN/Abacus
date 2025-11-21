@@ -23,6 +23,7 @@ export 'home/home_screen.dart';
 // Shared
 export 'shared/app_drawer.dart';
 export 'shared/dialog_utils.dart';
+export 'shared/custom_page_transitions.dart';
 
 // Bottom Navigation
 export 'bottom_nav_bar_screen.dart';

@@ -56,21 +56,38 @@ class MyApp extends StatelessWidget {
         return null;
       },
       routes: [
+        // Splash - NO transition (first screen)
         GoRoute(
           path: '/splash',
-          builder: (context, state) => const SplashScreen(),
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: const SplashScreen()),
         ),
+
+        // Login - FADE transition (smooth)
         GoRoute(
           path: '/login',
-          builder: (context, state) => const LoginScreen(),
+          pageBuilder: (context, state) => FadeTransitionPage(
+            key: state.pageKey,
+            child: const LoginScreen(),
+          ),
         ),
+
+        // Signup - SLIDE UP transition (modal-like)
         GoRoute(
           path: '/signup',
-          builder: (context, state) => const SignupScreen(),
+          pageBuilder: (context, state) => SlideUpTransitionPage(
+            key: state.pageKey,
+            child: const SignupScreen(),
+          ),
         ),
+
+        // Home - FADE transition (smooth)
         GoRoute(
           path: '/',
-          builder: (context, state) => const BottomNavBarScreen(),
+          pageBuilder: (context, state) => FadeTransitionPage(
+            key: state.pageKey,
+            child: const BottomNavBarScreen(),
+          ),
         ),
       ],
     );
