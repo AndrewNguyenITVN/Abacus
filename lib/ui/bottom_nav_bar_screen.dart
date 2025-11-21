@@ -4,6 +4,7 @@ import '/ui/transactions/transactions_screen.dart';
 import '/ui/transactions/add_transaction_screen.dart';
 import '/ui/categories/categories_screen.dart';
 import '/ui/account/account_screen.dart';
+import '/ui/shared/custom_page_transitions.dart';
 
 class BottomNavBarScreen extends StatefulWidget {
   const BottomNavBarScreen({super.key});
@@ -48,9 +49,9 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   // Hiển thị màn hình thêm giao dịch
   void _showAddTransactionScreen() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const AddTransactionScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(SlideUpPageRoute(page: const AddTransactionScreen()));
   }
 
   @override
