@@ -130,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
           tooltip: 'Tìm kiếm',
         ),
         _buildNotificationButton(),
+        _buildThemeToggleButton(),
         const SizedBox(width: 8),
       ],
     );
@@ -176,6 +177,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         );
       },
+    );
+  }
+
+  /// Toggle button cho dark/light mode
+  Widget _buildThemeToggleButton() {
+    final isBright = Theme.of(context).brightness == Brightness.light;
+    final changeTheme = context.read<void Function(bool)>();
+
+    return IconButton(
+      icon: Icon(isBright ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
+      onPressed: () => changeTheme(!isBright),
+      tooltip: isBright ? 'Chế độ tối' : 'Chế độ sáng',
     );
   }
 
