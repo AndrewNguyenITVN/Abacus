@@ -102,7 +102,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         title: const Text(
           'Thêm giao dịch',
@@ -113,7 +112,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           ),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: const Icon(Icons.close_rounded),

@@ -164,7 +164,6 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         title: const Text(
           'Chỉnh sửa giao dịch',
@@ -175,7 +174,6 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           ),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(

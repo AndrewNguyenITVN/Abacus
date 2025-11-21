@@ -47,7 +47,6 @@ class TransactionsScreen extends StatelessWidget {
     List<Transaction> transactions,
   ) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         title: const Text(
           'Sổ giao dịch',
@@ -58,7 +57,6 @@ class TransactionsScreen extends StatelessWidget {
           ),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
       ),
       body: Column(
@@ -86,7 +84,6 @@ class TransactionsScreen extends StatelessWidget {
     List<Transaction> transactions,
   ) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         title: const Text(
           'Sổ giao dịch',
@@ -97,7 +94,6 @@ class TransactionsScreen extends StatelessWidget {
           ),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
       ),
       body: Row(

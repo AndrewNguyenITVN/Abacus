@@ -116,7 +116,6 @@ class _HomeScreenState extends State<HomeScreen> {
         style: TextStyle(fontWeight: FontWeight.w600),
       ),
       elevation: 0,
-      backgroundColor: Theme.of(context).colorScheme.surface,
       actions: [
         IconButton(
           icon: const Icon(Icons.search),

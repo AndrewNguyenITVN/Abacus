@@ -214,7 +214,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
     final categoriesManager = context.watch<CategoriesManager>();
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         title: const Text(
           'Danh mục',
@@ -225,7 +224,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
           ),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(
