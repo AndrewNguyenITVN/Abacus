@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../models/my_category.dart';
-import '../../models/transaction.dart';
-import '../../models/transaction_type.dart';
-import '../categories/categories_manager.dart';
-import '../transactions/transactions_manager.dart';
+import '/models/transaction.dart';
+import '/models/transaction_type.dart';
+import '/models/my_category.dart';
+import '/ui/categories/categories_manager.dart';
+import '/ui/transactions/transactions_manager.dart';
+import 'transaction_helpers.dart';
+import 'transaction_form.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   final Transaction transaction;
@@ -19,13 +21,11 @@ class EditTransactionScreen extends StatefulWidget {
 class _EditTransactionScreenState extends State<EditTransactionScreen> {
   late TransactionType _selectedType;
   late List<MyCategory> _categories;
-  late String? _selectedCategoryId;
+  String? _selectedCategoryId;
 
   final _formKey = GlobalKey<FormState>();
-
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _noteController = TextEditingController();
 
   @override
   void initState() {
@@ -39,13 +39,10 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
     _selectedCategoryId = widget.transaction.categoryId;
     
     // Format amount for display
-    final formatter = NumberFormat('#,###');
-    _amountController.text = formatter
-        .format(widget.transaction.amount.toInt())
-        .replaceAll(',', '.');
+    final formatter = NumberFormat.decimalPattern('vi_VN');
+    _amountController.text = formatter.format(widget.transaction.amount);
     
     _descriptionController.text = widget.transaction.description;
-    _noteController.text = widget.transaction.note ?? '';
     
     _updateCategories();
   }
@@ -57,10 +54,10 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           ? categoriesManager.expenseCategories
           : categoriesManager.incomeCategories;
       
-      // Check if current category exists in new category list
+      // Check if current category exists in new category list (if switching types)
       final categoryExists = _categories.any((c) => c.id == _selectedCategoryId);
-      if (!categoryExists) {
-        _selectedCategoryId = null;
+      if (!categoryExists && _selectedType != (widget.transaction.type == 'income' ? TransactionType.income : TransactionType.expense)) {
+         _selectedCategoryId = null;
       }
     });
   }
@@ -69,32 +66,15 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   void dispose() {
     _amountController.dispose();
     _descriptionController.dispose();
-    _noteController.dispose();
     super.dispose();
-  }
-
-  void _addAmount(String amount) {
-    String currentAmount = _amountController.text.replaceAll('.', '');
-    if (amount == '000') {
-      if (currentAmount.isEmpty) {
-        return;
-      }
-      currentAmount += '000';
-    } else {
-      int valueToAdd = int.parse(amount);
-      int currentAmountInt = int.tryParse(currentAmount) ?? 0;
-      currentAmount = (currentAmountInt + valueToAdd).toString();
-    }
-    final formatter = NumberFormat('#,###');
-    _amountController.text = formatter.format(int.parse(currentAmount)).replaceAll(',', '.');
   }
 
   Future<void> _saveTransaction() async {
     if (_formKey.currentState!.validate()) {
       final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
-      final amount = double.parse(_amountController.text.replaceAll('.', ''));
+      
+      final amount = TransactionHelpers.parseAmount(_amountController.text)!;
       final description = _descriptionController.text;
-      final note = _noteController.text;
       final categoryId = _selectedCategoryId!;
       final type = _selectedType.toString().split('.').last;
 
@@ -105,7 +85,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         date: widget.transaction.date,
         categoryId: categoryId,
         type: type,
-        note: note.isEmpty ? null : note,
+        note: widget.transaction.note,
       );
 
       try {
@@ -113,7 +93,10 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã cập nhật giao dịch')),
+            const SnackBar(
+              content: Text('Đã cập nhật giao dịch'),
+              behavior: SnackBarBehavior.floating,
+            ),
           );
 
           Navigator.of(context).pop();
@@ -121,7 +104,11 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e')),
+            SnackBar(
+              content: Text('Lỗi: $e'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       }
@@ -135,12 +122,13 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         return AlertDialog(
           title: const Text('Xác nhận xóa'),
           content: const Text('Bạn có chắc chắn muốn xóa giao dịch này?'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: const Text('Hủy'),
             ),
-            TextButton(
+            ElevatedButton(
               onPressed: () async {
                 final transactionsManager = Provider.of<TransactionsManager>(context, listen: false);
                 
@@ -164,7 +152,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                   }
                 }
               },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Xóa'),
             ),
           ],
@@ -176,120 +164,54 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: const Text('Chỉnh sửa giao dịch'),
+        title: const Text(
+          'Chỉnh sửa giao dịch',
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 20,
+            letterSpacing: -0.5,
+          ),
+        ),
+        elevation: 0,
+        backgroundColor: const Color(0xFFF8F9FD),
+        surfaceTintColor: Colors.transparent,
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete_outline, color: Colors.red),
             onPressed: _deleteTransaction,
             tooltip: 'Xóa giao dịch',
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              SegmentedButton<TransactionType>(
-                segments: const [
-                  ButtonSegment(
-                      value: TransactionType.expense, label: Text('Chi tiêu')),
-                  ButtonSegment(
-                      value: TransactionType.income, label: Text('Thu nhập')),
-                ],
-                selected: {_selectedType},
-                onSelectionChanged: (Set<TransactionType> newSelection) {
-                  setState(() {
-                    _selectedType = newSelection.first;
-                    _updateCategories();
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Số tiền',
-                  icon: Icon(Icons.attach_money),
-                ),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập số tiền';
-                  }
-                  if (double.tryParse(value.replaceAll('.', '')) == null) {
-                    return 'Vui lòng nhập một số hợp lệ';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  for (var amount in ['1000', '10000', '100000', '000'])
-                    ElevatedButton(
-                      onPressed: () => _addAmount(amount),
-                      child: Text(amount == '000'
-                          ? '000'
-                          : NumberFormat.compact().format(int.parse(amount))),
-                    )
-                ],
-              ),
-              const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                value: _selectedCategoryId,
-                hint: const Text('Chọn danh mục'),
-                icon: const Icon(Icons.category),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedCategoryId = newValue!;
-                  });
-                },
-                items: _categories.map<DropdownMenuItem<String>>((MyCategory category) {
-                  return DropdownMenuItem<String>(
-                    value: category.id,
-                    child: Text(category.name),
-                  );
-                }).toList(),
-                validator: (value) =>
-                    value == null ? 'Vui lòng chọn danh mục' : null,
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Mô tả',
-                  icon: Icon(Icons.description),
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 40),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('Hủy'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _saveTransaction,
-                      child: const Text('Lưu thay đổi'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: TransactionForm(
+            selectedType: _selectedType,
+            onTypeChanged: (type) {
+              setState(() {
+                _selectedType = type;
+                _updateCategories();
+              });
+            },
+            amountController: _amountController,
+            onAmountChanged: () => setState(() {}),
+            categories: _categories,
+            selectedCategoryId: _selectedCategoryId,
+            onCategoryChanged: (value) {
+              setState(() {
+                _selectedCategoryId = value;
+              });
+            },
+            descriptionController: _descriptionController,
+            actionButtonText: 'Cập nhật giao dịch',
+            onActionTap: _saveTransaction,
           ),
         ),
       ),
     );
   }
 }
-
