@@ -1,6 +1,5 @@
 class SavingsGoal {
   final String id;
-  final String userId;
   final String name;
   final String? description;
   final double targetAmount;
@@ -13,7 +12,6 @@ class SavingsGoal {
 
   SavingsGoal({
     required this.id,
-    required this.userId,
     required this.name,
     this.description,
     required this.targetAmount,
@@ -67,7 +65,6 @@ class SavingsGoal {
   factory SavingsGoal.fromMap(Map<String, dynamic> map) {
     return SavingsGoal(
       id: map['id'] as String,
-      userId: '', // Không cần userId trong single-user app
       name: map['name'] as String,
       description: map['description'] as String?,
       targetAmount: map['target_amount'] as double,
@@ -86,7 +83,6 @@ class SavingsGoal {
   factory SavingsGoal.fromJson(Map<String, dynamic> json) {
     return SavingsGoal(
       id: json['id'] ?? '',
-      userId: json['user_id'] ?? json['userId'] ?? '',
       name: json['name'] ?? '',
       description: json['description'],
       targetAmount: (json['target_amount'] ?? json['targetAmount'] ?? 0).toDouble(),
@@ -105,7 +101,6 @@ class SavingsGoal {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'user_id': userId,
       'name': name,
       'description': description,
       'target_amount': targetAmount,
@@ -121,7 +116,6 @@ class SavingsGoal {
   // Copy with
   SavingsGoal copyWith({
     String? id,
-    String? userId,
     String? name,
     String? description,
     double? targetAmount,
@@ -134,7 +128,6 @@ class SavingsGoal {
   }) {
     return SavingsGoal(
       id: id ?? this.id,
-      userId: userId ?? this.userId,
       name: name ?? this.name,
       description: description ?? this.description,
       targetAmount: targetAmount ?? this.targetAmount,
@@ -147,4 +140,3 @@ class SavingsGoal {
     );
   }
 }
-
