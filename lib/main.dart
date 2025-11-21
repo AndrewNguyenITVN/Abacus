@@ -28,19 +28,35 @@ void main() async {
   runApp(MyApp(notificationsManager: notificationsManager));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final NotificationsManager notificationsManager;
 
   const MyApp({super.key, required this.notificationsManager});
 
   @override
-  Widget build(BuildContext context) {
-    final authManager = AuthManager();
+  State<MyApp> createState() => _MyAppState();
+}
 
-    final router = GoRouter(
+class _MyAppState extends State<MyApp> {
+  // Theme state - follow Yummy pattern
+  ThemeMode _themeMode = ThemeMode.light;
+
+  // Router & AuthManager - create once to prevent rebuilds
+  late final AuthManager _authManager;
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize AuthManager once
+    _authManager = AuthManager();
+
+    // Initialize GoRouter once
+    _router = GoRouter(
       debugLogDiagnostics: true,
       initialLocation: '/splash', // Start at splash screen
-      refreshListenable: authManager,
+      refreshListenable: _authManager,
       redirect: (context, state) {
         final authFromProvider = context.read<AuthManager>();
         final isLoggedIn = authFromProvider.isAuth;
@@ -91,11 +107,21 @@ class MyApp extends StatelessWidget {
         ),
       ],
     );
+  }
 
+  // Change theme method - follow Yummy pattern
+  void _changeThemeMode(bool useLightMode) {
+    setState(() {
+      _themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: authManager),
-        ChangeNotifierProvider.value(value: notificationsManager),
+        ChangeNotifierProvider.value(value: _authManager),
+        ChangeNotifierProvider.value(value: widget.notificationsManager),
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
         ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
@@ -106,6 +132,8 @@ class MyApp extends StatelessWidget {
               previous ?? TransactionsManager(categories),
         ),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
+        // Expose theme change callback - follow Yummy pattern
+        Provider<void Function(bool)>.value(value: _changeThemeMode),
       ],
       child: MaterialApp.router(
         title: 'Abacus',
@@ -116,9 +144,18 @@ class MyApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
           useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+          scaffoldBackgroundColor: const Color(0xFFF8F9FD),
         ),
-        routerConfig: router,
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF11998e),
+            brightness: Brightness.dark,
+          ),
+          useMaterial3: true,
+          scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+        ),
+        themeMode: _themeMode,
+        routerConfig: _router,
       ),
     );
   }

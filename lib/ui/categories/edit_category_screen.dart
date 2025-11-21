@@ -58,7 +58,6 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
     final isEditing = widget.category != null;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
         title: Text(
           isEditing ? 'Sửa danh mục' : 'Thêm danh mục',
@@ -69,7 +68,6 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
           ),
         ),
         elevation: 0,
-        backgroundColor: const Color(0xFFF8F9FD),
         surfaceTintColor: Colors.transparent,
         centerTitle: true,
       ),
