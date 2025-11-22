@@ -111,12 +111,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   AppBar _buildAppBar() {
+    final colorScheme = Theme.of(context).colorScheme;
     return AppBar(
-      title: const Text(
+      title: Text(
         'Trang chủ',
-        style: TextStyle(fontWeight: FontWeight.w600),
+        style: TextStyle(fontWeight: FontWeight.w600, color: colorScheme.onSurface),
       ),
       elevation: 0,
+      backgroundColor: colorScheme.surface,
       actions: [
         IconButton(
           icon: const Icon(Icons.search),
