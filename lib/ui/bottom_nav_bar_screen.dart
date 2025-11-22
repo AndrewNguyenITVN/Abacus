@@ -56,6 +56,8 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       body: Stack(
         children: _screens.asMap().entries.map((entry) {
@@ -78,7 +80,7 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surfaceContainer,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.08),
@@ -95,21 +97,21 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 // Trang chủ
-                Expanded(child: _buildNavItem(0, Icons.home, 'Trang chủ')),
+                Expanded(child: _buildNavItem(0, Icons.home_rounded, 'Trang chủ')),
                 // Sổ giao dịch
                 Expanded(
                   child: _buildNavItem(
                     1,
-                    Icons.account_balance_wallet,
+                    Icons.account_balance_wallet_rounded,
                     'Giao dịch',
                   ),
                 ),
                 // Nút thêm giao dịch - ngang hàng với các nút khác
                 Expanded(child: _buildAddButton()),
                 // Danh mục
-                Expanded(child: _buildNavItem(3, Icons.category, 'Danh mục')),
+                Expanded(child: _buildNavItem(3, Icons.category_rounded, 'Danh mục')),
                 // Tài khoản
-                Expanded(child: _buildNavItem(4, Icons.person, 'Tài khoản')),
+                Expanded(child: _buildNavItem(4, Icons.person_rounded, 'Tài khoản')),
               ],
             ),
           ),
@@ -122,6 +124,8 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
   // Widget xây dựng mục điều hướng
   Widget _buildNavItem(int index, IconData icon, String label) {
     final isSelected = _selectedIndex == index;
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return InkWell(
       onTap: () => _onItemTapped(index),
       borderRadius: BorderRadius.circular(12),
@@ -135,8 +139,8 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
               icon,
               size: 24,
               color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Colors.grey.shade600,
+                  ? colorScheme.primary
+                  : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 4),
             Text(
@@ -145,8 +149,8 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey.shade600,
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
           ],
