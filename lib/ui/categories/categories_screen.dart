@@ -99,31 +99,33 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
 
   Future<void> _deleteCategory(MyCategory category) async {
     final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
+    final colorScheme = Theme.of(context).colorScheme;
+    
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.warning_rounded, color: Color(0xFFee0979)),
-            SizedBox(width: 12),
+            Icon(Icons.warning_rounded, color: colorScheme.error),
+            const SizedBox(width: 12),
             Text(
               'Xác nhận xóa',
               style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 18,
-                color: Color(0xFF1a1a2e),
+                color: colorScheme.onSurface,
               ),
             ),
           ],
         ),
         content: Text(
           'Bạn có chắc chắn muốn xóa danh mục "${category.name}"?',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
-            color: Color(0xFF4a4a68),
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
         actions: [
@@ -135,7 +137,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             child: Text(
               'Hủy',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: colorScheme.onSurface.withOpacity(0.6),
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -212,6 +214,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
   @override
   Widget build(BuildContext context) {
     final categoriesManager = context.watch<CategoriesManager>();
+    final colorScheme = Theme.of(context).colorScheme;
     
     return Scaffold(
       appBar: AppBar(
@@ -237,7 +240,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surfaceContainerHigh, // Theme aware background
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
@@ -249,8 +252,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             ),
             child: TabBar(
               controller: _tabController,
-              labelColor: const Color(0xFF11998e),
-              unselectedLabelColor: Colors.grey.shade500,
+              labelColor: colorScheme.primary,
+              unselectedLabelColor: colorScheme.onSurface.withOpacity(0.5),
               labelStyle: const TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
@@ -261,7 +264,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
                 fontSize: 15,
               ),
               indicator: BoxDecoration(
-                color: const Color(0xFF11998e).withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               indicatorSize: TabBarIndicatorSize.tab,
@@ -305,6 +308,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
   }
 
   Widget _buildEmptyState() {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -328,12 +333,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Chưa có danh mục nào',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1a1a2e),
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -341,7 +346,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
             'Nhấn nút + để thêm danh mục mới',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey.shade600,
+              color: colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
         ],

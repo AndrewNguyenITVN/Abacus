@@ -29,44 +29,49 @@ class CategoryForm extends StatefulWidget {
 class _CategoryFormState extends State<CategoryForm> {
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildNameInput(),
+        _buildNameInput(colorScheme),
         const SizedBox(height: 24),
-        _buildColorPicker(),
+        _buildColorPicker(colorScheme),
         const SizedBox(height: 24),
-        _buildIconPicker(),
+        _buildIconPicker(colorScheme),
         const SizedBox(height: 24),
-        _buildPreviewCard(),
+        _buildPreviewCard(colorScheme),
         const SizedBox(height: 32),
-        _buildActionButton(),
+        _buildActionButton(colorScheme),
         const SizedBox(height: 24),
       ],
     );
   }
 
-  Widget _buildNameInput() {
+  Widget _buildNameInput(ColorScheme colorScheme) {
     return TextFormField(
       controller: widget.nameController,
+      style: TextStyle(color: colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: 'Tên danh mục',
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
         hintText: 'Nhập tên danh mục...',
+        hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: colorScheme.outlineVariant),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF11998e), width: 2),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
-        prefixIcon: const Icon(Icons.label_outline_rounded),
+        prefixIcon: Icon(Icons.label_outline_rounded, color: colorScheme.onSurfaceVariant),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: colorScheme.surfaceContainer ?? colorScheme.surface,
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
@@ -77,23 +82,23 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  Widget _buildColorPicker() {
+  Widget _buildColorPicker(ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Chọn màu sắc',
           style: TextStyle(
             fontSize: 16, 
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1a1a2e),
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surfaceContainer ?? colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -120,8 +125,8 @@ class _CategoryFormState extends State<CategoryForm> {
                     color: color,
                     shape: BoxShape.circle,
                     border: isSelected
-                        ? Border.all(color: Colors.black, width: 3)
-                        : Border.all(color: Colors.grey.shade200, width: 1),
+                        ? Border.all(color: colorScheme.onSurface, width: 3)
+                        : Border.all(color: colorScheme.outlineVariant, width: 1),
                     boxShadow: [
                       if (isSelected)
                         BoxShadow(
@@ -143,23 +148,23 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  Widget _buildIconPicker() {
+  Widget _buildIconPicker(ColorScheme colorScheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Chọn biểu tượng',
           style: TextStyle(
             fontSize: 16, 
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1a1a2e),
+            color: colorScheme.onSurface,
           ),
         ),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surfaceContainer ?? colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -189,16 +194,16 @@ class _CategoryFormState extends State<CategoryForm> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? colorValue.withOpacity(0.1)
-                        : Colors.grey.shade50,
+                        : colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isSelected ? colorValue : Colors.grey.shade200,
+                      color: isSelected ? colorValue : colorScheme.outlineVariant,
                       width: isSelected ? 2 : 1,
                     ),
                   ),
                   child: Icon(
                     entry.value,
-                    color: isSelected ? colorValue : Colors.grey.shade600,
+                    color: isSelected ? colorValue : colorScheme.onSurfaceVariant,
                     size: 28,
                   ),
                 ),
@@ -210,13 +215,13 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  Widget _buildPreviewCard() {
+  Widget _buildPreviewCard(ColorScheme colorScheme) {
     return Card(
       elevation: 0,
-      color: Colors.white,
+      color: colorScheme.surfaceContainer ?? colorScheme.surface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: colorScheme.outlineVariant),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -254,11 +259,11 @@ class _CategoryFormState extends State<CategoryForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Xem trước hiển thị',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey,
+                      color: colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -267,10 +272,10 @@ class _CategoryFormState extends State<CategoryForm> {
                     widget.nameController.text.isEmpty
                         ? 'Tên danh mục'
                         : widget.nameController.text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1a1a2e),
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -282,18 +287,18 @@ class _CategoryFormState extends State<CategoryForm> {
     );
   }
 
-  Widget _buildActionButton() {
+  Widget _buildActionButton(ColorScheme colorScheme) {
     return Container(
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
+        gradient: LinearGradient(
+          colors: [colorScheme.primary, colorScheme.secondary],
         ),
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF11998e).withOpacity(0.4),
+            color: colorScheme.primary.withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 8),
             spreadRadius: -4,
@@ -309,12 +314,12 @@ class _CategoryFormState extends State<CategoryForm> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.white),
+                Icon(Icons.check_circle_rounded, color: colorScheme.onPrimary),
                 const SizedBox(width: 12),
                 Text(
                   widget.actionButtonText,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: colorScheme.onPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.5,

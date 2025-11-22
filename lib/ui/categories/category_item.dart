@@ -17,11 +17,13 @@ class CategoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoryColor = AppHelpers.parseColor(category.color);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 10), // Changed from 12 to 10 to match TransactionItem
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -35,7 +37,7 @@ class CategoryItem extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: 8,
+          vertical: 10, // Changed from 8 to 10 to match TransactionItem
         ),
         leading: Container(
           width: 48,
@@ -66,28 +68,36 @@ class CategoryItem extends StatelessWidget {
         ),
         title: Text(
           category.name,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 15,
-            color: Color(0xFF1a1a2e),
+            color: colorScheme.onSurface,
             letterSpacing: -0.2,
           ),
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 4),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 2,
-            ),
-            child: Text(
-              category.isDefault ? 'Mặc định' : 'Tùy chỉnh',
-              style: TextStyle(
-                color: category.isDefault
-                    ? Colors.blue.shade700
-                    : Colors.purple.shade700,
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 2,
+              ),
+              decoration: BoxDecoration(
+                color: (category.isDefault ? Colors.blue : Colors.purple)
+                    .withOpacity(isDark ? 0.2 : 0.1),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                category.isDefault ? 'Mặc định' : 'Tùy chỉnh',
+                style: TextStyle(
+                  color: category.isDefault
+                      ? Colors.blue.shade400
+                      : Colors.purple.shade400,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -97,7 +107,7 @@ class CategoryItem extends StatelessWidget {
             : IconButton(
                 icon: Icon(
                   Icons.delete_outline_rounded,
-                  color: Colors.red.shade400,
+                  color: colorScheme.error,
                 ),
                 onPressed: onDelete,
                 tooltip: 'Xóa danh mục',
