@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '/models/transaction.dart';
 import '/models/my_category.dart';
+import '/ui/shared/app_constants.dart';
 
 class RecentTransactionsList extends StatelessWidget {
   final List<Transaction> transactions;
@@ -24,21 +25,7 @@ class RecentTransactionsList extends StatelessWidget {
   }
 
   IconData _getIconData(String iconName) {
-    const iconMap = {
-      'restaurant': Icons.restaurant,
-      'shopping_bag': Icons.shopping_bag,
-      'local_gas_station': Icons.local_gas_station,
-      'house': Icons.house,
-      'work': Icons.work,
-      'attach_money': Icons.attach_money,
-      'movie': Icons.movie,
-      'school': Icons.school,
-      'local_hospital': Icons.local_hospital,
-      'fitness_center': Icons.fitness_center,
-      'flight': Icons.flight,
-      'phone': Icons.phone,
-    };
-    return iconMap[iconName] ?? Icons.category;
+    return AppConstants.iconMap[iconName] ?? Icons.category;
   }
 
   Color _parseColor(String hexColor) {
