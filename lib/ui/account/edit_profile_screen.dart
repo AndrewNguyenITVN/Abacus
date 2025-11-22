@@ -85,10 +85,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đang cập nhật thông tin...'),
-          backgroundColor: Colors.blue,
-          duration: Duration(seconds: 1),
+        SnackBar(
+          content: const Text('Đang cập nhật thông tin...'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          duration: const Duration(seconds: 1),
         ),
       );
       
@@ -98,6 +98,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
   
   Future<void> _changeAvatar() async {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -111,7 +113,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: const Icon(Icons.camera_alt, color: Colors.deepPurple),
+                  leading: Icon(Icons.camera_alt, color: colorScheme.primary),
                   title: const Text('Chụp ảnh'),
                   onTap: () {
                     Navigator.pop(context);
@@ -121,7 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.photo_library, color: Colors.deepPurple),
+                  leading: Icon(Icons.photo_library, color: colorScheme.primary),
                   title: const Text('Chọn từ thư viện'),
                   onTap: () {
                     Navigator.pop(context);
@@ -140,6 +142,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Chỉnh sửa thông tin'),
@@ -158,7 +162,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     width: 100,
                     height: 100,
                     decoration: BoxDecoration(
-                      color: Colors.pink.shade100,
+                      color: colorScheme.primaryContainer,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -174,7 +178,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         style: TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
-                          color: Colors.pink.shade700,
+                          color: colorScheme.onPrimaryContainer,
                         ),
                       ),
                     ),
@@ -187,13 +191,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.deepPurple,
+                          color: colorScheme.primary,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: colorScheme.surface, width: 2),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.camera_alt,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           size: 20,
                         ),
                       ),
@@ -208,7 +212,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -221,12 +225,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Thông tin cá nhân',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -234,14 +238,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Full Name
                   TextFormField(
                     controller: _fullNameController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Họ và tên',
-                      prefixIcon: const Icon(Icons.person_outline),
+                      labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.person_outline, color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -255,17 +269,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Email
                   TextFormField(
                     controller: _emailController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Email',
-                      prefixIcon: const Icon(Icons.email_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.email_outlined, color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                     keyboardType: TextInputType.emailAddress,
-                    readOnly: true, // Prevent editing email for now as it might affect login
+                    readOnly: true, // Prevent editing email for now
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Vui lòng nhập email';
@@ -281,18 +305,27 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Phone
                   TextFormField(
                     controller: _phoneController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Số điện thoại',
-                      prefixIcon: const Icon(Icons.phone_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.phone_outlined, color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                     keyboardType: TextInputType.phone,
                     validator: (value) {
-                      // Optional phone validation
                       return null;
                     },
                   ),
@@ -301,14 +334,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Gender
                   DropdownButtonFormField<String>(
                     value: _selectedGender,
+                    style: TextStyle(color: colorScheme.onSurface, fontSize: 16),
+                    dropdownColor: colorScheme.surfaceContainer,
                     decoration: InputDecoration(
                       labelText: 'Giới tính',
-                      prefixIcon: const Icon(Icons.wc_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.wc_outlined, color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                     items: _genderOptions.map((String value) {
                       return DropdownMenuItem<String>(
@@ -329,14 +373,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Date of Birth
                   TextFormField(
                     controller: _dobController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Ngày sinh',
-                      prefixIcon: const Icon(Icons.calendar_today_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.calendar_today_outlined, color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                     readOnly: true,
                     onTap: () => _selectDate(context),
@@ -346,14 +400,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   // Address
                   TextFormField(
                     controller: _addressController,
+                    style: TextStyle(color: colorScheme.onSurface),
                     decoration: InputDecoration(
                       labelText: 'Địa chỉ',
-                      prefixIcon: const Icon(Icons.location_on_outlined),
+                      labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
+                      prefixIcon: Icon(Icons.location_on_outlined, color: colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.outlineVariant),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade50,
+                      fillColor: colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     ),
                     maxLines: 2,
                   ),
@@ -366,8 +430,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ElevatedButton(
               onPressed: _saveProfile,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -388,12 +452,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             OutlinedButton(
               onPressed: () => Navigator.of(context).pop(),
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.deepPurple,
+                foregroundColor: colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                side: const BorderSide(color: Colors.deepPurple),
+                side: BorderSide(color: colorScheme.primary),
               ),
               child: const Text(
                 'Hủy',

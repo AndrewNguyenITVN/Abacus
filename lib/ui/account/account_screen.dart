@@ -39,7 +39,7 @@ class AccountScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Action Buttons
-              _buildActionButtons(),
+              _buildActionButtons(context),
               const SizedBox(height: 20),
               
               // Settings Section
@@ -51,7 +51,7 @@ class AccountScreen extends StatelessWidget {
               const SizedBox(height: 20),
               
               // Version Info
-              _buildVersionInfo(),
+              _buildVersionInfo(context),
               const SizedBox(height: 24),
             ],
           ),
@@ -61,6 +61,9 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildHeader(BuildContext context, Account account) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -87,16 +90,16 @@ class AccountScreen extends StatelessWidget {
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
+                      gradient: LinearGradient(
                         colors: [
-                          Color(0xFF667eea), // Purple
-                          Color(0xFF764ba2), // Deep purple
+                          colorScheme.primary,
+                          colorScheme.secondary,
                         ],
                       ),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF667eea).withOpacity(0.4),
+                          color: colorScheme.primary.withOpacity(0.4),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),
@@ -105,10 +108,10 @@ class AccountScreen extends StatelessWidget {
                     child: Center(
                       child: Text(
                         account.initials ?? 'NA',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: colorScheme.onPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
@@ -157,7 +160,7 @@ class AccountScreen extends StatelessWidget {
               Container(
                 child: IconButton(
                   icon: const Icon(Icons.edit_rounded),
-                  color: Colors.grey.shade700,
+                  color: colorScheme.onSurfaceVariant,
                   tooltip: 'Chỉnh sửa thông tin',
                   onPressed: () async {
                     final result = await Navigator.of(context).push(
@@ -177,10 +180,10 @@ class AccountScreen extends StatelessWidget {
           // Name
           Text(
             account.fullName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1a1a2e),
+              color: colorScheme.onSurface,
               letterSpacing: -0.5,
             ),
           ),
@@ -189,20 +192,20 @@ class AccountScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.7),
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.phone_rounded, size: 16, color: Colors.grey.shade700),
+                Icon(Icons.phone_rounded, size: 16, color: colorScheme.onSurfaceVariant),
                 const SizedBox(width: 6),
                 Text(
                   account.phone.isNotEmpty ? account.phone : 'Chưa cập nhật SĐT',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade800,
+                    color: colorScheme.onSurface,
                     letterSpacing: -0.2,
                   ),
                 ),
@@ -214,13 +217,15 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  Widget _buildActionButtons(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -235,24 +240,28 @@ class AccountScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildActionButton(
+              context,
               Icons.account_balance_wallet_rounded,
               'Quản lý\nchi tiêu',
-              [const Color(0xFF667eea), const Color(0xFF764ba2)], // Purple gradient
+              [const Color(0xFF667eea), const Color(0xFF764ba2)],
             ),
             _buildActionButton(
+              context,
               Icons.credit_card_rounded,
               'Cài đặt\nthanh toán',
-              [const Color(0xFFee0979), const Color(0xFFff6a00)], // Pink-Orange gradient
+              [const Color(0xFFee0979), const Color(0xFFff6a00)],
             ),
             _buildActionButton(
+              context,
               Icons.security_rounded,
               'Đăng nhập\nvà bảo mật',
-              [const Color(0xFF11998e), const Color(0xFF38ef7d)], // Teal-Green gradient
+              [const Color(0xFF11998e), const Color(0xFF38ef7d)],
             ),
             _buildActionButton(
+              context,
               Icons.notifications_rounded,
               'Cài đặt\nthông báo',
-              [const Color(0xFFf093fb), const Color(0xFFee0979)], // Pink gradient
+              [const Color(0xFFf093fb), const Color(0xFFee0979)],
             ),
           ],
         ),
@@ -260,7 +269,9 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, List<Color> gradientColors) {
+  Widget _buildActionButton(BuildContext context, IconData icon, String label, List<Color> gradientColors) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Column(
       children: [
         Container(
@@ -282,10 +293,10 @@ class AccountScreen extends StatelessWidget {
         Text(
           label,
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF1a1a2e),
+            color: colorScheme.onSurface,
             letterSpacing: -0.2,
           ),
         ),
@@ -294,11 +305,13 @@ class AccountScreen extends StatelessWidget {
   }
 
   Widget _buildSettingsSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -312,105 +325,111 @@ class AccountScreen extends StatelessWidget {
         child: Column(
           children: [
             _buildSettingItem(
+              context,
               Icons.help_center_rounded,
               'Trung tâm trợ giúp',
-              Colors.grey.shade600,
-              //onTap: () => _showSnackBar(context, 'Trung tâm trợ giúp'),
+              colorScheme.onSurfaceVariant,
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSettingItem(
+              context,
               Icons.notifications_rounded,
               'Cài đặt thông báo',
-              Colors.grey.shade600,
+              colorScheme.onSurfaceVariant,
               onTap: () => _showSpendingSettingsDialog(context),
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSettingItem(
+              context,
               Icons.share_rounded,
               'Chia sẻ góp ý',
-              Colors.grey.shade600,
-              //onTap: () => _showSnackBar(context, 'Chia sẻ góp ý'),
+              colorScheme.onSurfaceVariant,
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSettingItem(
+              context,
               Icons.info_rounded,
               'Thông tin chung',
-              Colors.grey.shade600,
-              //onTap: () => _showSnackBar(context, 'Thông tin chung'),
+              colorScheme.onSurfaceVariant,
             ),
-            _buildDivider(),
+            _buildDivider(context),
             _buildSettingItem(
+              context,
               Icons.palette_rounded,
               'Giao diện & Màu sắc', 
-              Colors.grey.shade600,
+              colorScheme.onSurfaceVariant,
               onTap: () => showDialog(
                 context: context,
                 builder: (context) => const ThemeSettingsDialog(),
               ),
             ),
-            _buildDivider(),
-            _buildLanguageItem(),
+            _buildDivider(context),
+            _buildLanguageItem(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSettingItem(IconData icon, String title, Color iconColor,
+  Widget _buildSettingItem(BuildContext context, IconData icon, String title, Color iconColor,
       {VoidCallback? onTap, Widget? trailing}) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Icon(icon, color: iconColor, size: 22),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF1a1a2e),
+          color: colorScheme.onSurface,
           letterSpacing: -0.2,
         ),
       ),
       trailing: trailing ??
           Icon(
             Icons.chevron_right_rounded,
-            color: Colors.grey.shade400,
+            color: colorScheme.onSurfaceVariant.withOpacity(0.5),
             size: 24,
           ),
       onTap: onTap,
     );
   }
 
-  Widget _buildLanguageItem() {
+  Widget _buildLanguageItem(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
       leading: Container(
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(Icons.language_rounded, color: Colors.grey.shade600, size: 22),
+        child: Icon(Icons.language_rounded, color: colorScheme.onSurfaceVariant, size: 22),
       ),
-      title: const Text(
+      title: Text(
         'Ngôn ngữ',
         style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF1a1a2e),
+          color: colorScheme.onSurface,
           letterSpacing: -0.2,
         ),
       ),
       trailing: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -418,7 +437,7 @@ class AccountScreen extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: Colors.grey.shade700,
+            color: colorScheme.onSurfaceVariant,
             letterSpacing: 0.5,
           ),
         ),
@@ -426,16 +445,18 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDivider() {
+  Widget _buildDivider(BuildContext context) {
     return Divider(
       height: 1,
       thickness: 1,
       indent: 60,
-      color: Colors.grey.shade200,
+      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.5),
     );
   }
 
   Widget _buildLogoutSection(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ElevatedButton(
@@ -444,13 +465,13 @@ class AccountScreen extends StatelessWidget {
           context.go('/login');
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.red,
+          backgroundColor: colorScheme.surfaceContainer,
+          foregroundColor: colorScheme.error,
           padding: const EdgeInsets.symmetric(vertical: 16),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
-            side: BorderSide(color: Colors.red.shade100),
+            side: BorderSide(color: colorScheme.error.withOpacity(0.2)),
           ),
         ),
         child: const Row(
@@ -472,14 +493,16 @@ class AccountScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVersionInfo() {
+  Widget _buildVersionInfo(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Center(
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -494,7 +517,7 @@ class AccountScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey.shade700,
+                color: colorScheme.onSurfaceVariant,
                 letterSpacing: -0.2,
               ),
             ),
@@ -519,7 +542,7 @@ class AccountScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade600,
+                  color: colorScheme.onSurfaceVariant,
                   letterSpacing: -0.2,
                 ),
               ),
