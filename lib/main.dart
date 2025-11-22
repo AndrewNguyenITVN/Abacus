@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'ui/screens.dart';
 import 'services/notification_service.dart';
 import 'ui/notifications/notifications_manager.dart';
-import 'ui/shared/theme_manager.dart'; // Import ThemeManager
+import 'ui/shared/theme_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,10 +39,8 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Theme Manager - create once
   late final ThemeManager _themeManager;
   
-  // Router & AuthManager - create once to prevent rebuilds
   late final AuthManager _authManager;
   late final GoRouter _router;
 
@@ -117,7 +115,6 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider.value(value: _authManager),
         ChangeNotifierProvider.value(value: widget.notificationsManager),
-        // Provide ThemeManager
         ChangeNotifierProvider.value(value: _themeManager), 
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
@@ -130,7 +127,6 @@ class _MyAppState extends State<MyApp> {
         ),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],
-      // Use Consumer to rebuild MaterialApp when ThemeManager changes
       child: Consumer<ThemeManager>(
         builder: (context, themeManager, child) {
           return MaterialApp.router(
@@ -138,21 +134,19 @@ class _MyAppState extends State<MyApp> {
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(
-                seedColor: themeManager.colorSelected.color, // Use selected color
+                seedColor: themeManager.colorSelected.color,
                 brightness: Brightness.light,
               ),
               useMaterial3: true,
-              scaffoldBackgroundColor: const Color(0xFFF8F9FD),
             ),
             darkTheme: ThemeData(
               colorScheme: ColorScheme.fromSeed(
-                seedColor: themeManager.colorSelected.color, // Use selected color
+                seedColor: themeManager.colorSelected.color,
                 brightness: Brightness.dark,
               ),
               useMaterial3: true,
-              scaffoldBackgroundColor: const Color(0xFF1A1A1A),
             ),
-            themeMode: themeManager.themeMode, // Use managed theme mode
+            themeMode: themeManager.themeMode, 
             routerConfig: _router,
           );
         },

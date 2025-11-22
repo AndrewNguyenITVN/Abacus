@@ -39,18 +39,18 @@ class TransactionForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildTypeSelector(),
+        _buildTypeSelector(context),
         const SizedBox(height: 20),
-        _buildAmountInputCard(),
+        _buildAmountInputCard(context),
         const SizedBox(height: 16),
         QuickAmountSelector(
           controller: amountController,
           onChanged: onAmountChanged,
         ),
         const SizedBox(height: 20),
-        _buildCategorySelector(),
+        _buildCategorySelector(context),
         const SizedBox(height: 20),
-        _buildDescriptionInput(),
+        _buildDescriptionInput(context),
         const SizedBox(height: 32),
         _buildActionButton(context),
         const SizedBox(height: 20),
@@ -60,11 +60,13 @@ class TransactionForm extends StatelessWidget {
 
   // --- Type Selector ---
 
-  Widget _buildTypeSelector() {
+  Widget _buildTypeSelector(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -79,6 +81,7 @@ class TransactionForm extends StatelessWidget {
         children: [
           Expanded(
             child: _buildTypeButton(
+              context: context,
               type: TransactionType.expense,
               label: 'Chi tiêu',
               icon: Icons.trending_down_rounded,
@@ -88,6 +91,7 @@ class TransactionForm extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: _buildTypeButton(
+              context: context,
               type: TransactionType.income,
               label: 'Thu nhập',
               icon: Icons.trending_up_rounded,
@@ -100,12 +104,15 @@ class TransactionForm extends StatelessWidget {
   }
 
   Widget _buildTypeButton({
+    required BuildContext context,
     required TransactionType type,
     required String label,
     required IconData icon,
     required List<Color> gradient,
   }) {
     final isSelected = selectedType == type;
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return InkWell(
       onTap: () => onTypeChanged(type),
       borderRadius: BorderRadius.circular(12),
@@ -121,14 +128,14 @@ class TransactionForm extends StatelessWidget {
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : Colors.grey.shade600,
+              color: isSelected ? Colors.white : colorScheme.onSurface.withOpacity(0.6),
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey.shade600,
+                color: isSelected ? Colors.white : colorScheme.onSurface.withOpacity(0.6),
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 fontSize: 15,
               ),
@@ -141,15 +148,16 @@ class TransactionForm extends StatelessWidget {
 
   // --- Amount Input ---
 
-  Widget _buildAmountInputCard() {
+  Widget _buildAmountInputCard(BuildContext context) {
     final gradient = selectedType == TransactionType.expense
         ? AppConstants.expenseGradient
         : AppConstants.incomeGradient;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -180,12 +188,12 @@ class TransactionForm extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Số tiền',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1a1a2e),
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -198,21 +206,21 @@ class TransactionForm extends StatelessWidget {
               hintText: '0',
               hintStyle: TextStyle(
                 fontSize: 32,
-                color: Colors.grey.shade300,
+                color: colorScheme.onSurface.withOpacity(0.3),
                 fontWeight: FontWeight.bold,
               ),
               border: InputBorder.none,
               suffixText: '₫',
-              suffixStyle: const TextStyle(
+              suffixStyle: TextStyle(
                 fontSize: 24,
-                color: Color(0xFF1a1a2e),
+                color: colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1a1a2e),
+              color: colorScheme.onSurface,
             ),
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
@@ -233,11 +241,13 @@ class TransactionForm extends StatelessWidget {
 
   // --- Category Selector ---
 
-  Widget _buildCategorySelector() {
+  Widget _buildCategorySelector(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -268,12 +278,12 @@ class TransactionForm extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Danh mục',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1a1a2e),
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -283,16 +293,17 @@ class TransactionForm extends StatelessWidget {
             value: selectedCategoryId,
             hint: Text(
               'Chọn danh mục',
-              style: TextStyle(color: Colors.grey.shade400),
+              style: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
             ),
+            dropdownColor: colorScheme.surfaceContainerHigh, // Popup color
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -319,7 +330,10 @@ class TransactionForm extends StatelessWidget {
                       color: AppHelpers.parseColor(category.color),
                     ),
                     const SizedBox(width: 8),
-                    Text(category.name),
+                    Text(
+                      category.name,
+                      style: TextStyle(color: colorScheme.onSurface),
+                    ),
                   ],
                 ),
               );
@@ -334,11 +348,13 @@ class TransactionForm extends StatelessWidget {
 
   // --- Description Input ---
 
-  Widget _buildDescriptionInput() {
+  Widget _buildDescriptionInput(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -369,12 +385,12 @@ class TransactionForm extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Ghi chú',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF1a1a2e),
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -382,16 +398,17 @@ class TransactionForm extends StatelessWidget {
           const SizedBox(height: 16),
           TextFormField(
             controller: descriptionController,
+            style: TextStyle(color: colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: 'Thêm ghi chú cho giao dịch này...',
-              hintStyle: TextStyle(color: Colors.grey.shade400),
+              hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade200),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),

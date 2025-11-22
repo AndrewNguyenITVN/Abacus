@@ -16,11 +16,14 @@ class TransactionSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.all(16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -35,6 +38,7 @@ class TransactionSummaryCard extends StatelessWidget {
         children: [
           // Income row
           _buildRow(
+            context: context,
             label: 'Thu nhập',
             amount: totalIncome,
             icon: Icons.trending_up_rounded,
@@ -46,6 +50,7 @@ class TransactionSummaryCard extends StatelessWidget {
           
           // Expense row
           _buildRow(
+            context: context,
             label: 'Chi tiêu',
             amount: totalExpense,
             icon: Icons.trending_down_rounded,
@@ -60,9 +65,9 @@ class TransactionSummaryCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.grey.shade200,
-                  Colors.grey.shade100,
-                  Colors.grey.shade200,
+                  colorScheme.outlineVariant.withOpacity(0.1),
+                  colorScheme.outlineVariant,
+                  colorScheme.outlineVariant.withOpacity(0.1),
                 ],
               ),
             ),
@@ -78,33 +83,33 @@ class TransactionSummaryCard extends StatelessWidget {
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.blue.shade400, Colors.purple.shade400],
+                        colors: [colorScheme.primary, colorScheme.secondary],
                       ),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.account_balance_wallet_rounded,
-                      color: Colors.white,
+                      color: colorScheme.onPrimary,
                       size: 20,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
+                  Text(
                     'Số dư',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF1a1a2e),
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
               ),
               Text(
                 AppHelpers.formatCurrency(balance),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1a1a2e),
+                  color: colorScheme.onSurface,
                 ),
               ),
             ],
@@ -115,6 +120,7 @@ class TransactionSummaryCard extends StatelessWidget {
   }
 
   Widget _buildRow({
+    required BuildContext context,
     required String label,
     required double amount,
     required IconData icon,
@@ -122,6 +128,8 @@ class TransactionSummaryCard extends StatelessWidget {
     required Color amountColor,
     required bool isPositive,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -142,10 +150,10 @@ class TransactionSummaryCard extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF1a1a2e),
+                color: colorScheme.onSurface,
               ),
             ),
           ],

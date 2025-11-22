@@ -68,8 +68,8 @@ class TransactionsScreen extends StatelessWidget {
           ),
           Expanded(
             child: transactions.isEmpty
-                ? _buildEmptyState()
-                : _buildGroupedTransactionList(transactions, categoriesManager),
+                ? _buildEmptyState(context)
+                : _buildGroupedTransactionList(context, transactions, categoriesManager),
           ),
         ],
       ),
@@ -114,15 +114,17 @@ class TransactionsScreen extends StatelessWidget {
           // RIGHT COLUMN (65%) - Transaction List
           Expanded(
             child: transactions.isEmpty
-                ? _buildEmptyState()
-                : _buildGroupedTransactionList(transactions, categoriesManager),
+                ? _buildEmptyState(context)
+                : _buildGroupedTransactionList(context, transactions, categoriesManager),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -143,18 +145,18 @@ class TransactionsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
+          Text(
             'Chưa có giao dịch nào',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1a1a2e),
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Bắt đầu bằng cách thêm giao dịch đầu tiên',
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+            style: TextStyle(fontSize: 14, color: colorScheme.onSurface.withOpacity(0.6)),
           ),
         ],
       ),
@@ -162,6 +164,7 @@ class TransactionsScreen extends StatelessWidget {
   }
 
   Widget _buildGroupedTransactionList(
+    BuildContext context,
     List<Transaction> transactions,
     CategoriesManager categoriesManager,
   ) {
@@ -187,7 +190,7 @@ class TransactionsScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
         if (item is DateTime) {
-          return _buildDateHeader(item);
+          return _buildDateHeader(context, item);
         } else if (item is Transaction) {
           // Find category securely
           final category = categoriesManager.items.firstWhere(
@@ -212,12 +215,14 @@ class TransactionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDateHeader(DateTime date) {
+  Widget _buildDateHeader(BuildContext context, DateTime date) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       margin: const EdgeInsets.only(top: 16, bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -246,10 +251,10 @@ class TransactionsScreen extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             AppHelpers.formatLongDate(date),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1a1a2e),
+              color: colorScheme.onSurface,
               letterSpacing: -0.3,
             ),
           ),

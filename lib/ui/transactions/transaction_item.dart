@@ -17,13 +17,15 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final isIncome = transaction.type == 'income';
     final categoryColor = AppHelpers.parseColor(category.color);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer ?? colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -65,10 +67,10 @@ class TransactionItem extends StatelessWidget {
         ),
         title: Text(
           category.name,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 15,
-            color: Color(0xFF1a1a2e),
+            color: colorScheme.onSurface,
             letterSpacing: -0.2,
           ),
         ),
@@ -78,7 +80,7 @@ class TransactionItem extends StatelessWidget {
                 child: Text(
                   transaction.description,
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color: colorScheme.onSurface.withOpacity(0.6),
                     fontSize: 14,
                   ),
                   maxLines: 1,
@@ -90,8 +92,8 @@ class TransactionItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: isIncome
-                ? const Color(0xFF11998e).withOpacity(0.1)
-                : const Color(0xFFee0979).withOpacity(0.1),
+                ? const Color(0xFF11998e).withOpacity(isDark ? 0.2 : 0.1)
+                : const Color(0xFFee0979).withOpacity(isDark ? 0.2 : 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Text(
