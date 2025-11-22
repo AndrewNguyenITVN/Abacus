@@ -113,10 +113,11 @@ class _AuthCardState extends State<AuthCard> {
   Widget _buildHeader() {
     return Column(
       children: [
-        const Icon(
-          Icons.account_balance_wallet,
-          size: 80,
-          color: Color(0xFF11998e),
+        Image.asset(
+          'assets/images/splash_logo.png',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
         ),
         const SizedBox(height: 16),
         const Text(
