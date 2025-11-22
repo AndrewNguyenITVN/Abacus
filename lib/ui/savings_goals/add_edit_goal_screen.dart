@@ -56,14 +56,17 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(
           _isEditing ? 'Chỉnh sửa mục tiêu' : 'Tạo mục tiêu mới',
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w600, color: colorScheme.onSurface),
         ),
         elevation: 0,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: colorScheme.surface,
+        iconTheme: IconThemeData(color: colorScheme.onSurface),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -80,11 +83,18 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
               // Name
               TextFormField(
                 controller: _nameController,
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Tên mục tiêu *',
+                  labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                   hintText: 'VD: Mua xe máy, Du lịch,...',
+                  hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  prefixIcon: const Icon(Icons.label),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outlineVariant),
+                  ),
+                  prefixIcon: Icon(Icons.label, color: colorScheme.onSurfaceVariant),
                 ),
                 validator: (value) =>
                     (value == null || value.isEmpty) ? 'Vui lòng nhập tên mục tiêu' : null,
@@ -95,11 +105,18 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
               // Description
               TextFormField(
                 controller: _descriptionController,
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Mô tả',
+                  labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                   hintText: 'Mô tả chi tiết về mục tiêu...',
+                  hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  prefixIcon: const Icon(Icons.description),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outlineVariant),
+                  ),
+                  prefixIcon: Icon(Icons.description, color: colorScheme.onSurfaceVariant),
                 ),
                 maxLines: 3,
               ),
@@ -110,12 +127,20 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
               TextFormField(
                 controller: _targetAmountController,
                 keyboardType: TextInputType.number,
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Số tiền mục tiêu *',
+                  labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                   hintText: 'Nhập số tiền',
+                  hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  prefixIcon: const Icon(Icons.attach_money),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outlineVariant),
+                  ),
+                  prefixIcon: Icon(Icons.attach_money, color: colorScheme.onSurfaceVariant),
                   suffixText: '₫',
+                  suffixStyle: TextStyle(color: colorScheme.onSurface),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'Vui lòng nhập số tiền mục tiêu';
@@ -137,12 +162,20 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
               TextFormField(
                 controller: _currentAmountController,
                 keyboardType: TextInputType.number,
+                style: TextStyle(color: colorScheme.onSurface),
                 decoration: InputDecoration(
                   labelText: 'Số tiền hiện tại',
+                  labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                   hintText: 'Nhập số tiền đã tiết kiệm',
+                  hintStyle: TextStyle(color: colorScheme.onSurface.withOpacity(0.4)),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  prefixIcon: const Icon(Icons.account_balance_wallet),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: colorScheme.outlineVariant),
+                  ),
+                  prefixIcon: Icon(Icons.account_balance_wallet, color: colorScheme.onSurfaceVariant),
                   suffixText: '₫',
+                  suffixStyle: TextStyle(color: colorScheme.onSurface),
                 ),
                 validator: (value) {
                   if (value != null && value.isNotEmpty) {
@@ -168,11 +201,16 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 child: InputDecorator(
                   decoration: InputDecoration(
                     labelText: 'Hạn hoàn thành',
+                    labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    prefixIcon: const Icon(Icons.calendar_today),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: colorScheme.outlineVariant),
+                    ),
+                    prefixIcon: Icon(Icons.calendar_today, color: colorScheme.onSurfaceVariant),
                     suffixIcon: _targetDate != null
                         ? IconButton(
-                            icon: const Icon(Icons.clear),
+                            icon: Icon(Icons.clear, color: colorScheme.onSurfaceVariant),
                             onPressed: () => setState(() => _targetDate = null),
                           )
                         : null,
@@ -182,7 +220,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                         ? AppHelpers.formatDate(_targetDate!)
                         : 'Chọn ngày hoàn thành (tùy chọn)',
                     style: TextStyle(
-                      color: _targetDate != null ? Colors.black87 : Colors.grey.shade600,
+                      color: _targetDate != null ? colorScheme.onSurface : colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ),
@@ -202,8 +240,8 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                 child: ElevatedButton(
                   onPressed: _saveGoal,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple.shade600,
-                    foregroundColor: Colors.white,
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                   child: Text(
@@ -222,11 +260,13 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
   Widget _buildIconColorSelection() {
     final selectedColor = AppHelpers.parseColor(_selectedColor);
     final selectedIconData = AppHelpers.getIconData(_selectedIcon);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: selectedColor.withOpacity(0.1),
+        color: selectedColor.withOpacity(isDark ? 0.2 : 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: selectedColor.withOpacity(0.3)),
       ),
@@ -244,14 +284,14 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
           const SizedBox(height: 16),
 
           // Icon selection
-          const Text('Chọn biểu tượng', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          Text('Chọn biểu tượng', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
           const SizedBox(height: 8),
           
           // Using GridView for Icons (Similar to Categories)
           Container(
             height: 150,
             decoration: BoxDecoration(
-               color: Colors.white.withOpacity(0.5),
+               color: colorScheme.surfaceContainerHighest.withOpacity(0.5),
                borderRadius: BorderRadius.circular(12),
             ),
             child: GridView.builder(
@@ -278,7 +318,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                     child: Icon(
                       entry.value,
                       size: 20,
-                      color: isSelected ? selectedColor : Colors.grey.shade600,
+                      color: isSelected ? selectedColor : colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 );
@@ -289,7 +329,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
           const SizedBox(height: 16),
 
           // Color selection
-          const Text('Chọn màu sắc', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          Text('Chọn màu sắc', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -307,7 +347,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                     color: color,
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: isSelected ? Colors.black87 : Colors.transparent,
+                      color: isSelected ? colorScheme.onSurface : Colors.transparent,
                       width: 3,
                     ),
                   ),
@@ -334,25 +374,27 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
 
     final selectedColor = AppHelpers.parseColor(_selectedColor);
     final selectedIconData = AppHelpers.getIconData(_selectedIcon);
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: colorScheme.outlineVariant),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Xem trước', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          Text('Xem trước', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: colorScheme.onSurface)),
           const SizedBox(height: 12),
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: selectedColor.withOpacity(0.15),
+                  color: selectedColor.withOpacity(isDark ? 0.2 : 0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(selectedIconData, color: selectedColor, size: 24),
@@ -364,12 +406,12 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
                   children: [
                     Text(
                       _nameController.text.isEmpty ? 'Tên mục tiêu' : _nameController.text,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: colorScheme.onSurface),
                     ),
                     if (_targetDate != null)
                       Text(
                         'Đến ${AppHelpers.formatDate(_targetDate!)}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.6)),
                       ),
                   ],
                 ),
@@ -386,7 +428,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
             child: LinearProgressIndicator(
               value: progress / 100,
               minHeight: 8,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: colorScheme.surfaceContainerHighest,
               valueColor: AlwaysStoppedAnimation<Color>(selectedColor),
             ),
           ),
@@ -400,7 +442,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
               ),
               Text(
                 AppHelpers.formatCurrency(targetAmount),
-                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withOpacity(0.6)),
               ),
             ],
           ),

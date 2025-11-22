@@ -12,6 +12,8 @@ class SavingsGoalsBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     final goalsManager = context.watch<SavingsGoalsManager>();
     final activeGoals = goalsManager.activeGoals.take(3).toList();
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     if (goalsManager.totalGoals == 0) {
       return _buildEmptyState(context);
@@ -21,7 +23,7 @@ class SavingsGoalsBlock extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -43,7 +45,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.purple.shade50,
+                      color: Colors.purple.withOpacity(isDark ? 0.2 : 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -56,19 +58,19 @@ class SavingsGoalsBlock extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Mục tiêu tiết kiệm',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                       Text(
                         '${goalsManager.activeGoalsCount} mục tiêu đang thực hiện',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey.shade600,
+                          color: colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -99,8 +101,8 @@ class SavingsGoalsBlock extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.purple.shade50,
-                  Colors.blue.shade50,
+                  Colors.purple.withOpacity(isDark ? 0.2 : 0.1),
+                  Colors.blue.withOpacity(isDark ? 0.2 : 0.1),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -118,7 +120,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade700,
+                        color: colorScheme.onSurface.withOpacity(0.8),
                       ),
                     ),
                     Text(
@@ -126,7 +128,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
-                        color: Colors.purple.shade700,
+                        color: Colors.purple.shade700, // Keep semantic color
                       ),
                     ),
                   ],
@@ -137,7 +139,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: goalsManager.overallProgress / 100,
                     minHeight: 8,
-                    backgroundColor: Colors.grey.shade200,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       Colors.purple.shade600,
                     ),
@@ -159,7 +161,7 @@ class SavingsGoalsBlock extends StatelessWidget {
                       AppHelpers.formatCurrency(goalsManager.totalTarget),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -200,11 +202,14 @@ class SavingsGoalsBlock extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -219,7 +224,7 @@ class SavingsGoalsBlock extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.purple.shade50,
+              color: Colors.purple.withOpacity(isDark ? 0.2 : 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -229,12 +234,12 @@ class SavingsGoalsBlock extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Chưa có mục tiêu tiết kiệm',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: colorScheme.onSurface,
             ),
           ),
           const SizedBox(height: 8),
@@ -243,7 +248,7 @@ class SavingsGoalsBlock extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              color: Colors.grey.shade600,
+              color: colorScheme.onSurface.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 16),

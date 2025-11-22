@@ -21,14 +21,16 @@ class QuickAmountSelector extends StatelessWidget {
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(right: i < amounts.length - 1 ? 8 : 0), 
-              child: _buildButton(amounts[i]),
+              child: _buildButton(context, amounts[i]),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildButton(String amount) {
+  Widget _buildButton(BuildContext context, String amount) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     String buttonText;
     if (amount == '00') {
       buttonText = '.00'; 
@@ -45,9 +47,9 @@ class QuickAmountSelector extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200, width: 1.5),
+          border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -62,7 +64,7 @@ class QuickAmountSelector extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Colors.grey.shade700,
+              color: colorScheme.onSurface,
             ),
           ),
         ),

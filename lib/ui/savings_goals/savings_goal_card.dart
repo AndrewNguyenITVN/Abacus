@@ -20,16 +20,20 @@ class SavingsGoalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = AppHelpers.parseColor(goal.color);
     final daysRemaining = goal.daysRemaining;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: isDetailMode ? 2 : 0,
-      color: isDetailMode ? null : Colors.white,
+      color: isDetailMode 
+          ? colorScheme.surfaceContainer 
+          : Colors.transparent, // For block mode, usually on white bg or specific container
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: isDetailMode 
             ? BorderSide.none 
-            : BorderSide(color: color.withOpacity(0.2)),
+            : BorderSide(color: color.withOpacity(0.3)),
       ),
       child: InkWell(
         onTap: () => showGoalDetailDialog(context, goal),
@@ -45,7 +49,7 @@ class SavingsGoalCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.15),
+                      color: color.withOpacity(isDark ? 0.2 : 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(
@@ -61,10 +65,10 @@ class SavingsGoalCard extends StatelessWidget {
                       children: [
                         Text(
                           goal.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: colorScheme.onSurface,
                           ),
                         ),
                         if (isDetailMode && goal.description != null && goal.description!.isNotEmpty)
@@ -72,7 +76,7 @@ class SavingsGoalCard extends StatelessWidget {
                             goal.description!,
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey.shade600,
+                              color: colorScheme.onSurface.withOpacity(0.6),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -85,7 +89,7 @@ class SavingsGoalCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               color: daysRemaining > 30
-                                  ? Colors.grey.shade600
+                                  ? colorScheme.onSurface.withOpacity(0.6)
                                   : Colors.orange.shade700,
                               fontWeight: daysRemaining <= 30
                                   ? FontWeight.w600
@@ -113,7 +117,7 @@ class SavingsGoalCard extends StatelessWidget {
                       'Tiến độ',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade600,
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                     Text(
@@ -134,7 +138,7 @@ class SavingsGoalCard extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: goal.progressPercentage / 100,
                   minHeight: isDetailMode ? 10 : 6,
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                 ),
               ),
@@ -156,7 +160,7 @@ class SavingsGoalCard extends StatelessWidget {
                     AppHelpers.formatCurrency(goal.targetAmount),
                     style: TextStyle(
                       fontSize: isDetailMode ? 13 : 11,
-                      color: Colors.grey.shade600,
+                      color: colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                 ],
@@ -171,7 +175,7 @@ class SavingsGoalCard extends StatelessWidget {
                       Icon(
                         Icons.calendar_today,
                         size: 14,
-                        color: Colors.grey.shade600,
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -181,7 +185,7 @@ class SavingsGoalCard extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           color: daysRemaining > 30
-                              ? Colors.grey.shade600
+                              ? colorScheme.onSurface.withOpacity(0.6)
                               : Colors.orange.shade700,
                           fontWeight: daysRemaining <= 30
                               ? FontWeight.w600
@@ -193,14 +197,14 @@ class SavingsGoalCard extends StatelessWidget {
                     Icon(
                       Icons.trending_up,
                       size: 14,
-                      color: Colors.grey.shade600,
+                      color: colorScheme.onSurface.withOpacity(0.6),
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Còn ${AppHelpers.formatCurrency(goal.remainingAmount)}',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
@@ -260,7 +264,7 @@ class SavingsGoalCard extends StatelessWidget {
           AppHelpers.formatCurrency(goal.remainingAmount),
           style: TextStyle(
             fontSize: 10,
-            color: Colors.grey.shade600,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
           ),
         ),
       ],
@@ -268,15 +272,18 @@ class SavingsGoalCard extends StatelessWidget {
   }
 
   Widget _buildPopupMenu(BuildContext context, SavingsGoal goal) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return PopupMenuButton(
+      color: colorScheme.surfaceContainerHigh,
       itemBuilder: (context) => [
-        const PopupMenuItem(
+        PopupMenuItem(
           value: 'edit',
           child: Row(
             children: [
-              Icon(Icons.edit, size: 20),
-              SizedBox(width: 8),
-              Text('Chỉnh sửa'),
+              Icon(Icons.edit, size: 20, color: colorScheme.onSurface),
+              const SizedBox(width: 8),
+              Text('Chỉnh sửa', style: TextStyle(color: colorScheme.onSurface)),
             ],
           ),
         ),
@@ -306,28 +313,34 @@ class SavingsGoalCard extends StatelessWidget {
   }
 
   void _showDeleteConfirmDialog(BuildContext context, SavingsGoal goal) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Xác nhận xóa'),
-        content: Text('Bạn có chắc chắn muốn xóa mục tiêu "${goal.name}"?'),
+        backgroundColor: colorScheme.surfaceContainer,
+        title: Text('Xác nhận xóa', style: TextStyle(color: colorScheme.onSurface)),
+        content: Text(
+          'Bạn có chắc chắn muốn xóa mục tiêu "${goal.name}"?',
+          style: TextStyle(color: colorScheme.onSurfaceVariant),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Hủy'),
+            child: Text('Hủy', style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6))),
           ),
           ElevatedButton(
             onPressed: () async {
               final goalsManager = context.read<SavingsGoalsManager>();
-              await goalsManager.deleteGoal(goal.id);
+                await goalsManager.deleteGoal(goal.id);
               
-              if (context.mounted) {
+                if (context.mounted) {
                 Navigator.of(context).pop(); // Close dialog
-                ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Đã xóa mục tiêu')),
-                );
-              }
+                  );
+                }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
