@@ -53,7 +53,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
               Text('Đã lưu cài đặt thông báo'),
             ],
           ),
-          backgroundColor: const Color(0xFF4CAF50),
+          backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -66,9 +66,13 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     if (_isLoading) {
-      return const AlertDialog(
-        content: SizedBox(
+      return AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        content: const SizedBox(
           height: 100,
           child: Center(child: CircularProgressIndicator()),
         ),
@@ -76,6 +80,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
     }
 
     return AlertDialog(
+      backgroundColor: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
@@ -84,19 +89,23 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
               Icons.notifications_rounded,
-              color: Colors.grey.shade700,
+              color: colorScheme.onSurfaceVariant,
               size: 24,
             ),
           ),
           const SizedBox(width: 12),
-          const Text(
+          Text(
             'Cài đặt thông báo',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              fontSize: 18, 
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -109,7 +118,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.green.shade50,
+                color: Colors.green.withOpacity(isDark ? 0.15 : 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -120,14 +129,15 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.savings_rounded, size: 18, color: Color(0xFF4CAF50)),
+                            const Icon(Icons.savings_rounded, size: 18, color: Colors.green),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
                                 'Đạt mục tiêu tiết kiệm',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -138,7 +148,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                           'Thông báo khi đạt 100% mục tiêu',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -151,7 +161,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                         _savingsGoalEnabled = v;
                       });
                     },
-                    activeColor: const Color(0xFF4CAF50),
+                    activeColor: Colors.green,
                   ),
                 ],
               ),
@@ -162,7 +172,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                color: Colors.orange.withOpacity(isDark ? 0.15 : 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -173,14 +183,15 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.warning_rounded, size: 18, color: Color(0xFFFF9800)),
+                            const Icon(Icons.warning_rounded, size: 18, color: Colors.orange),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
                                 'Cảnh báo chi tiêu',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
+                                  color: colorScheme.onSurface,
                                 ),
                               ),
                             ),
@@ -191,7 +202,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                           'Nhận thông báo khi vượt ngưỡng',
                           style: TextStyle(
                             fontSize: 13,
-                            color: Colors.grey.shade600,
+                            color: colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
@@ -204,7 +215,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                         _enabled = v;
                       });
                     },
-                    activeColor: const Color(0xFFFF9800),
+                    activeColor: Colors.orange,
                   ),
                 ],
               ),
@@ -214,9 +225,10 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
             // Threshold slider
             Text(
               'Ngưỡng cảnh báo: $_threshold%',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
@@ -224,17 +236,17 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
               'Cảnh báo lặp lại mỗi +5% sau khi vượt ngưỡng',
               style: TextStyle(
                 fontSize: 12,
-                color: Colors.grey.shade600,
+                color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 12),
             SliderTheme(
               data: SliderTheme.of(context).copyWith(
-                activeTrackColor: const Color(0xFFFF9800),
-                inactiveTrackColor: Colors.grey.shade300,
-                thumbColor: const Color(0xFFFF9800),
-                overlayColor: const Color(0xFFFF9800).withOpacity(0.2),
-                valueIndicatorColor: const Color(0xFFFF9800),
+                activeTrackColor: Colors.orange,
+                inactiveTrackColor: colorScheme.surfaceContainerHighest,
+                thumbColor: Colors.orange,
+                overlayColor: Colors.orange.withOpacity(0.2),
+                valueIndicatorColor: Colors.orange,
                 valueIndicatorTextStyle: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
@@ -260,10 +272,10 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: colorScheme.primary.withOpacity(isDark ? 0.15 : 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: Colors.blue.shade200,
+                  color: colorScheme.primary.withOpacity(0.3),
                   width: 1,
                 ),
               ),
@@ -271,7 +283,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                 children: [
                   Icon(
                     Icons.info_outline_rounded,
-                    color: Colors.blue.shade700,
+                    color: colorScheme.primary,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -280,7 +292,8 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
                       'Ví dụ: Ngưỡng 70% → báo ở 70%, 75%, 80%, 85%...',
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.blue.shade900,
+                        color: colorScheme.primary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
@@ -295,14 +308,14 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
           onPressed: () => Navigator.pop(context),
           child: Text(
             'Hủy',
-            style: TextStyle(color: Colors.grey.shade600),
+            style: TextStyle(color: colorScheme.onSurfaceVariant),
           ),
         ),
         ElevatedButton(
           onPressed: _saveSettings,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF4CAF50),
-            foregroundColor: Colors.white,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -313,4 +326,3 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
     );
   }
 }
-

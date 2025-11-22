@@ -21,12 +21,13 @@ class NotificationsBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final notificationsManager = context.watch<NotificationsManager>();
     final notifications = notificationsManager.notifications;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         children: [
@@ -36,7 +37,7 @@ class NotificationsBottomSheet extends StatelessWidget {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: colorScheme.outlineVariant,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -47,16 +48,18 @@ class NotificationsBottomSheet extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Thông báo',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 if (notifications.isNotEmpty)
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: Colors.grey.shade700),
+                    icon: Icon(Icons.more_vert, color: colorScheme.onSurfaceVariant),
+                    color: colorScheme.surfaceContainerHigh,
                     onSelected: (value) {
                       if (value == 'mark_all_read') {
                         notificationsManager.markAllAsRead();
@@ -64,27 +67,30 @@ class NotificationsBottomSheet extends StatelessWidget {
                         _showClearAllDialog(context, notificationsManager);
                       }
                     },
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: 'mark_all_read',
-                        child: Text('Đánh dấu tất cả đã đọc'),
-                      ),
-                      const PopupMenuItem(
-                        value: 'clear_all',
-                        child: Text('Xóa tất cả'),
-                      ),
-                    ],
+                    itemBuilder: (context) {
+                      final itemStyle = TextStyle(color: colorScheme.onSurface);
+                      return [
+                        PopupMenuItem(
+                          value: 'mark_all_read',
+                          child: Text('Đánh dấu tất cả đã đọc', style: itemStyle),
+                        ),
+                        PopupMenuItem(
+                          value: 'clear_all',
+                          child: Text('Xóa tất cả', style: itemStyle),
+                        ),
+                      ];
+                    },
                   ),
               ],
             ),
           ),
 
-          const Divider(height: 1),
+          Divider(height: 1, color: colorScheme.outlineVariant.withOpacity(0.5)),
 
           // Notification List
           Expanded(
             child: notifications.isEmpty
-                ? _buildEmptyState()
+                ? _buildEmptyState(context)
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     itemCount: notifications.length,
@@ -110,7 +116,9 @@ class NotificationsBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -118,14 +126,14 @@ class NotificationsBottomSheet extends StatelessWidget {
           Icon(
             Icons.notifications_off_outlined,
             size: 80,
-            color: Colors.grey.shade300,
+            color: colorScheme.onSurfaceVariant.withOpacity(0.3),
           ),
           const SizedBox(height: 16),
           Text(
             'Chưa có thông báo nào',
             style: TextStyle(
               fontSize: 16,
-              color: Colors.grey.shade600,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
         ],
@@ -137,24 +145,28 @@ class NotificationsBottomSheet extends StatelessWidget {
     BuildContext context,
     NotificationsManager manager,
   ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Xóa tất cả thông báo?'),
-        content: const Text(
+        backgroundColor: colorScheme.surfaceContainer,
+        title: Text('Xóa tất cả thông báo?', style: TextStyle(color: colorScheme.onSurface)),
+        content: Text(
           'Bạn có chắc chắn muốn xóa tất cả thông báo? Hành động này không thể hoàn tác.',
+          style: TextStyle(color: colorScheme.onSurfaceVariant),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Hủy'),
+            child: Text('Hủy', style: TextStyle(color: colorScheme.onSurfaceVariant)),
           ),
           TextButton(
             onPressed: () {
               manager.clearAll();
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: colorScheme.error),
             child: const Text('Xóa'),
           ),
         ],
@@ -176,6 +188,9 @@ class _NotificationItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return Dismissible(
       key: Key(notification.id),
       direction: DismissDirection.endToStart,
@@ -183,17 +198,21 @@ class _NotificationItem extends StatelessWidget {
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
-        color: Colors.red,
-        child: const Icon(Icons.delete, color: Colors.white),
+        color: colorScheme.error,
+        child: Icon(Icons.delete, color: colorScheme.onError),
       ),
       child: InkWell(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: notification.isRead ? Colors.white : Colors.blue.shade50,
+            color: notification.isRead 
+                ? Colors.transparent 
+                : colorScheme.primary.withOpacity(isDark ? 0.1 : 0.05),
             border: Border(
-              bottom: BorderSide(color: Colors.grey.shade200),
+              bottom: BorderSide(
+                color: colorScheme.outlineVariant.withOpacity(0.5),
+              ),
             ),
           ),
           child: Row(
@@ -203,7 +222,7 @@ class _NotificationItem extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: notification.color.withOpacity(0.1),
+                  color: notification.color.withOpacity(isDark ? 0.2 : 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -230,6 +249,7 @@ class _NotificationItem extends StatelessWidget {
                               fontWeight: notification.isRead
                                   ? FontWeight.w500
                                   : FontWeight.bold,
+                              color: colorScheme.onSurface,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -239,8 +259,8 @@ class _NotificationItem extends StatelessWidget {
                           Container(
                             width: 8,
                             height: 8,
-                            decoration: const BoxDecoration(
-                              color: Colors.blue,
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -251,7 +271,7 @@ class _NotificationItem extends StatelessWidget {
                       notification.body,
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade700,
+                        color: colorScheme.onSurfaceVariant,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -261,7 +281,7 @@ class _NotificationItem extends StatelessWidget {
                       _getRelativeTime(notification.createdAt),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade500,
+                        color: colorScheme.onSurfaceVariant.withOpacity(0.7),
                       ),
                     ),
                   ],
@@ -291,4 +311,3 @@ class _NotificationItem extends StatelessWidget {
     }
   }
 }
-
