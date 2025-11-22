@@ -31,17 +31,29 @@ class RecentTransactionsList extends StatelessWidget {
       'house': Icons.house,
       'work': Icons.work,
       'attach_money': Icons.attach_money,
+      'movie': Icons.movie,
+      'school': Icons.school,
+      'local_hospital': Icons.local_hospital,
+      'fitness_center': Icons.fitness_center,
+      'flight': Icons.flight,
+      'phone': Icons.phone,
     };
     return iconMap[iconName] ?? Icons.category;
   }
 
   Color _parseColor(String hexColor) {
-    final hexCode = hexColor.replaceAll('#', '');
-    return Color(int.parse('FF$hexCode', radix: 16));
+    try {
+      final hexCode = hexColor.replaceAll('#', '');
+      return Color(int.parse('FF$hexCode', radix: 16));
+    } catch (e) {
+      return Colors.grey;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (transactions.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(32),
@@ -51,14 +63,14 @@ class RecentTransactionsList extends StatelessWidget {
               Icon(
                 Icons.receipt_long_outlined,
                 size: 64,
-                color: Colors.grey.shade400,
+                color: colorScheme.onSurface.withOpacity(0.3),
               ),
               const SizedBox(height: 16),
               Text(
                 'Chưa có giao dịch nào',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey.shade600,
+                  color: colorScheme.onSurface.withOpacity(0.5),
                 ),
               ),
             ],
@@ -79,11 +91,12 @@ class RecentTransactionsList extends StatelessWidget {
           orElse: () => categories.first,
         );
         final isIncome = transaction.type == 'income';
+        final categoryColor = _parseColor(category.color);
 
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colorScheme.surfaceContainer ?? colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
@@ -101,26 +114,27 @@ class RecentTransactionsList extends StatelessWidget {
             leading: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: _parseColor(category.color).withOpacity(0.1),
+                color: categoryColor.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 _getIconData(category.icon),
-                color: _parseColor(category.color),
+                color: categoryColor,
                 size: 24,
               ),
             ),
             title: Text(
               category.name,
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 15,
+                color: colorScheme.onSurface,
               ),
             ),
             subtitle: Text(
               _formatDate(transaction.date),
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: colorScheme.onSurface.withOpacity(0.6),
                 fontSize: 13,
               ),
             ),
@@ -138,4 +152,3 @@ class RecentTransactionsList extends StatelessWidget {
     );
   }
 }
-

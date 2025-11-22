@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'ui/screens.dart';
 import 'services/notification_service.dart';
 import 'ui/notifications/notifications_manager.dart';
+import 'ui/shared/theme_manager.dart'; // Import ThemeManager
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,9 +39,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Theme state - follow Yummy pattern
-  ThemeMode _themeMode = ThemeMode.light;
-
+  // Theme Manager - create once
+  late final ThemeManager _themeManager;
+  
   // Router & AuthManager - create once to prevent rebuilds
   late final AuthManager _authManager;
   late final GoRouter _router;
@@ -48,8 +49,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
-    // Initialize AuthManager once
+    
+    // Initialize Managers
+    _themeManager = ThemeManager();
     _authManager = AuthManager();
 
     // Initialize GoRouter once
@@ -109,19 +111,14 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  // Change theme method - follow Yummy pattern
-  void _changeThemeMode(bool useLightMode) {
-    setState(() {
-      _themeMode = useLightMode ? ThemeMode.light : ThemeMode.dark;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: _authManager),
         ChangeNotifierProvider.value(value: widget.notificationsManager),
+        // Provide ThemeManager
+        ChangeNotifierProvider.value(value: _themeManager), 
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
         ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
@@ -132,30 +129,33 @@ class _MyAppState extends State<MyApp> {
               previous ?? TransactionsManager(categories),
         ),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
-        // Expose theme change callback - follow Yummy pattern
-        Provider<void Function(bool)>.value(value: _changeThemeMode),
       ],
-      child: MaterialApp.router(
-        title: 'Abacus',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.lightBlue,
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFFF8F9FD),
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF11998e),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-          scaffoldBackgroundColor: const Color(0xFF1A1A1A),
-        ),
-        themeMode: _themeMode,
-        routerConfig: _router,
+      // Use Consumer to rebuild MaterialApp when ThemeManager changes
+      child: Consumer<ThemeManager>(
+        builder: (context, themeManager, child) {
+          return MaterialApp.router(
+            title: 'Abacus',
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: themeManager.colorSelected.color, // Use selected color
+                brightness: Brightness.light,
+              ),
+              useMaterial3: true,
+              scaffoldBackgroundColor: const Color(0xFFF8F9FD),
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: themeManager.colorSelected.color, // Use selected color
+                brightness: Brightness.dark,
+              ),
+              useMaterial3: true,
+              scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+            ),
+            themeMode: themeManager.themeMode, // Use managed theme mode
+            routerConfig: _router,
+          );
+        },
       ),
     );
   }

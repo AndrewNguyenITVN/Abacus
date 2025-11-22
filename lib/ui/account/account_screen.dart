@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../models/account.dart';
 import '/ui/account/edit_profile_screen.dart';
 import '/ui/account/account_manager.dart';
 import '/ui/auth/auth_manager.dart';
 import '../notifications/notification_settings_dialog.dart';
+import '../shared/theme_settings_dialog.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -341,9 +341,12 @@ class AccountScreen extends StatelessWidget {
             _buildDivider(),
             _buildSettingItem(
               Icons.palette_rounded,
-              'Đổi màu nền',
+              'Giao diện & Màu sắc', 
               Colors.grey.shade600,
-              //onTap: () => _showSnackBar(context, 'Đổi màu nền'),
+              onTap: () => showDialog(
+                context: context,
+                builder: (context) => const ThemeSettingsDialog(),
+              ),
             ),
             _buildDivider(),
             _buildLanguageItem(),

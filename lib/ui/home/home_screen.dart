@@ -9,6 +9,7 @@ import '/ui/bottom_nav_bar_screen.dart';
 import 'home_summary_cards.dart';
 import 'monthly_report_cards.dart';
 import 'recent_transactions_list.dart';
+import '/ui/shared/theme_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -180,15 +181,16 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+
   /// Toggle button cho dark/light mode
   Widget _buildThemeToggleButton() {
-    final isBright = Theme.of(context).brightness == Brightness.light;
-    final changeTheme = context.read<void Function(bool)>();
+    final themeManager = context.watch<ThemeManager>();
+    final isDarkMode = themeManager.isDarkMode;
 
     return IconButton(
-      icon: Icon(isBright ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
-      onPressed: () => changeTheme(!isBright),
-      tooltip: isBright ? 'Chế độ tối' : 'Chế độ sáng',
+      icon: Icon(isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
+      onPressed: () => themeManager.toggleTheme(!isDarkMode),
+      tooltip: isDarkMode ? 'Chuyển sang chế độ sáng' : 'Chuyển sang chế độ tối',
     );
   }
 
@@ -355,12 +357,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Giao dịch gần đây',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               TextButton(

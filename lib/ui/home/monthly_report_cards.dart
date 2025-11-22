@@ -29,42 +29,40 @@ class MonthlyReportCard extends StatelessWidget {
     return '${value.toStringAsFixed(0)}đ';
   }
 
-  // Lấy thông tin màu sắc và text theo loại báo cáo
-  _ReportConfig get _config {
-    if (reportType == ReportType.expense) {
-      return _ReportConfig(
-        title: 'Báo cáo tháng này',
-        subtitle: 'Tổng chi tháng này',
-        emptyMessage: 'Chưa có chi tiêu',
-        primaryColor: Colors.red,
-        secondaryColor: Colors.orange,
-        gradientColors: [Colors.orange.shade50, Colors.red.shade50],
-        borderColor: Colors.orange.shade200,
-        buttonColor: Colors.orange.shade700,
-      );
-    } else {
-      return _ReportConfig(
-        title: 'Báo cáo thu nhập',
-        subtitle: 'Tổng thu tháng này',
-        emptyMessage: 'Chưa có thu nhập',
-        primaryColor: Colors.green,
-        secondaryColor: Colors.teal,
-        gradientColors: [Colors.green.shade50, Colors.teal.shade50],
-        borderColor: Colors.green.shade200,
-        buttonColor: Colors.green.shade700,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final config = _config;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    // Define configuration based on report type and theme
+    String title;
+    String subtitle;
+    String emptyMessage;
+    Color primaryColor;
+    Color containerBg;
+    Color borderColor;
+
+    if (reportType == ReportType.expense) {
+      title = 'Báo cáo tháng này';
+      subtitle = 'Tổng chi tháng này';
+      emptyMessage = 'Chưa có chi tiêu';
+      primaryColor = Colors.red;
+      containerBg = isDark ? Colors.red.withOpacity(0.1) : Colors.red.shade50;
+      borderColor = isDark ? Colors.red.withOpacity(0.3) : Colors.red.shade200;
+    } else {
+      title = 'Báo cáo thu nhập';
+      subtitle = 'Tổng thu tháng này';
+      emptyMessage = 'Chưa có thu nhập';
+      primaryColor = Colors.green;
+      containerBg = isDark ? Colors.green.withOpacity(0.1) : Colors.green.shade50;
+      borderColor = isDark ? Colors.green.withOpacity(0.3) : Colors.green.shade200;
+    }
 
     // Tính % thay đổi
     String percentageText;
     if (previousMonthAmount == 0) {
       percentageText =
-          currentMonthAmount > 0 ? 'Mới bắt đầu' : config.emptyMessage;
+          currentMonthAmount > 0 ? 'Mới bắt đầu' : emptyMessage;
     } else {
       final change =
           ((currentMonthAmount - previousMonthAmount) / previousMonthAmount) *
@@ -87,13 +85,9 @@ class MonthlyReportCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: config.gradientColors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: containerBg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: config.borderColor),
+        border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -110,9 +104,9 @@ class MonthlyReportCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                config.title,
-                style: const TextStyle(
-                  color: Colors.black87,
+                title,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
@@ -127,7 +121,7 @@ class MonthlyReportCard extends StatelessWidget {
                 child: Text(
                   'Xem báo cáo',
                   style: TextStyle(
-                    color: config.buttonColor,
+                    color: primaryColor,
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
@@ -138,15 +132,18 @@ class MonthlyReportCard extends StatelessWidget {
           Text(
             _formatCurrency(currentMonthAmount),
             style: TextStyle(
-              color: config.primaryColor.shade700,
+              color: primaryColor,
               fontSize: 26,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 2),
           Text(
-            '${config.subtitle} - $percentageText',
-            style: const TextStyle(color: Colors.black54, fontSize: 12),
+            '$subtitle - $percentageText',
+            style: TextStyle(
+              color: colorScheme.onSurface.withOpacity(0.6),
+              fontSize: 12,
+            ),
           ),
           const SizedBox(height: 16),
           // Bar Chart với dữ liệu thật
@@ -155,18 +152,20 @@ class MonthlyReportCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               _buildBarColumn(
+                context: context,
                 height: previousHeight.clamp(30.0, 100.0),
                 label: 'Tháng trước',
                 isHighlighted: false,
-                color: config.primaryColor,
+                color: primaryColor,
               ),
               const SizedBox(width: 24),
               _buildBarColumn(
+                context: context,
                 height: currentHeight.clamp(30.0, 100.0),
                 label: 'Tháng này',
                 isHighlighted: true,
                 topLabel: _formatCurrencyShort(currentMonthAmount),
-                color: config.primaryColor,
+                color: primaryColor,
               ),
             ],
           ),
@@ -176,12 +175,15 @@ class MonthlyReportCard extends StatelessWidget {
   }
 
   Widget _buildBarColumn({
+    required BuildContext context,
     required double height,
     required String label,
     required bool isHighlighted,
-    required MaterialColor color,
+    required Color color,
     String? topLabel,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -189,7 +191,7 @@ class MonthlyReportCard extends StatelessWidget {
           Text(
             topLabel,
             style: TextStyle(
-              color: color.shade700,
+              color: color,
               fontSize: 11,
               fontWeight: FontWeight.bold,
             ),
@@ -202,14 +204,14 @@ class MonthlyReportCard extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: isHighlighted
                 ? LinearGradient(
-                    colors: [color.shade400, color.shade600],
+                    colors: [color.withOpacity(0.7), color],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   )
                 : LinearGradient(
                     colors: [
-                      color.shade300.withOpacity(0.6),
-                      color.shade400.withOpacity(0.4),
+                      color.withOpacity(0.3),
+                      color.withOpacity(0.4),
                     ],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -218,7 +220,7 @@ class MonthlyReportCard extends StatelessWidget {
               top: Radius.circular(8),
             ),
             border: Border.all(
-              color: isHighlighted ? color.shade700 : color.shade300,
+              color: isHighlighted ? color : color.withOpacity(0.5),
               width: isHighlighted ? 1.5 : 1,
             ),
           ),
@@ -227,7 +229,9 @@ class MonthlyReportCard extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: isHighlighted ? Colors.black87 : Colors.black54,
+            color: isHighlighted 
+                ? colorScheme.onSurface 
+                : colorScheme.onSurface.withOpacity(0.6),
             fontSize: 11,
             fontWeight: isHighlighted ? FontWeight.bold : FontWeight.normal,
           ),
@@ -236,27 +240,3 @@ class MonthlyReportCard extends StatelessWidget {
     );
   }
 }
-
-// Class helper để quản lý config cho từng loại báo cáo
-class _ReportConfig {
-  final String title;
-  final String subtitle;
-  final String emptyMessage;
-  final MaterialColor primaryColor;
-  final MaterialColor secondaryColor;
-  final List<Color> gradientColors;
-  final Color borderColor;
-  final Color buttonColor;
-
-  _ReportConfig({
-    required this.title,
-    required this.subtitle,
-    required this.emptyMessage,
-    required this.primaryColor,
-    required this.secondaryColor,
-    required this.gradientColors,
-    required this.borderColor,
-    required this.buttonColor,
-  });
-}
-
