@@ -1,16 +1,14 @@
 import 'package:flutter/foundation.dart';
 import '/models/transaction.dart';
-import '/ui/categories/categories_manager.dart';
 import '/services/transaction_service.dart';
 
 class TransactionsManager extends ChangeNotifier {
-  final CategoriesManager categoriesManager;
   final TransactionService _transactionService = TransactionService();
 
   List<Transaction> _transactions = [];
   bool _isLoaded = false;
 
-  TransactionsManager(this.categoriesManager) {
+  TransactionsManager() {
     _loadTransactions();
   }
 

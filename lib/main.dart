@@ -239,10 +239,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: _themeManager), 
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
-        ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
-          create: (context) => TransactionsManager(Provider.of<CategoriesManager>(context, listen: false)),
-          update: (context, categories, previous) => previous ?? TransactionsManager(categories),
-        ),
+        ChangeNotifierProvider(create: (context) => TransactionsManager()),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],
       child: Consumer<ThemeManager>(
