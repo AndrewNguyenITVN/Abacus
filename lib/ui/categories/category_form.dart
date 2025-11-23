@@ -96,6 +96,7 @@ class _CategoryFormState extends State<CategoryForm> {
         ),
         const SizedBox(height: 12),
         Container(
+          width: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainer ?? colorScheme.surface,
