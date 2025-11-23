@@ -145,6 +145,7 @@ class _MyAppState extends State<MyApp> {
                 ),
               ],
             ),
+            // Branch 2: Danh mục
             StatefulShellBranch(
               routes: [
                 GoRoute(
