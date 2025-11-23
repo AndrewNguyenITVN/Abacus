@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../services/notification_service.dart';
 
 class NotificationSettingsDialog extends StatefulWidget {
@@ -9,7 +10,7 @@ class NotificationSettingsDialog extends StatefulWidget {
 }
 
 class _NotificationSettingsDialogState extends State<NotificationSettingsDialog> {
-  final NotificationService _notificationService = NotificationService();
+  late final NotificationService _notificationService;
   
   bool _isLoading = true;
   int _threshold = 70;
@@ -19,6 +20,7 @@ class _NotificationSettingsDialogState extends State<NotificationSettingsDialog>
   @override
   void initState() {
     super.initState();
+    _notificationService = context.read<NotificationService>();
     _loadSettings();
   }
 

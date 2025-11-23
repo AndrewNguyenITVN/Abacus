@@ -7,7 +7,6 @@ import 'ui/screens.dart';
 import 'services/notification_service.dart';
 import 'ui/notifications/notifications_manager.dart';
 import 'ui/shared/theme_manager.dart';
-import 'ui/shared/custom_page_transitions.dart'; 
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -26,12 +25,20 @@ void main() async {
     notificationsManager.addNotification(notification);
   };
 
-  runApp(MyApp(notificationsManager: notificationsManager));
+  runApp(MyApp(
+    notificationsManager: notificationsManager,
+    notificationService: notificationService,
+  ));
 }
 
 class MyApp extends StatefulWidget {
   final NotificationsManager notificationsManager;
-  const MyApp({super.key, required this.notificationsManager});
+  final NotificationService notificationService;
+  const MyApp({
+    super.key,
+    required this.notificationsManager,
+    required this.notificationService,
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -196,7 +203,7 @@ class _MyAppState extends State<MyApp> {
                           throw Exception('Account not found');
                         }
                         return SlideUpTransitionPage(
-                          key: state.pageKey,
+            key: state.pageKey,
                           child: EditProfileScreen(account: account),
                         );
                       },
@@ -225,9 +232,10 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        Provider.value(value: widget.notificationService),
         ChangeNotifierProvider.value(value: _authManager),
         ChangeNotifierProvider.value(value: widget.notificationsManager),
-        ChangeNotifierProvider.value(value: _themeManager),
+        ChangeNotifierProvider.value(value: _themeManager), 
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
         ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
@@ -241,15 +249,9 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp.router(
             title: 'Abacus',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: themeManager.colorSelected.color, brightness: Brightness.light),
-              useMaterial3: true,
-            ),
-            darkTheme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: themeManager.colorSelected.color, brightness: Brightness.dark),
-              useMaterial3: true,
-            ),
-            themeMode: themeManager.themeMode,
+            theme: themeManager.getThemeData(Brightness.light),
+            darkTheme: themeManager.getThemeData(Brightness.dark),
+            themeMode: themeManager.themeMode, 
             routerConfig: _router,
           );
         },
