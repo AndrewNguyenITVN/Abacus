@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart';
 import 'auth_card.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -26,12 +27,7 @@ class LoginScreen extends StatelessWidget {
               child: AuthCard(
                 mode: AuthMode.login,
                 onSwitchMode: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SignupScreen(),
-                    ),
-                  );
+                  context.push('/signup');
                 },
               ),
             ),

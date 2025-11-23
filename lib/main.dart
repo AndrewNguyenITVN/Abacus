@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> {
         // Signup - SLIDE UP transition (modal-like)
         GoRoute(
           path: '/signup',
-          pageBuilder: (context, state) => SlideUpTransitionPage(
+          pageBuilder: (context, state) => FadeTransitionPage(
             key: state.pageKey,
             child: const SignupScreen(),
           ),

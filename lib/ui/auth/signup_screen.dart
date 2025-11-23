@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth_card.dart';
+import 'package:go_router/go_router.dart';
 
 class SignupScreen extends StatelessWidget {
   const SignupScreen({super.key});
@@ -25,7 +26,11 @@ class SignupScreen extends StatelessWidget {
               child: AuthCard(
                 mode: AuthMode.signup,
                 onSwitchMode: () {
-                  Navigator.pop(context);
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/login');
+                  }
                 },
               ),
             ),
