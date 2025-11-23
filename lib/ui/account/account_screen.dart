@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/account.dart';
-import '/ui/account/edit_profile_screen.dart';
 import '/ui/account/account_manager.dart';
 import '/ui/auth/auth_manager.dart';
 import '../notifications/notification_settings_dialog.dart';
@@ -163,12 +162,10 @@ class AccountScreen extends StatelessWidget {
                   color: colorScheme.onSurfaceVariant,
                   tooltip: 'Chỉnh sửa thông tin',
                   onPressed: () async {
-                    final result = await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => EditProfileScreen(account: account),
-                      ),
-                    );
-                    if (result != null && result is Account) {
+                    // Lấy account từ Manager trong route, không cần truyền extra
+                    final result = await context.push<Account?>('/account/edit');
+                    
+                    if (result != null && context.mounted) {
                       context.read<AccountManager>().updateAccount(result);
                     }
                   },
@@ -462,7 +459,6 @@ class AccountScreen extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           context.read<AuthManager>().logout();
-          context.go('/login');
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: colorScheme.surfaceContainer,
