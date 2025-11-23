@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/ui/savings_goals/savings_goals_manager.dart';
-import '/ui/savings_goals/savings_goals_screen.dart';
 import '../shared/app_helpers.dart';
 import 'savings_goal_card.dart';
+import 'package:go_router/go_router.dart';
 
 class SavingsGoalsBlock extends StatelessWidget {
   const SavingsGoalsBlock({super.key});
@@ -79,11 +79,7 @@ class SavingsGoalsBlock extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const SavingsGoalsScreen(),
-                    ),
-                  );
+                  context.go('/savings-goals');
                 },
                 child: const Text(
                   'Xem tất cả',
@@ -182,11 +178,7 @@ class SavingsGoalsBlock extends StatelessWidget {
               child: Center(
                 child: TextButton.icon(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SavingsGoalsScreen(),
-                      ),
-                    );
+                      context.go('/savings-goals');
                   },
                   icon: const Icon(Icons.arrow_forward, size: 16),
                   label: Text(
@@ -254,11 +246,7 @@ class SavingsGoalsBlock extends StatelessWidget {
           const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const SavingsGoalsScreen(),
-                ),
-              );
+              context.go('/savings-goals');
             },
             icon: const Icon(Icons.add),
             label: const Text('Tạo mục tiêu đầu tiên'),

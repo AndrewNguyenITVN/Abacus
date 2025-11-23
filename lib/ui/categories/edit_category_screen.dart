@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/my_category.dart';
 import 'category_form.dart';
 import '../shared/app_constants.dart';
+import 'package:go_router/go_router.dart';
 
 class EditCategoryScreen extends StatefulWidget {
   final MyCategory? category; // null khi thêm mới
@@ -48,8 +49,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
         type: widget.type,
         isDefault: widget.category?.isDefault ?? false,
       );
-
-      Navigator.of(context).pop(category);
+      context.pop(category);
     }
   }
 

@@ -7,21 +7,21 @@ import 'ui/screens.dart';
 import 'services/notification_service.dart';
 import 'ui/notifications/notifications_manager.dart';
 import 'ui/shared/theme_manager.dart';
+import 'ui/shared/custom_page_transitions.dart'; 
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('vi_VN', null);
   await dotenv.load();
 
-  // Initialize notification service
   final notificationService = NotificationService();
   await notificationService.initialize();
 
-  // Initialize notifications manager
   final notificationsManager = NotificationsManager();
   await notificationsManager.loadNotifications();
 
-  // Setup callback để lưu notifications khi có thông báo mới
   notificationService.onNotificationCreated = (notification) {
     notificationsManager.addNotification(notification);
   };
@@ -31,7 +31,6 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final NotificationsManager notificationsManager;
-
   const MyApp({super.key, required this.notificationsManager});
 
   @override
@@ -40,69 +39,182 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late final ThemeManager _themeManager;
-  
   late final AuthManager _authManager;
   late final GoRouter _router;
 
   @override
   void initState() {
     super.initState();
-    
-    // Initialize Managers
     _themeManager = ThemeManager();
     _authManager = AuthManager();
 
-    // Initialize GoRouter once
     _router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
       debugLogDiagnostics: true,
-      initialLocation: '/splash', // Start at splash screen
+      initialLocation: '/splash',
       refreshListenable: _authManager,
       redirect: (context, state) {
-        final authFromProvider = context.read<AuthManager>();
-        final isLoggedIn = authFromProvider.isAuth;
+        final authManager = context.read<AuthManager>();
+        final isAuth = authManager.isAuth;
+        
+        // Kiểm tra xem user có đang ở trang login/signup/splash không
+        final isLoggingIn = state.matchedLocation == '/login' || 
+                            state.matchedLocation == '/signup' ||
+                            state.matchedLocation == '/splash';
 
-        final isAtAuthScreen =
-            state.matchedLocation == '/login' ||
-            state.matchedLocation == '/signup';
-
-        if (isLoggedIn && isAtAuthScreen) {
+        // Chưa đăng nhập và không ở trang auth -> về trang login
+        if (!isAuth && !isLoggingIn) {
+          return '/login';
+        }
+        if (isAuth && isLoggingIn) {
           return '/';
         }
-
         return null;
       },
       routes: [
-        // Splash - NO transition (first screen)
         GoRoute(
           path: '/splash',
-          pageBuilder: (context, state) =>
-              NoTransitionPage(key: state.pageKey, child: const SplashScreen()),
+          builder: (context, state) => const SplashScreen(),
         ),
-
-        // Login - FADE transition (smooth)
         GoRoute(
           path: '/login',
-          pageBuilder: (context, state) => FadeTransitionPage(
-            key: state.pageKey,
-            child: const LoginScreen(),
-          ),
+          pageBuilder: (context, state) => FadeTransitionPage(key: state.pageKey, child: const LoginScreen()),
         ),
-
-        // Signup - SLIDE UP transition (modal-like)
         GoRoute(
           path: '/signup',
-          pageBuilder: (context, state) => FadeTransitionPage(
-            key: state.pageKey,
-            child: const SignupScreen(),
-          ),
+          pageBuilder: (context, state) => FadeTransitionPage(key: state.pageKey, child: const SignupScreen()),
         ),
 
-        // Home - FADE transition (smooth)
+        // Cấu hình Bottom Navigation Bar (Shell Route)
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) {
+            return BottomNavBarScreen(navigationShell: navigationShell);
+          },
+          branches: [
+            // Branch 0: Trang chủ
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/',
+                  builder: (context, state) => const HomeScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'savings-goals', 
+                      builder: (context, state) => const SavingsGoalsScreen(),
+                      routes: [
+                        GoRoute(
+                          path: 'add',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) => SlideUpTransitionPage(
+                            key: state.pageKey,
+                            child: const AddEditGoalScreen(),
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'edit/:id',
+                          parentNavigatorKey: _rootNavigatorKey,
+                          pageBuilder: (context, state) {
+                            final id = state.pathParameters['id']!;
+                            final goalsManager = context.read<SavingsGoalsManager>();
+                            final goal = goalsManager.findById(id);
+                            return SlideUpTransitionPage(
+                              key: state.pageKey,
+                              child: AddEditGoalScreen(goal: goal),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // Branch 1: Giao dịch
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/transactions',
+                  builder: (context, state) => const TransactionsScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/categories',
+                  builder: (context, state) => const CategoriesScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'add',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) {
+                        final type = state.uri.queryParameters['type'] ?? 'expense';
+                        return SlideUpTransitionPage(
+                          key: state.pageKey,
+                          child: EditCategoryScreen(type: type),
+                        );
+                      },
+                    ),
+                    GoRoute(
+                      path: 'edit/:id',
+                      parentNavigatorKey: _rootNavigatorKey,
+                      pageBuilder: (context, state) {
+                        final id = state.pathParameters['id']!;
+                        final categoriesManager = context.read<CategoriesManager>();
+                        final category = categoriesManager.findById(id);
+                        if (category == null) {
+                          throw Exception('Category not found');
+                        }
+                        return SlideUpTransitionPage(
+                          key: state.pageKey,
+                          child: EditCategoryScreen(
+                            category: category,
+                            type: category.type,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            // Branch 3: Tài khoản
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/account',
+                  builder: (context, state) => const AccountScreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      parentNavigatorKey: _rootNavigatorKey, // Che lấp BottomBar
+                      pageBuilder: (context, state) {
+                        // Lấy account từ AccountManager thay vì truyền qua extra
+                        final accountManager = context.read<AccountManager>();
+                        final account = accountManager.account;
+                        if (account == null) {
+                          throw Exception('Account not found');
+                        }
+                        return SlideUpTransitionPage(
+                          key: state.pageKey,
+                          child: EditProfileScreen(account: account),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
+
+        // Route cho Add Transaction (Nằm ngoài Shell để che mất BottomBar)
         GoRoute(
-          path: '/',
-          pageBuilder: (context, state) => FadeTransitionPage(
+          parentNavigatorKey: _rootNavigatorKey, 
+          path: '/add-transaction',
+          pageBuilder: (context, state) => SlideUpTransitionPage(
             key: state.pageKey,
-            child: const BottomNavBarScreen(),
+            child: const AddTransactionScreen(),
           ),
         ),
       ],
@@ -115,15 +227,12 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider.value(value: _authManager),
         ChangeNotifierProvider.value(value: widget.notificationsManager),
-        ChangeNotifierProvider.value(value: _themeManager), 
+        ChangeNotifierProvider.value(value: _themeManager),
         ChangeNotifierProvider(create: (context) => AccountManager()),
         ChangeNotifierProvider(create: (context) => CategoriesManager()),
         ChangeNotifierProxyProvider<CategoriesManager, TransactionsManager>(
-          create: (context) => TransactionsManager(
-            Provider.of<CategoriesManager>(context, listen: false),
-          ),
-          update: (context, categories, previous) =>
-              previous ?? TransactionsManager(categories),
+          create: (context) => TransactionsManager(Provider.of<CategoriesManager>(context, listen: false)),
+          update: (context, categories, previous) => previous ?? TransactionsManager(categories),
         ),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],
@@ -133,20 +242,14 @@ class _MyAppState extends State<MyApp> {
             title: 'Abacus',
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: themeManager.colorSelected.color,
-                brightness: Brightness.light,
-              ),
+              colorScheme: ColorScheme.fromSeed(seedColor: themeManager.colorSelected.color, brightness: Brightness.light),
               useMaterial3: true,
             ),
             darkTheme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: themeManager.colorSelected.color,
-                brightness: Brightness.dark,
-              ),
+              colorScheme: ColorScheme.fromSeed(seedColor: themeManager.colorSelected.color, brightness: Brightness.dark),
               useMaterial3: true,
             ),
-            themeMode: themeManager.themeMode, 
+            themeMode: themeManager.themeMode,
             routerConfig: _router,
           );
         },

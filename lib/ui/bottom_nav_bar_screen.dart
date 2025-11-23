@@ -1,83 +1,44 @@
 import 'package:flutter/material.dart';
-import '/ui/home/home_screen.dart';
-import '/ui/transactions/transactions_screen.dart';
-import '/ui/transactions/add_transaction_screen.dart';
-import '/ui/categories/categories_screen.dart';
-import '/ui/account/account_screen.dart';
-import '/ui/shared/custom_page_transitions.dart';
+import 'package:go_router/go_router.dart';
 
-class BottomNavBarScreen extends StatefulWidget {
-  const BottomNavBarScreen({super.key});
+class BottomNavBarScreen extends StatelessWidget {
+  final StatefulNavigationShell navigationShell;
 
-  @override
-  State<BottomNavBarScreen> createState() => BottomNavBarScreenState();
-}
+  const BottomNavBarScreen({
+    super.key,
+    required this.navigationShell,
+  });
 
-class BottomNavBarScreenState extends State<BottomNavBarScreen> {
-  int _selectedIndex = 0;
-
-  // Danh sách các màn hình
-  final List<Widget> _screens = [
-    const HomeScreen(), // Trang chủ
-    const TransactionsScreen(), // Sổ giao dịch
-    const SizedBox(), // Placeholder để phù hợp với vị trí nút thêm
-    const CategoriesScreen(), // Danh mục
-    const AccountScreen(), // Tài khoản
-  ];
-
-  // Xử lý khi chọn một mục trên thanh điều hướng
-  void _onItemTapped(int index) {
-    // Nếu là nút thêm giao dịch (index 2), mở màn hình thêm giao dịch
+  void _onItemTapped(int index, BuildContext context) {
+    // Xử lý nút Add Transaction (Nút giữa - index 2)
     if (index == 2) {
-      _showAddTransactionScreen();
+      context.push('/add-transaction');
       return;
     }
 
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+    // Logic ánh xạ Index UI -> Index Branch Router
+    // UI: [0:Home, 1:Trans, 2:ADD, 3:Cat, 4:Acc]
+    // Router: [0:Home, 1:Trans, -- , 2:Cat, 3:Acc]
+    
+    int branchIndex = index < 2 ? index : index - 1;
 
-  // Public method để navigate từ child widgets
-  void navigateToIndex(int index) {
-    if (index != 2 && index >= 0 && index < _screens.length) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
-
-  // Hiển thị màn hình thêm giao dịch
-  void _showAddTransactionScreen() {
-    Navigator.of(
-      context,
-    ).push(SlideUpPageRoute(page: const AddTransactionScreen()));
+    navigationShell.goBranch(
+      branchIndex,
+      // Cho phép quay về route đầu tiên của branch khi tap lại tab đang active
+      initialLocation: branchIndex == navigationShell.currentIndex,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     
-    return Scaffold(
-      body: Stack(
-        children: _screens.asMap().entries.map((entry) {
-          final index = entry.key;
-          final screen = entry.value;
-          final isSelected = _selectedIndex == index;
+    int routerIndex = navigationShell.currentIndex;
+    int uiIndex = routerIndex < 2 ? routerIndex : routerIndex + 1;
 
-          return AnimatedScale(
-            scale: isSelected ? 1.0 : 1.15,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: AnimatedOpacity(
-              opacity: isSelected ? 1.0 : 0.0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: IgnorePointer(ignoring: !isSelected, child: screen),
-            ),
-          );
-        }).toList(),
-      ),
+    return Scaffold(
+      body: navigationShell,
+      
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainer,
@@ -96,22 +57,11 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Trang chủ
-                Expanded(child: _buildNavItem(0, Icons.home_rounded, 'Trang chủ')),
-                // Sổ giao dịch
-                Expanded(
-                  child: _buildNavItem(
-                    1,
-                    Icons.account_balance_wallet_rounded,
-                    'Giao dịch',
-                  ),
-                ),
-                // Nút thêm giao dịch - ngang hàng với các nút khác
-                Expanded(child: _buildAddButton()),
-                // Danh mục
-                Expanded(child: _buildNavItem(3, Icons.category_rounded, 'Danh mục')),
-                // Tài khoản
-                Expanded(child: _buildNavItem(4, Icons.person_rounded, 'Tài khoản')),
+                Expanded(child: _buildNavItem(context, 0, Icons.home_rounded, 'Trang chủ', uiIndex)),
+                Expanded(child: _buildNavItem(context, 1, Icons.account_balance_wallet_rounded, 'Giao dịch', uiIndex)),
+                Expanded(child: _buildAddButton(context)), // Nút giữa (Index 2)
+                Expanded(child: _buildNavItem(context, 3, Icons.category_rounded, 'Danh mục', uiIndex)),
+                Expanded(child: _buildNavItem(context, 4, Icons.person_rounded, 'Tài khoản', uiIndex)),
               ],
             ),
           ),
@@ -121,13 +71,12 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
     );
   }
 
-  // Widget xây dựng mục điều hướng
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _selectedIndex == index;
+  Widget _buildNavItem(BuildContext context, int index, IconData icon, String label, int currentUiIndex) {
+    final isSelected = currentUiIndex == index;
     final colorScheme = Theme.of(context).colorScheme;
-    
+
     return InkWell(
-      onTap: () => _onItemTapped(index),
+      onTap: () => _onItemTapped(index, context),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -138,9 +87,7 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
             Icon(
               icon,
               size: 24,
-              color: isSelected
-                  ? colorScheme.primary
-                  : colorScheme.onSurfaceVariant,
+              color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
             ),
             const SizedBox(height: 4),
             Text(
@@ -148,9 +95,7 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
+                color: isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
               ),
             ),
           ],
@@ -159,10 +104,9 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
     );
   }
 
-  // Widget xây dựng nút thêm giao dịch (đặc biệt)
-  Widget _buildAddButton() {
+  Widget _buildAddButton(BuildContext context) {
     return InkWell(
-      onTap: _showAddTransactionScreen,
+      onTap: () => _onItemTapped(2, context),
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -174,8 +118,8 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [const Color(0xFF11998e), const Color(0xFF38ef7d)],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF11998e), Color(0xFF38ef7d)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -188,11 +132,7 @@ class BottomNavBarScreenState extends State<BottomNavBarScreen> {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.add_rounded,
-                color: Colors.white,
-                size: 28,
-              ),
+              child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
             ),
             const SizedBox(height: 4),
           ],

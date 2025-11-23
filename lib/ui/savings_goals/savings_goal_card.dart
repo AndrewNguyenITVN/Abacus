@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '/models/savings_goal.dart';
 import '../shared/app_helpers.dart';
 import 'goal_action_dialogs.dart';
-import 'add_edit_goal_screen.dart';
 import 'savings_goals_manager.dart';
 
 class SavingsGoalCard extends StatelessWidget {
@@ -300,11 +300,7 @@ class SavingsGoalCard extends StatelessWidget {
       ],
       onSelected: (value) {
         if (value == 'edit') {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => AddEditGoalScreen(goal: goal),
-            ),
-          );
+          context.push('/savings-goals/edit/${goal.id}');
         } else if (value == 'delete') {
           _showDeleteConfirmDialog(context, goal);
         }

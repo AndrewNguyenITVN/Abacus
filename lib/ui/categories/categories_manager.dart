@@ -130,4 +130,13 @@ class CategoriesManager extends ChangeNotifier {
     _isLoaded = false;
     await _loadCategories();
   }
+
+  // Tìm category theo ID
+  MyCategory? findById(String id) {
+    try {
+      return items.firstWhere((c) => c.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }

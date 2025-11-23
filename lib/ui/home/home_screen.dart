@@ -10,6 +10,7 @@ import 'home_summary_cards.dart';
 import 'monthly_report_cards.dart';
 import 'recent_transactions_list.dart';
 import '/ui/shared/theme_manager.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -370,9 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
               TextButton(
                 onPressed: () {
                   // Navigate đến Transactions screen (index 1)
-                  final bottomNavState = context
-                      .findAncestorStateOfType<BottomNavBarScreenState>();
-                  bottomNavState?.navigateToIndex(1);
+                  context.go('/transactions');
                 },
                 child: const Text('Xem tất cả'),
               ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/ui/savings_goals/savings_goals_manager.dart';
-import '/ui/savings_goals/add_edit_goal_screen.dart';
 import 'savings_goal_card.dart';
+import 'package:go_router/go_router.dart';
 
 class SavingsGoalsScreen extends StatefulWidget {
   final String? selectedGoalId;
@@ -56,11 +56,7 @@ class _SavingsGoalsScreenState extends State<SavingsGoalsScreen>
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const AddEditGoalScreen(),
-                ),
-              );
+              context.push('/savings-goals/add');
             },
           ),
         ],

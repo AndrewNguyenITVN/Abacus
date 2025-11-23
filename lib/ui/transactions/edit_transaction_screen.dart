@@ -8,6 +8,7 @@ import '/ui/categories/categories_manager.dart';
 import '/ui/transactions/transactions_manager.dart';
 import '../shared/app_helpers.dart';
 import 'transaction_form.dart';
+import 'package:go_router/go_router.dart';
 
 class EditTransactionScreen extends StatefulWidget {
   final Transaction transaction;
@@ -99,7 +100,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
             ),
           );
 
-          Navigator.of(context).pop();
+          //Navigator.of(context).pop();
+          context.pop();
         }
       } catch (e) {
         if (mounted) {
@@ -125,7 +127,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              //onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(),
               child: const Text('Hủy'),
             ),
             ElevatedButton(
@@ -136,8 +139,10 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                   await transactionsManager.deleteTransaction(widget.transaction.id);
                   
                   if (mounted) {
-                    Navigator.of(context).pop(); // Close dialog
-                    Navigator.of(context).pop(); // Return to transactions screen
+                    //Navigator.of(context).pop(); // Close dialog
+                    context.pop();
+                    //Navigator.of(context).pop(); // Return to transactions screen
+                    context.pop();
                     
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Đã xóa giao dịch')),
@@ -145,7 +150,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
                   }
                 } catch (e) {
                   if (mounted) {
-                    Navigator.of(context).pop(); // Close dialog
+                    //Navigator.of(context).pop(); // Close dialog
+                    context.pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Lỗi: $e')),
                     );

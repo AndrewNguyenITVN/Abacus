@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/my_category.dart';
 import '/ui/categories/categories_manager.dart';
-import '/ui/categories/edit_category_screen.dart';
 import 'category_item.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
@@ -30,11 +30,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
   Future<void> _addCategory() async {
     final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
     final type = _tabController.index == 0 ? 'expense' : 'income';
-    final result = await Navigator.push<MyCategory>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditCategoryScreen(type: type),
-      ),
+    final result = await context.push<MyCategory>(
+      '/categories/add?type=$type',
     );
 
     if (result != null && mounted) {
@@ -63,14 +60,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> with SingleTickerPr
 
   Future<void> _editCategory(MyCategory category) async {
     final categoriesManager = Provider.of<CategoriesManager>(context, listen: false);
-    final result = await Navigator.push<MyCategory>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditCategoryScreen(
-          category: category,
-          type: category.type,
-        ),
-      ),
+    final result = await context.push<MyCategory>(
+      '/categories/edit/${category.id}',
     );
 
     if (result != null && mounted) {

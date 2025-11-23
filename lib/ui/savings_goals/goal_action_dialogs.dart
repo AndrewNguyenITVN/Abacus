@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import '/models/savings_goal.dart';
 import '../shared/app_helpers.dart';
 import 'savings_goals_manager.dart';
-import 'add_edit_goal_screen.dart';
 import 'quick_amount_selector.dart';
+import 'package:go_router/go_router.dart';
 
 // --- Update Progress Dialog ---
 
@@ -190,15 +190,17 @@ void showGoalDetailDialog(BuildContext context, SavingsGoal goal) {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          //onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
           child: Text('Đóng', style: TextStyle(color: colorScheme.onSurface.withOpacity(0.6))),
         ),
         ElevatedButton(
           onPressed: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => AddEditGoalScreen(goal: goal)),
-            );
+            // Navigator.of(context).pop();
+            // Navigator.of(context).push(
+            //   MaterialPageRoute(builder: (context) => AddEditGoalScreen(goal: goal)),
+            // );
+            context.push('/savings-goals/edit/${goal.id}');
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: colorScheme.primary,
