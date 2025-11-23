@@ -249,9 +249,15 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp.router(
             title: 'Abacus',
             debugShowCheckedModeBanner: false,
-            theme: themeManager.getThemeData(Brightness.light),
-            darkTheme: themeManager.getThemeData(Brightness.dark),
-            themeMode: themeManager.themeMode, 
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: themeManager.colorSelected.color, brightness: Brightness.light),
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: themeManager.colorSelected.color, brightness: Brightness.dark),
+              useMaterial3: true,
+            ),
+            themeMode: themeManager.themeMode,
             routerConfig: _router,
           );
         },
