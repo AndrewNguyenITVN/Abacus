@@ -37,7 +37,7 @@ The application provides a comprehensive solution for managing personal finances
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/25-26Sem1-Courses/ct312hm01-project-AndrewNguyenITVN.git
+git clone https://github.com/AndrewNguyenITVN/Abacus.git
 cd abacus
 ```
 
