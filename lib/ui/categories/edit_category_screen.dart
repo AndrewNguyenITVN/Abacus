@@ -42,6 +42,7 @@ class _EditCategoryScreenState extends State<EditCategoryScreen> {
   void _saveCategory() {
     if (_formKey.currentState!.validate()) {
       final category = MyCategory(
+        userId: widget.category?.userId ?? '',
         id: widget.category?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
         name: _nameController.text.trim(),
         icon: _selectedIcon,
