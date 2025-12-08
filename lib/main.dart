@@ -238,7 +238,13 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: widget.notificationsManager),
         ChangeNotifierProvider.value(value: _themeManager), 
         ChangeNotifierProvider(create: (context) => AccountManager()),
-        ChangeNotifierProvider(create: (context) => CategoriesManager()),
+        ChangeNotifierProxyProvider<AuthManager, CategoriesManager>(
+          create: (context) => CategoriesManager(),
+          update: (context, authManager, categoriesManager) {
+            categoriesManager!.update(authManager.user);
+            return categoriesManager;
+          },
+        ),
         ChangeNotifierProvider(create: (context) => TransactionsManager()),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],

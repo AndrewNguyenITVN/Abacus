@@ -1,5 +1,6 @@
 class MyCategory {
   final String id;
+  final String userId; 
   final String name;
   final String icon;
   final String color;
@@ -8,6 +9,7 @@ class MyCategory {
 
   MyCategory({
     required this.id,
+    required this.userId, 
     required this.name,
     required this.icon,
     required this.color,
@@ -18,6 +20,7 @@ class MyCategory {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'user_id': userId, 
       'name': name,
       'icon': icon,
       'color': color,
@@ -29,6 +32,7 @@ class MyCategory {
   factory MyCategory.fromMap(Map<String, dynamic> map) {
     return MyCategory(
       id: map['id'] as String,
+      userId: (map['user_id'] as String?) ?? '', 
       name: map['name'] as String,
       icon: map['icon'] as String,
       color: map['color'] as String,
@@ -39,6 +43,7 @@ class MyCategory {
 
   MyCategory copyWith({
     String? id,
+    String? userId, 
     String? name,
     String? icon,
     String? color,
@@ -47,6 +52,7 @@ class MyCategory {
   }) {
     return MyCategory(
       id: id ?? this.id,
+      userId: userId ?? this.userId, 
       name: name ?? this.name,
       icon: icon ?? this.icon,
       color: color ?? this.color,

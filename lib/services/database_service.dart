@@ -20,6 +20,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE categories(
             id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL, 
             name TEXT NOT NULL,
             icon TEXT NOT NULL,
             color TEXT NOT NULL,
