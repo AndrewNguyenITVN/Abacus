@@ -33,6 +33,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE transactions(
             id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
             amount REAL NOT NULL,
             description TEXT NOT NULL,
             date TEXT NOT NULL,
