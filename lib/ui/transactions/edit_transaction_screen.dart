@@ -81,6 +81,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
 
       final updatedTransaction = Transaction(
         id: widget.transaction.id,
+        userId: widget.transaction.userId,
         amount: amount,
         description: description,
         date: widget.transaction.date,

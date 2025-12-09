@@ -245,7 +245,13 @@ class _MyAppState extends State<MyApp> {
             return categoriesManager;
           },
         ),
-        ChangeNotifierProvider(create: (context) => TransactionsManager()),
+        ChangeNotifierProxyProvider<AuthManager, TransactionsManager>(
+          create: (context) => TransactionsManager(),
+          update: (context, authManager, transactionsManager) {
+            transactionsManager!.update(authManager.user);
+            return transactionsManager;
+          },
+        ),
         ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
       ],
       child: Consumer<ThemeManager>(

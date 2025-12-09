@@ -58,6 +58,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
       final newTransaction = Transaction(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: '', // Placeholder, Manager will set correct userId
         amount: amount,
         description: description,
         date: DateTime.now(),
