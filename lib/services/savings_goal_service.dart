@@ -63,11 +63,13 @@ class SavingsGoalService {
     );
   }
 
-  // Get all savings goals
-  Future<List<SavingsGoal>> getGoals() async {
+  // Get all savings goals for a specific user
+  Future<List<SavingsGoal>> getGoals(String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'savings_goals',
+      where: 'user_id = ?',
+      whereArgs: [userId],
       orderBy: 'updated_at DESC',
     );
 
@@ -77,14 +79,14 @@ class SavingsGoalService {
   }
 
   // Get active goals (not completed)
-  Future<List<SavingsGoal>> getActiveGoals() async {
-    final goals = await getGoals();
+  Future<List<SavingsGoal>> getActiveGoals(String userId) async {
+    final goals = await getGoals(userId);
     return goals.where((g) => !g.isCompleted).toList();
   }
 
   // Get completed goals
-  Future<List<SavingsGoal>> getCompletedGoals() async {
-    final goals = await getGoals();
+  Future<List<SavingsGoal>> getCompletedGoals(String userId) async {
+    final goals = await getGoals(userId);
     return goals.where((g) => g.isCompleted).toList();
   }
 
@@ -101,10 +103,14 @@ class SavingsGoalService {
     return SavingsGoal.fromMap(maps.first);
   }
 
-  // Clear all savings goals
-  Future<void> clearGoals() async {
+  // Clear all savings goals for a specific user
+  Future<void> clearGoals(String userId) async {
     final db = await database;
-    await db.delete('savings_goals');
+    await db.delete(
+      'savings_goals',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
   }
 
   /// Format currency helper

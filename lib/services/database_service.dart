@@ -47,6 +47,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE savings_goals(
             id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
             target_amount REAL NOT NULL,
