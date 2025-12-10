@@ -237,10 +237,34 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider.value(value: _authManager),
         ChangeNotifierProvider.value(value: widget.notificationsManager),
         ChangeNotifierProvider.value(value: _themeManager), 
-        ChangeNotifierProvider(create: (context) => AccountManager()),
-        ChangeNotifierProvider(create: (context) => CategoriesManager()),
-        ChangeNotifierProvider(create: (context) => TransactionsManager()),
-        ChangeNotifierProvider(create: (context) => SavingsGoalsManager()),
+        ChangeNotifierProxyProvider<AuthManager, AccountManager>(
+          create: (context) => AccountManager(),
+          update: (context, authManager, accountManager) {
+            accountManager!.update(authManager.user);
+            return accountManager;
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthManager, CategoriesManager>(
+          create: (context) => CategoriesManager(),
+          update: (context, authManager, categoriesManager) {
+            categoriesManager!.update(authManager.user);
+            return categoriesManager;
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthManager, TransactionsManager>(
+          create: (context) => TransactionsManager(),
+          update: (context, authManager, transactionsManager) {
+            transactionsManager!.update(authManager.user);
+            return transactionsManager;
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthManager, SavingsGoalsManager>(
+          create: (context) => SavingsGoalsManager(),
+          update: (context, authManager, savingsGoalsManager) {
+            savingsGoalsManager!.update(authManager.user);
+            return savingsGoalsManager;
+          },
+        ),
       ],
       child: Consumer<ThemeManager>(
         builder: (context, themeManager, child) {

@@ -22,7 +22,7 @@ class TransactionService {
     );
 
     // Check spending after adding any transaction (income or expense affects %)
-    await _checkMonthlySpending();
+    await _checkMonthlySpending(transaction.userId);
   }
 
   // Update transaction
@@ -36,11 +36,11 @@ class TransactionService {
     );
     
     // Check spending after updating transaction
-    await _checkMonthlySpending();
+    await _checkMonthlySpending(transaction.userId);
   }
 
   // Delete transaction
-  Future<void> deleteTransaction(String transactionId) async {
+  Future<void> deleteTransaction(String transactionId, String userId) async {
     final db = await database;
     await db.delete(
       'transactions',
@@ -49,14 +49,16 @@ class TransactionService {
     );
     
     // Check spending after deleting transaction
-    await _checkMonthlySpending();
+    await _checkMonthlySpending(userId);
   }
 
-  // Get all transactions
-  Future<List<app_transaction.Transaction>> getTransactions() async {
+  // Get all transactions for a specific user
+  Future<List<app_transaction.Transaction>> getTransactions(String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'transactions',
+      where: 'user_id = ?',
+      whereArgs: [userId],
       orderBy: 'date DESC',
     );
 
@@ -65,13 +67,13 @@ class TransactionService {
     });
   }
 
-  // Get transactions by type
-  Future<List<app_transaction.Transaction>> getTransactionsByType(String type) async {
+  // Get transactions by type for a specific user
+  Future<List<app_transaction.Transaction>> getTransactionsByType(String type, String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'transactions',
-      where: 'type = ?',
-      whereArgs: [type],
+      where: 'type = ? AND user_id = ?',
+      whereArgs: [type, userId],
       orderBy: 'date DESC',
     );
 
@@ -80,18 +82,20 @@ class TransactionService {
     });
   }
 
-  // Get transactions by date range
+  // Get transactions by date range for a specific user
   Future<List<app_transaction.Transaction>> getTransactionsByDateRange(
     DateTime startDate,
     DateTime endDate,
+    String userId,
   ) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'transactions',
-      where: 'date >= ? AND date <= ?',
+      where: 'date >= ? AND date <= ? AND user_id = ?',
       whereArgs: [
         startDate.toIso8601String(),
         endDate.toIso8601String(),
+        userId,
       ],
       orderBy: 'date DESC',
     );
@@ -101,19 +105,23 @@ class TransactionService {
     });
   }
 
-  // Clear all transactions
-  Future<void> clearTransactions() async {
+  // Clear all transactions for a specific user
+  Future<void> clearTransactions(String userId) async {
     final db = await database;
-    await db.delete('transactions');
+    await db.delete(
+      'transactions',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
   }
 
-  // Get monthly income and expenses
-  Future<Map<String, double>> getMonthlyTotals() async {
+  // Get monthly income and expenses for a specific user
+  Future<Map<String, double>> getMonthlyTotals(String userId) async {
     final now = DateTime.now();
     final startOfMonth = DateTime(now.year, now.month, 1);
     final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59);
 
-    final transactions = await getTransactionsByDateRange(startOfMonth, endOfMonth);
+    final transactions = await getTransactionsByDateRange(startOfMonth, endOfMonth, userId);
 
     double totalIncome = 0;
     double totalExpense = 0;
@@ -133,11 +141,13 @@ class TransactionService {
   }
 
   // Check monthly spending and send notification if needed
-  Future<void> _checkMonthlySpending() async {
+  Future<void> _checkMonthlySpending(String? userId) async {
+    if (userId == null) return;
+    
     // Check if notifications enabled
     if (!await _notificationService.isEnabled()) return;
 
-    final totals = await getMonthlyTotals();
+    final totals = await getMonthlyTotals(userId);
     final monthlyIncome = totals['income'] ?? 0;
     final monthlyExpense = totals['expense'] ?? 0;
 

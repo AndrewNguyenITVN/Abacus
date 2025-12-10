@@ -1,15 +1,30 @@
 import 'package:flutter/foundation.dart';
-import '/models/transaction.dart';
-import '/services/transaction_service.dart';
+import '../../models/transaction.dart';
+import '../../models/account.dart';
+import '../../services/transaction_service.dart';
 
 class TransactionsManager extends ChangeNotifier {
   final TransactionService _transactionService = TransactionService();
 
   List<Transaction> _transactions = [];
   bool _isLoaded = false;
+  String? _userId;
 
-  TransactionsManager() {
-    _loadTransactions();
+  TransactionsManager();
+
+  void update(Account? user) {
+    if (user == null) {
+      _userId = null;
+      _transactions = [];
+      _isLoaded = false;
+      notifyListeners();
+      return;
+    }
+
+    if (_userId != user.id || !_isLoaded) {
+      _userId = user.id;
+      _loadTransactions();
+    }
   }
 
   List<Transaction> get transactions {
@@ -92,8 +107,10 @@ class TransactionsManager extends ChangeNotifier {
 
   // Load transactions từ SQLite
   Future<void> _loadTransactions() async {
+    if (_userId == null) return;
+
     try {
-      _transactions = await _transactionService.getTransactions();
+      _transactions = await _transactionService.getTransactions(_userId!);
       _isLoaded = true;
       notifyListeners();
     } catch (e) {
@@ -105,9 +122,12 @@ class TransactionsManager extends ChangeNotifier {
 
   // Thêm transaction mới
   Future<void> addTransaction(Transaction transaction) async {
+    if (_userId == null) return;
+
     try {
-      await _transactionService.insertTransaction(transaction);
-      _transactions.add(transaction);
+      final transactionWithUserId = transaction.copyWith(userId: _userId);
+      await _transactionService.insertTransaction(transactionWithUserId);
+      _transactions.add(transactionWithUserId);
       notifyListeners();
     } catch (e) {
       print('Error adding transaction: $e');
@@ -117,11 +137,14 @@ class TransactionsManager extends ChangeNotifier {
 
   // Cập nhật transaction
   Future<void> updateTransaction(Transaction transaction) async {
+    if (_userId == null) return;
+
     try {
-      await _transactionService.updateTransaction(transaction);
-      final index = _transactions.indexWhere((t) => t.id == transaction.id);
+      final transactionWithUserId = transaction.copyWith(userId: _userId);
+      await _transactionService.updateTransaction(transactionWithUserId);
+      final index = _transactions.indexWhere((t) => t.id == transactionWithUserId.id);
       if (index != -1) {
-        _transactions[index] = transaction;
+        _transactions[index] = transactionWithUserId;
         notifyListeners();
       }
     } catch (e) {
@@ -132,8 +155,10 @@ class TransactionsManager extends ChangeNotifier {
 
   // Xóa transaction
   Future<void> deleteTransaction(String id) async {
+    if (_userId == null) return;
+
     try {
-      await _transactionService.deleteTransaction(id);
+      await _transactionService.deleteTransaction(id, _userId!);
       _transactions.removeWhere((t) => t.id == id);
       notifyListeners();
     } catch (e) {

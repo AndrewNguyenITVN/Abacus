@@ -40,23 +40,13 @@ class CategoryService {
     );
   }
 
-  // Get all categories
-  Future<List<MyCategory>> getCategories() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('categories');
-
-    return List.generate(maps.length, (i) {
-      return MyCategory.fromMap(maps[i]);
-    });
-  }
-
-  // Get expense categories
-  Future<List<MyCategory>> getExpenseCategories() async {
+  // Get all categories for a specific user
+  Future<List<MyCategory>> getCategories(String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'categories',
-      where: 'type = ?',
-      whereArgs: ['expense'],
+      where: 'user_id = ?',
+      whereArgs: [userId],
     );
 
     return List.generate(maps.length, (i) {
@@ -64,13 +54,27 @@ class CategoryService {
     });
   }
 
-  // Get income categories
-  Future<List<MyCategory>> getIncomeCategories() async {
+  // Get expense categories for a specific user
+  Future<List<MyCategory>> getExpenseCategories(String userId) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       'categories',
-      where: 'type = ?',
-      whereArgs: ['income'],
+      where: 'type = ? AND user_id = ?',
+      whereArgs: ['expense', userId],
+    );
+
+    return List.generate(maps.length, (i) {
+      return MyCategory.fromMap(maps[i]);
+    });
+  }
+
+  // Get income categories for a specific user
+  Future<List<MyCategory>> getIncomeCategories(String userId) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'categories',
+      where: 'type = ? AND user_id = ?',
+      whereArgs: ['income', userId],
     );
 
     return List.generate(maps.length, (i) {

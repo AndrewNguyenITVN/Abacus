@@ -20,6 +20,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE categories(
             id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL, 
             name TEXT NOT NULL,
             icon TEXT NOT NULL,
             color TEXT NOT NULL,
@@ -32,6 +33,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE transactions(
             id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
             amount REAL NOT NULL,
             description TEXT NOT NULL,
             date TEXT NOT NULL,
@@ -45,6 +47,7 @@ class DatabaseService {
         await db.execute('''
           CREATE TABLE savings_goals(
             id TEXT PRIMARY KEY,
+            user_id TEXT NOT NULL,
             name TEXT NOT NULL,
             description TEXT,
             target_amount REAL NOT NULL,

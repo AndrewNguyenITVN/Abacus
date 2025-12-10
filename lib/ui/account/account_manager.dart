@@ -5,27 +5,19 @@ import '../../services/auth_service.dart';
 class AccountManager with ChangeNotifier {
   Account? _account;
   final AuthService _authService = AuthService();
-  bool _isLoading = true;
+  bool _isLoading = false;
 
   Account? get account => _account;
   bool get isLoading => _isLoading;
 
-  AccountManager() {
-    loadAccount();
-  }
+  AccountManager();
 
-  Future<void> loadAccount() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      _account = await _authService.getUserFromStore();
-    } catch (e) {
-      print('Error loading account: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+  void update(Account? account) {
+    _account = account;
+    // notifyListeners(); // update được gọi khi build, tránh notify khi đang build nếu không cần thiết
+    // Tuy nhiên ProxyProvider update callback được gọi ngay khi dependency change.
+    // Việc gán _account là đủ nếu consumer rebuild.
+    // Nhưng nếu logic khác cần trigger thì notify.
   }
 
   Future<void> updateAccount(Account newAccount) async {
@@ -50,7 +42,6 @@ class AccountManager with ChangeNotifier {
       _account = updatedAccount;
     } catch (e) {
       print('Error updating account: $e');
-      // Revert or show error? For now just print
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -1,23 +1,39 @@
 import 'package:flutter/foundation.dart';
-import '/models/savings_goal.dart';
-import '/services/savings_goal_service.dart';
+import '../../models/savings_goal.dart';
+import '../../models/account.dart';
+import '../../services/savings_goal_service.dart';
 
 class SavingsGoalsManager extends ChangeNotifier {
   final SavingsGoalService _goalService = SavingsGoalService();
   
   List<SavingsGoal> _goals = [];
   bool _isLoaded = false;
+  String? _userId;
 
-  SavingsGoalsManager() {
-    _loadGoals();
+  SavingsGoalsManager();
+
+  void update(Account? user) {
+    if (user == null) {
+      _userId = null;
+      _goals = [];
+      _isLoaded = false;
+      notifyListeners();
+      return;
+    }
+
+    if (_userId != user.id || !_isLoaded) {
+      _userId = user.id;
+      _loadGoals();
+    }
   }
 
   bool get isLoaded => _isLoaded;
 
   // Load goals từ SQLite
   Future<void> _loadGoals() async {
+    if (_userId == null) return;
     try {
-      _goals = await _goalService.getGoals();
+      _goals = await _goalService.getGoals(_userId!);
       _isLoaded = true;
       notifyListeners();
     } catch (e) {
@@ -63,9 +79,11 @@ class SavingsGoalsManager extends ChangeNotifier {
 
   // Add new goal
   Future<void> addGoal(SavingsGoal goal) async {
+    if (_userId == null) return;
     try {
-      await _goalService.insertGoal(goal);
-      _goals.add(goal);
+      final goalWithUserId = goal.copyWith(userId: _userId);
+      await _goalService.insertGoal(goalWithUserId);
+      _goals.add(goalWithUserId);
       notifyListeners();
     } catch (error) {
       print('Error adding goal: $error');
@@ -75,8 +93,12 @@ class SavingsGoalsManager extends ChangeNotifier {
 
   // Update goal
   Future<void> updateGoal(SavingsGoal updatedGoal) async {
+    if (_userId == null) return;
     try {
-      final goalWithTimestamp = updatedGoal.copyWith(updatedAt: DateTime.now());
+      final goalWithTimestamp = updatedGoal.copyWith(
+        userId: _userId,
+        updatedAt: DateTime.now(),
+      );
       await _goalService.updateGoal(goalWithTimestamp);
       
       final index = _goals.indexWhere((g) => g.id == updatedGoal.id);

@@ -487,6 +487,7 @@ class _AddEditGoalScreenState extends State<AddEditGoalScreen> {
       } else {
         final newGoal = SavingsGoal(
           id: 'g${DateTime.now().millisecondsSinceEpoch}',
+          userId: '', // Placeholder, Manager will set correct userId
           name: _nameController.text,
           description: _descriptionController.text.isEmpty ? null : _descriptionController.text,
           targetAmount: targetAmount,
