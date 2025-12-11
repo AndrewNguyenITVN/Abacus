@@ -48,12 +48,23 @@ class _MyAppState extends State<MyApp> {
   late final ThemeManager _themeManager;
   late final AuthManager _authManager;
   late final GoRouter _router;
+  String? _lastUserId;
 
   @override
   void initState() {
     super.initState();
     _themeManager = ThemeManager();
     _authManager = AuthManager();
+    _lastUserId = _authManager.user?.id;
+
+    _authManager.addListener(() {
+      final currentUserId = _authManager.user?.id;
+      if (currentUserId != _lastUserId) {
+        // User changed (login/logout) -> Clear notifications
+        widget.notificationsManager.clearAll();
+        _lastUserId = currentUserId;
+      }
+    });
 
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
