@@ -19,6 +19,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   TransactionType _selectedType = TransactionType.expense;
   late List<MyCategory> _categories;
   String? _selectedCategoryId;
+  String? _imagePath;
 
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
@@ -64,6 +65,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         date: DateTime.now(),
         categoryId: categoryId,
         type: type,
+        imagePath: _imagePath,
       );
 
       try {
@@ -143,6 +145,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
             descriptionController: _descriptionController,
             actionButtonText: 'Lưu giao dịch',
             onActionTap: _saveTransaction,
+            imagePath: _imagePath,
+            onImageChanged: (path) => setState(() => _imagePath = path),
           ),
         ),
       ),

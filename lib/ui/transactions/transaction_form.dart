@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '/models/transaction_type.dart';
 import '/models/my_category.dart';
 import '../savings_goals/quick_amount_selector.dart';
@@ -18,6 +20,8 @@ class TransactionForm extends StatelessWidget {
   final VoidCallback onActionTap;
   final bool isDelete;
   final VoidCallback? onDeleteTap;
+  final String? imagePath;
+  final ValueChanged<String?> onImageChanged;
 
   const TransactionForm({
     super.key,
@@ -33,6 +37,8 @@ class TransactionForm extends StatelessWidget {
     required this.onActionTap,
     this.isDelete = false,
     this.onDeleteTap,
+    this.imagePath,
+    required this.onImageChanged,
   });
 
   @override
@@ -51,11 +57,163 @@ class TransactionForm extends StatelessWidget {
         _buildCategorySelector(context),
         const SizedBox(height: 20),
         _buildDescriptionInput(context),
+        const SizedBox(height: 20),
+        _buildImagePicker(context),
         const SizedBox(height: 32),
         _buildActionButton(context),
         const SizedBox(height: 20),
       ],
     );
+  }
+
+  // --- Image Picker ---
+  Widget _buildImagePicker(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: -4,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blueGrey.shade400,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Hình ảnh',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: colorScheme.onSurface,
+                    ),
+                  ),
+                ],
+              ),
+              if (imagePath != null)
+                IconButton(
+                  onPressed: () => onImageChanged(null),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          if (imagePath != null)
+            GestureDetector(
+              onTap: () => _showFullScreenImage(context, imagePath!),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.file(
+                  File(imagePath!),
+                  height: 300,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            )
+          else
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _pickImage(ImageSource.camera),
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('Chụp ảnh'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => _pickImage(ImageSource.gallery),
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Thư viện'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  void _showFullScreenImage(BuildContext context, String path) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.white,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            InteractiveViewer(
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: Image.file(
+                File(path),
+                fit: BoxFit.contain,
+              ),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.of(context).pop(),
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.black45,
+                  padding: const EdgeInsets.all(8),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null) {
+      onImageChanged(pickedFile.path);
+    }
   }
 
   // --- Type Selector ---
@@ -66,7 +224,7 @@ class TransactionForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer ?? colorScheme.surface,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -157,7 +315,7 @@ class TransactionForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer ?? colorScheme.surface,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -247,7 +405,7 @@ class TransactionForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer ?? colorScheme.surface,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -354,7 +512,7 @@ class TransactionForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainer ?? colorScheme.surface,
+        color: colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

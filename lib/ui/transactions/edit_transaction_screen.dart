@@ -23,6 +23,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
   late TransactionType _selectedType;
   late List<MyCategory> _categories;
   String? _selectedCategoryId;
+  String? _imagePath;
 
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
@@ -38,6 +39,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         : TransactionType.expense;
     
     _selectedCategoryId = widget.transaction.categoryId;
+    _imagePath = widget.transaction.imagePath;
     
     // Format amount for display
     final formatter = NumberFormat.decimalPattern('vi_VN');
@@ -88,6 +90,7 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
         categoryId: categoryId,
         type: type,
         note: widget.transaction.note,
+        imagePath: _imagePath,
       );
 
       try {
@@ -214,6 +217,8 @@ class _EditTransactionScreenState extends State<EditTransactionScreen> {
             descriptionController: _descriptionController,
             actionButtonText: 'Cập nhật giao dịch',
             onActionTap: _saveTransaction,
+            imagePath: _imagePath,
+            onImageChanged: (path) => setState(() => _imagePath = path),
           ),
         ),
       ),
