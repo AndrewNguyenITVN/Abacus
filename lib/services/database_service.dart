@@ -39,7 +39,8 @@ class DatabaseService {
             date TEXT NOT NULL,
             category_id TEXT NOT NULL,
             type TEXT NOT NULL,
-            note TEXT
+            note TEXT,
+            image_path TEXT
           )
         ''');
 

@@ -7,6 +7,7 @@ class Transaction {
   final String categoryId;
   final String type;
   final String? note;
+  final String? imagePath;
 
   Transaction({
     required this.id,
@@ -17,6 +18,7 @@ class Transaction {
     required this.categoryId,
     required this.type,
     this.note,
+    this.imagePath,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,6 +31,7 @@ class Transaction {
       'category_id': categoryId,
       'type': type,
       'note': note,
+      'image_path': imagePath,
     };
   }
 
@@ -42,6 +45,7 @@ class Transaction {
       categoryId: map['category_id'] as String,
       type: map['type'] as String,
       note: map['note'] as String?,
+      imagePath: map['image_path'] as String?,
     );
   }
 
@@ -54,6 +58,7 @@ class Transaction {
     String? categoryId,
     String? type,
     String? note,
+    String? imagePath,
   }) {
     return Transaction(
       id: id ?? this.id,
@@ -64,6 +69,7 @@ class Transaction {
       categoryId: categoryId ?? this.categoryId,
       type: type ?? this.type,
       note: note ?? this.note,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 }
