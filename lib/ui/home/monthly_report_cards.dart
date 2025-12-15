@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 enum ReportType { expense, income }
 
@@ -112,7 +113,10 @@ class MonthlyReportCard extends StatelessWidget {
                 ),
               ),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  final typeStr = reportType == ReportType.expense ? 'expense' : 'income';
+                  context.push('/report-detail?type=$typeStr');
+                },
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   minimumSize: const Size(0, 30),
