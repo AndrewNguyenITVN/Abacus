@@ -19,6 +19,7 @@ export 'transactions/transactions_screen.dart';
 export 'transactions/add_transaction_screen.dart';
 // Home
 export 'home/home_screen.dart';
+export 'home/detailed_report_screen.dart';
 // Shared
 export 'shared/app_drawer.dart';
 export 'shared/dialog_utils.dart';

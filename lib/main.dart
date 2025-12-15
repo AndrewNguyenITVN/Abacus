@@ -236,6 +236,16 @@ class _MyAppState extends State<MyApp> {
             child: const AddTransactionScreen(),
           ),
         ),
+
+        // Route cho Report Detail
+        GoRoute(
+          parentNavigatorKey: _rootNavigatorKey,
+          path: '/report-detail',
+          builder: (context, state) {
+             final type = state.uri.queryParameters['type'] ?? 'expense';
+             return DetailedReportScreen(type: type);
+          },
+        ),
       ],
     );
   }
