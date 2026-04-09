@@ -1,8 +1,14 @@
-# 📱 CT312H: MOBILE PROGRAMMING
+# CT312H: MOBILE PROGRAMMING
 
 ## Project Description
 
 **Abacus** is a mobile spending management application built with Flutter. The system allows users to seamlessly track personal and group expenditures. Key features include user authentication, an interactive dashboard with financial summaries, transaction management, budget planning, and insightful reports with charts.
+
+---
+
+## Demo
+
+[Watch Demo on YouTube](https://youtu.be/wzkd5Z7rRwo)
 
 The application provides a comprehensive solution for managing personal finances with features such as:
 - Real-time transaction tracking (Income/Expense)
@@ -108,13 +114,13 @@ flutter run
 
 ## Features
 
-### 1. 🔐 Authentication
+### 1.  Authentication
 - User registration and login
 - Secure session management with automatic token refresh
 - Persistent login state
 - Profile management with user information
 
-### 2. 🏠 Home Dashboard
+### 2.  Home Dashboard
 - Current balance display
 - Total income and expense summary
 - Spending ratio analysis with progress indicators
@@ -122,7 +128,7 @@ flutter run
 - Recent transactions list
 - Savings goals overview
 
-### 3. 💰 Transaction Management
+### 3.  Transaction Management
 - Add, edit, and delete transactions
 - Income and expense classification
 - Category assignment with visual icons
@@ -131,13 +137,13 @@ flutter run
 - Monthly transaction summaries
 - Responsive layout (portrait/landscape)
 
-### 4. 📂 Category Management
+### 4.  Category Management
 - Custom expense and income categories
 - Icon and color customization
 - Default categories initialization
 - Category-based transaction filtering
 
-### 5. 🎯 Savings Goals
+### 5.  Savings Goals
 - Create and track financial goals
 - Progress visualization with progress bars
 - Add/withdraw funds from goals
@@ -145,21 +151,21 @@ flutter run
 - Completion notifications
 - Summary on home screen
 
-### 6. 🔔 Notifications & Alerts
+### 6.  Notifications & Alerts
 - Spending threshold alerts (customizable percentage)
 - Savings goal completion notifications
 - Notification history management
 - Mark as read / delete notifications
 - Settings for enabling/disabling alerts
 
-### 7. 👤 Account Management
+### 7.  Account Management
 - View and edit user profile
 - Update personal information (name, phone, address, date of birth, gender)
 - Theme settings (Dark/Light mode)
 - Notification preferences
 - Logout functionality
 
-### 8. 🎨 UI/UX Features
+### 8.  UI/UX Features
 - Responsive design (Portrait & Landscape)
 - Smooth animations and transitions
 - Dark/Light theme support
