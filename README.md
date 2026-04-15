@@ -108,7 +108,6 @@ flutter run
 
 ### Platform Support
 - **Android:** Full support
-- **iOS:** Full support
 
 ---
 
